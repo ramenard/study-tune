@@ -10,6 +10,7 @@ async function bootstrap() {
     .setTitle('Chat API')
     .setDescription('API NestJS avec Hugging Face')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   app.useGlobalPipes(new ValidationPipe({whitelist: true}))

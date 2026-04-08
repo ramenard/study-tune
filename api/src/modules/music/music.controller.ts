@@ -1,7 +1,12 @@
-import { Body, Controller, Get, Param, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, HttpCode, HttpStatus, UseGuards} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { MusicService } from './music.service';
 import { CreateMusicDto } from './dto/create-music.dto';
+import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
+@ApiTags('music')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('music')
 export class MusicController {
   constructor(private readonly musicService: MusicService) {}
@@ -12,7 +17,6 @@ export class MusicController {
     return this.musicService.generateAndStore(dto);
   }
 
-  // 👇 kie.ai appelle cette route quand la musique est prête
   @Post('webhook/kie')
   @HttpCode(HttpStatus.OK)
   async kieWebhook(@Body() payload: any) {
