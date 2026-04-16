@@ -27,22 +27,22 @@ export class StorageService {
     }
   }
 
-  async downloadAndStore(audioUrl: string, trackId: string): Promise<string> {
+  async downloadAndStore(audioUrl: string, userId: string, musicId: string): Promise<string> {
     this.logger.log(`Downloading audio from: ${audioUrl}`);
 
     const response = await firstValueFrom(
       this.http.get(audioUrl, {
         responseType: 'stream',
-        timeout: 60000, // 60s pour les gros fichiers
+        timeout: 60000,
         headers: {
-          'User-Agent': 'Mozilla/5.0', // certains CDN bloquent sans User-Agent
+          'User-Agent': 'Mozilla/5.0',
         },
       }),
     );
 
     const stream = response.data as Readable;
     const contentLength = response.headers['content-length'];
-    const objectName = `tracks/${trackId}.mp3`;
+    const objectName = `tracks/${userId}_${musicId}.mp3`;
 
     await this.client.putObject(
       this.bucket,

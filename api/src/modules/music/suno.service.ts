@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -64,7 +64,18 @@ export class SunoService {
 
     if (!taskId) {
       this.logger.error(`No taskId in response: ${JSON.stringify(data)}`);
-      throw new Error(`Kie.ai returned no taskId. Full response: ${JSON.stringify(data)}`);
+
+      if (data?.code === 402) {
+        throw new HttpException(
+          { statusCode: 402, error: 'INSUFFICIENT_CREDITS', message: data.msg },
+          HttpStatus.PAYMENT_REQUIRED,
+        );
+      }
+
+      throw new HttpException(
+        { statusCode: 502, error: 'KIE_NO_TASK_ID', message: data?.msg ?? 'Kie.ai returned no taskId' },
+        HttpStatus.BAD_GATEWAY,
+      );
     }
     this.logger.log(`Generation started, taskId: ${taskId}`);
     return taskId;
@@ -93,7 +104,6 @@ export class SunoService {
         `Waiting... ${pending.length} track(s) still processing (attempt ${attempt + 1}/${maxRetries})`,
       );
 
-      // Si une track est en erreur on arrête tout
       const failed = results.find((t) => t.status === 'error');
       if (failed) {
         throw new Error(`Track ${failed.id} failed during generation`);

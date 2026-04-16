@@ -1,11 +1,9 @@
-import {IsBoolean, IsOptional, IsString, MinLength} from 'class-validator';
-import {Transform} from "class-transformer";
+import { IsBoolean, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateMusicDto {
   @IsString()
   @MinLength(10)
-  @Transform(({value}) => value?.replace(/\n/g, ' '))
-  prompt: string;
+  lyrics: string;
 
   @IsOptional()
   @IsString()

@@ -1,8 +1,9 @@
-import {Body, Controller, Get, Param, Post, HttpCode, HttpStatus, UseGuards} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { MusicService } from './music.service';
 import { CreateMusicDto } from './dto/create-music.dto';
-import {JwtAuthGuard} from "../auth/jwt-auth.guard";
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('music')
 @ApiBearerAuth()
@@ -13,8 +14,8 @@ export class MusicController {
 
   @Post('generate')
   @HttpCode(HttpStatus.ACCEPTED)
-  async generate(@Body() dto: CreateMusicDto) {
-    return this.musicService.generateAndStore(dto);
+  async generate(@Body() dto: CreateMusicDto, @Req() req: Request & { user: { id: string } }) {
+    return this.musicService.generateAndStore(dto, req.user.id);
   }
 
   @Post('webhook/kie')
