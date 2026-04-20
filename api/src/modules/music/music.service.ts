@@ -1,10 +1,11 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SunoService } from './suno.service';
 import { StorageService } from './storage.service';
 import { Music } from './entities/music.entity';
 import { CreateMusicDto } from './dto/create-music.dto';
+import { UpdateMusicDto } from './dto/update-music.dto';
 
 @Injectable()
 export class MusicService {
@@ -97,18 +98,51 @@ export class MusicService {
     }
   }
 
-  async findAll(): Promise<Music[]> {
-    return this.musicRepo.find({ order: { createdAt: 'DESC' } });
+  async findAllByUser(userId: string, page: number, limit: number): Promise<{ data: Music[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.musicRepo.findAndCount({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { data, total, page, limit };
   }
 
-  async findOne(id: string): Promise<Music> {
+  async findOneByUser(id: string, userId: string): Promise<Music> {
     const music = await this.musicRepo.findOneBy({ id });
-    if (!music) throw new NotFoundException(`Music ${id} not found`);
+
+    if (!music) {
+      throw new NotFoundException(`Music ${id} not found`);
+    }
+
+    if (music.userId !== userId) {
+      throw new ForbiddenException();
+    }
+
     return music;
   }
 
-  async getStreamUrl(id: string): Promise<{ url: string }> {
-    const music = await this.findOne(id);
+  async update(id: string, dto: UpdateMusicDto, userId: string): Promise<Music> {
+    const music = await this.findOneByUser(id, userId);
+
+    if (dto.title) {
+      music.title = dto.title;
+    }
+
+    if (dto.style) {
+      music.style = dto.style;
+    }
+
+    if (dto.lyrics) {
+      music.lyrics = dto.lyrics;
+    }
+
+    return this.musicRepo.save(music);
+  }
+
+  async getStreamUrl(id: string, userId: string): Promise<{ url: string }> {
+    const music = await this.findOneByUser(id, userId);
     const url = await this.storage.getPresignedUrl(music.objectName);
     return { url };
   }

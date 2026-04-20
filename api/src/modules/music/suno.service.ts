@@ -135,10 +135,20 @@ export class SunoService {
   }
 
   private mapStatus(raw: string): KieTrack['status'] {
-    const s = raw?.toLowerCase();
-    if (s === 'complete' || s === 'completed' || s === 'success') return 'complete';
-    if (s === 'error' || s === 'failed') return 'error';
-    if (s === 'processing' || s === 'running') return 'processing';
+    const status = raw?.toLowerCase();
+
+    if (['complete', 'completed', 'success'].includes(status)) {
+      return 'complete';
+    }
+
+    if (['error', 'failed'].includes(status)) {
+      return 'error';
+    }
+
+    if (['processing', 'running'].includes(status)) {
+      return 'processing';
+    }
+
     return 'pending';
   }
 

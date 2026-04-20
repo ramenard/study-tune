@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToMany } from 'typeorm';
 import { Music } from '../../music/entities/music.entity';
+import { Playlist } from '../../playlist/entities/playlist.entity';
 
 @Entity('user')
 export class User {
@@ -17,6 +18,12 @@ export class User {
 
   @OneToMany(() => Music, (music) => music.user)
   musics: Music[];
+
+  @OneToMany(() => Playlist, (playlist) => playlist.creator)
+  createdPlaylists: Playlist[];
+
+  @ManyToMany(() => Playlist, (playlist) => playlist.members)
+  sharedPlaylists: Playlist[];
 
   @CreateDateColumn()
   createdAt: Date;

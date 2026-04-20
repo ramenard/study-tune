@@ -4,9 +4,13 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
 import {MusicModule} from "./modules/music/music.module";
 import {DocumentModule} from "./modules/document/document.module";
 import {AuthModule} from "./modules/auth/auth.module";
+import {PlaylistModule} from "./modules/playlist/playlist.module";
+import {FriendshipModule} from "./modules/friendship/friendship.module";
+import {Friendship} from "./modules/friendship/entities/friendship.entity";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Music} from "./modules/music/entities/music.entity";
 import {User} from "./modules/auth/entities/user.entity";
+import {Playlist} from "./modules/playlist/entities/playlist.entity";
 
 @Module({
   imports: [
@@ -14,6 +18,8 @@ import {User} from "./modules/auth/entities/user.entity";
     MusicModule,
     DocumentModule,
     AuthModule,
+    PlaylistModule,
+    FriendshipModule,
     ConfigModule.forRoot({isGlobal: true}),
     TypeOrmModule.forRootAsync({
     imports: [ConfigModule],
@@ -25,7 +31,7 @@ import {User} from "./modules/auth/entities/user.entity";
       username: config.get('DB_USER', 'user'),
       password: config.get('DB_PASSWORD', 'password'),
       database: config.get('DB_NAME', 'musicdb'),
-      entities: [Music, User],
+      entities: [Music, User, Playlist, Friendship],
       synchronize: config.get('NODE_ENV') !== 'production',
     }),
   }),],
