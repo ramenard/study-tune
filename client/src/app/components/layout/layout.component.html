@@ -1,0 +1,44 @@
+<div class="app">
+  <nav class="nav-drawer">
+    <div class="drawer-header">
+      <div class="drawer-logo">
+        <mat-icon>music_note</mat-icon>
+      </div>
+      <span class="drawer-title">Study Tune</span>
+    </div>
+
+    <div class="tokens-widget" routerLink="/tokens">
+      <mat-icon class="tokens-icon">toll</mat-icon>
+      <div class="tokens-info">
+        <span class="tokens-label">Tokens restants</span>
+        <span class="tokens-value">{{ tokens() }}</span>
+      </div>
+    </div>
+
+    <div class="drawer-section">Navigation</div>
+
+    @for (item of navItems; track item.id) {
+      <a class="drawer-item"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: item.route === '/' }">
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+
+    <div class="drawer-spacer"></div>
+
+    <button class="dark-toggle" (click)="toggleDark()">
+      <mat-icon>{{ dark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      <span>{{ dark() ? 'Mode clair' : 'Mode sombre' }}</span>
+    </button>
+  </nav>
+
+  <div class="main-wrap">
+    <main class="main">
+      <router-outlet />
+    </main>
+    <app-player-bar />
+  </div>
+</div>

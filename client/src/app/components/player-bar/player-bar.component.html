@@ -1,0 +1,30 @@
+<div class="player-bar">
+  <div class="track-info">
+    <div class="track-thumb" [style.background]="currentTrack().color">
+      <mat-icon>music_note</mat-icon>
+    </div>
+    <div class="track-meta">
+      <span class="track-title">{{ currentTrack().title }}</span>
+      <span class="track-subject">{{ currentTrack().subject }}</span>
+    </div>
+    <button class="icon-btn">
+      <mat-icon>favorite_border</mat-icon>
+    </button>
+  </div>
+
+  <div class="controls">
+    <button class="icon-btn">
+      <mat-icon>skip_previous</mat-icon>
+    </button>
+    <button class="play-btn" (click)="togglePlay()">
+      <mat-icon>{{ playing() ? 'pause' : 'play_arrow' }}</mat-icon>
+    </button>
+    <button class="icon-btn">
+      <mat-icon>skip_next</mat-icon>
+    </button>
+  </div>
+
+  <div class="volume">
+    <mat-icon class="volume-icon">volume_up</mat-icon>
+  </div>
+</div>

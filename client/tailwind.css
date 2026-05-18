@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@source "./src/**/*.html";
+@source "./src/**/*.ts";
+
+@theme {
+  --color-primary: #6c5ce7;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark: #4c3aaa;
+  --color-primary-glow: #e8e0ff;
+}

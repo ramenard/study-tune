@@ -1,0 +1,48 @@
+{
+  "name": "client",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "tw:build": "tailwindcss -i tailwind.css -o src/tailwind.out.css",
+    "tw:watch": "tailwindcss -i tailwind.css -o src/tailwind.out.css --watch",
+    "start": "npm run tw:build && concurrently \"npm run tw:watch\" \"ng serve\"",
+    "build": "npm run tw:build && ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.4",
+  "dependencies": {
+    "@angular/animations": "^21.2.13",
+    "@angular/cdk": "^21.2.11",
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/material": "^21.2.11",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular-eslint/builder": "^21.4.0",
+    "@angular-eslint/eslint-plugin": "^21.4.0",
+    "@angular-eslint/eslint-plugin-template": "^21.4.0",
+    "@angular-eslint/schematics": "^21.4.0",
+    "@angular-eslint/template-parser": "^21.4.0",
+    "@angular/build": "^21.2.11",
+    "@angular/cli": "^21.2.11",
+    "@angular/compiler-cli": "^21.2.0",
+    "@tailwindcss/cli": "^4.3.0",
+    "@tailwindcss/postcss": "^4.3.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.4.0",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^4.3.0",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.59.3"
+  }
+}
