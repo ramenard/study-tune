@@ -22,6 +22,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/playlists/playlists.component').then(m => m.PlaylistsComponent)
       },
       {
+        path: 'friends',
+        loadComponent: () => import('./pages/friends/friends.component').then(m => m.FriendsComponent)
+      },
+      {
         path: '**',
         redirectTo: ''
       }
