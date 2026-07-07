@@ -18,6 +18,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/library/library.component').then(m => m.LibraryComponent)
       },
       {
+        path: 'playlists',
+        loadComponent: () => import('./pages/playlists/playlists.component').then(m => m.PlaylistsComponent)
+      },
+      {
         path: '**',
         redirectTo: ''
       }

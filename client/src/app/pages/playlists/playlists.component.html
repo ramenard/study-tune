@@ -1,0 +1,66 @@
+<div class="playlists">
+  <div class="page-header">
+    <div>
+      <h1>Mes Playlists</h1>
+      <p>{{ playlists().length }} playlists créées</p>
+    </div>
+    <button mat-flat-button color="primary" (click)="openNewForm()">
+      <mat-icon>add</mat-icon>
+      Nouvelle
+    </button>
+  </div>
+
+  @if (showNewForm()) {
+    <div class="new-form-card">
+      <div class="new-form-card__title">Nouvelle playlist</div>
+      <div class="new-form-card__row">
+        <input
+          #nameInput
+          class="new-form-card__input"
+          type="text"
+          placeholder="Nom de la playlist..."
+          [value]="newPlaylistName()"
+          (input)="onNameInput(nameInput.value)"
+          (keydown)="onCreateKeydown($event)"
+          autofocus />
+        <button mat-flat-button color="primary" (click)="createPlaylist()">Créer</button>
+        <button mat-stroked-button (click)="cancelNewForm()">Annuler</button>
+      </div>
+    </div>
+  }
+
+  <div class="grid">
+    @for (playlist of playlists(); track playlist.id) {
+      <div class="playlist-card">
+        <div class="playlist-card__accent" [style.background]="playlist.color"></div>
+
+        <div class="playlist-card__top">
+          <div class="playlist-card__icon" [style.background]="playlist.color">
+            <mat-icon>music_note</mat-icon>
+          </div>
+          <div class="playlist-card__info">
+            <div class="playlist-card__name">{{ playlist.name }}</div>
+            <div class="playlist-card__count">{{ playlist.count }} musiques</div>
+          </div>
+        </div>
+
+        <div class="playlist-card__bottom">
+          <span class="visibility-badge" [class.visibility-badge--public]="playlist.isPublic">
+            @if (playlist.isPublic) {
+              <mat-icon>public</mat-icon>
+              Publique
+            }
+            @if (!playlist.isPublic) {
+              <mat-icon>lock</mat-icon>
+              Privée
+            }
+          </span>
+          <button mat-button color="primary" class="share-btn">
+            <mat-icon>share</mat-icon>
+            Partager
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
