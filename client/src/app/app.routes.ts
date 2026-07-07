@@ -26,6 +26,14 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/friends/friends.component').then(m => m.FriendsComponent)
       },
       {
+        path: 'tokens',
+        loadComponent: () => import('./pages/tokens/tokens.component').then(m => m.TokensComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./pages/profile/profile.component').then(m => m.ProfileComponent)
+      },
+      {
         path: '**',
         redirectTo: ''
       }

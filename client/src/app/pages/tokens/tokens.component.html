@@ -1,0 +1,102 @@
+@if (successPack()) {
+  <div class="toast">
+    <mat-icon class="toast__icon">check_circle</mat-icon>
+    +{{ successPack()!.tokens }} tokens ajoutés !
+  </div>
+}
+
+<div class="tokens">
+  <div class="page-header">
+    <h1>Tokens</h1>
+    <p>Achète des tokens pour générer tes fiches et musiques</p>
+  </div>
+
+  <div class="balance-card">
+    <div class="balance-card__icon-wrap">
+      <mat-icon class="balance-card__icon">toll</mat-icon>
+    </div>
+    <div class="balance-card__main">
+      <div class="balance-card__label">Solde actuel</div>
+      <div class="balance-card__amount">
+        {{ balance() }}
+        <span class="balance-card__unit">tokens</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar__fill" [style.width.%]="balancePercent()"></div>
+      </div>
+      <div class="balance-card__hint">
+        ≈ {{ estimatedGenerations() }} générations ou {{ estimatedSheets() }} fiches
+      </div>
+    </div>
+    <div class="balance-card__costs">
+      <div class="cost-item">
+        <mat-icon>bolt</mat-icon>
+        Génération : 10 tokens
+      </div>
+      <div class="cost-item">
+        <mat-icon>description</mat-icon>
+        Fiche : 5 tokens
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Choisir un pack</div>
+
+  <div class="packs-grid">
+    @for (pack of packs; track pack.id) {
+      <div class="pack-card"
+           [class.pack-card--selected]="selectedPackId() === pack.id"
+           [class.pack-card--popular]="pack.isPopular"
+           (click)="selectPack(pack.id)">
+        @if (pack.isPopular) {
+          <div class="pack-card__popular-badge">Populaire ⭐</div>
+        }
+        @if (selectedPackId() === pack.id) {
+          <div class="pack-card__check">
+            <mat-icon>check</mat-icon>
+          </div>
+        }
+        <div class="pack-card__label">{{ pack.label }}</div>
+        <div class="pack-card__tokens">{{ pack.tokens }}</div>
+        <div class="pack-card__tokens-unit">tokens</div>
+        <div class="pack-card__price">{{ pack.price }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="cta-card">
+    <mat-icon class="cta-card__icon">credit_card</mat-icon>
+    <div class="cta-card__info">
+      <div class="cta-card__title">{{ ctaTitle() }}</div>
+      <div class="cta-card__sub">Paiement sécurisé · Stripe · Sans abonnement</div>
+    </div>
+    <button mat-flat-button color="primary" class="pay-btn"
+            [disabled]="!canPurchase()"
+            (click)="purchase()">
+      <mat-icon>{{ purchaseBtnIcon() }}</mat-icon>
+      {{ purchaseBtnLabel() }}
+    </button>
+  </div>
+
+  <div class="section-title">Historique</div>
+
+  <div class="history-card">
+    @for (entry of history; track entry.label; let last = $last) {
+      <div class="history-item">
+        <div class="history-item__icon-wrap" [class.history-item__icon-wrap--credit]="entry.amount > 0">
+          <mat-icon [class.history-item__icon--credit]="entry.amount > 0">{{ historyIcon(entry.amount) }}</mat-icon>
+        </div>
+        <div class="history-item__content">
+          <div class="history-item__label">{{ entry.label }}</div>
+          <div class="history-item__date">{{ entry.date }}</div>
+        </div>
+        <span class="history-item__amount" [class.history-item__amount--credit]="entry.amount > 0">
+          {{ historyAmountLabel(entry.amount) }}
+        </span>
+      </div>
+      @if (!last) {
+        <div class="divider"></div>
+      }
+    }
+  </div>
+</div>
