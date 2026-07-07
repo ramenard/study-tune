@@ -1,0 +1,142 @@
+@if (toast()) {
+  <div class="toast">{{ toast() }}</div>
+}
+
+<div class="page-header">
+  <div>
+    <h1>Ma Bibliothèque</h1>
+    <p>{{ tracks().length }} musiques générées</p>
+  </div>
+  <div class="sort-wrap">
+    <select class="sort-select" #sortSelect [value]="sort()" (change)="onSort(sortSelect.value)">
+      <option value="date">Plus récent</option>
+      <option value="title">Titre A→Z</option>
+      <option value="subject">Matière</option>
+    </select>
+    <mat-icon class="sort-icon">expand_more</mat-icon>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <mat-icon class="search-icon">search</mat-icon>
+  <input
+    #searchInput
+    class="search-input"
+    type="text"
+    placeholder="Rechercher par titre ou matière..."
+    [value]="search()"
+    (input)="onSearch(searchInput.value)" />
+</div>
+
+<div class="table-card">
+  <div class="table-header">
+    <div></div>
+    <div>Titre</div>
+    <div>Matière</div>
+    <div>Style</div>
+    <div class="col-right">Durée</div>
+    <div class="col-center">Actions</div>
+  </div>
+
+  @if (paged().length === 0) {
+    <div class="empty-state">Aucune musique pour « {{ search() }} »</div>
+  }
+
+  @for (track of paged(); track track.id; let last = $last) {
+    <div class="table-row">
+      <div class="thumb" [style.background]="track.color" (click)="playTrack(track)">
+        <mat-icon>music_note</mat-icon>
+      </div>
+
+      <div class="title-cell">
+        @if (editId() === track.id) {
+          <input
+            class="title-input"
+            autofocus
+            [(ngModel)]="editValueStr"
+            (keydown)="onEditKeydown($event, track.id)"
+            (blur)="saveEdit(track.id)" />
+        }
+        @if (editId() !== track.id) {
+          <div class="track-title" (click)="playTrack(track)">{{ track.title }}</div>
+        }
+        @if (deleteId() === track.id) {
+          <div class="delete-confirm">
+            Supprimer ?
+            <span class="confirm-yes" (click)="confirmDelete(track.id)">Oui</span>
+            <span class="confirm-no" (click)="toggleDelete(track.id)">Non</span>
+          </div>
+        }
+      </div>
+
+      <div class="subject-cell">{{ track.subject }}</div>
+
+      <div class="style-cell">
+        <span class="style-chip" [style.background]="styleColor(track.style)">{{ track.style }}</span>
+      </div>
+
+      <div class="duration-cell">{{ track.duration }}</div>
+
+      <div class="actions-cell">
+        <button
+          class="action-btn"
+          [class.active]="editId() === track.id"
+          title="Renommer"
+          (click)="startEdit(track)">
+          <mat-icon>edit</mat-icon>
+        </button>
+
+        <button
+          class="action-btn"
+          [class.added]="addedTo()[track.id]"
+          title="Ajouter à une playlist"
+          [matMenuTriggerFor]="playlistMenu">
+          @if (addedTo()[track.id]) {
+            <mat-icon>check</mat-icon>
+          }
+          @if (!addedTo()[track.id]) {
+            <mat-icon>add</mat-icon>
+          }
+        </button>
+
+        <mat-menu #playlistMenu="matMenu" xPosition="before">
+          <div class="pl-menu-header">Ajouter à</div>
+          @for (playlist of playlists; track playlist.id) {
+            <button mat-menu-item (click)="addToPlaylist(track.id, playlist)">
+              <span class="pl-item">
+                <span class="pl-dot" [style.background]="playlist.color"></span>
+                <span class="pl-name">{{ playlist.name }}</span>
+                <span class="pl-count">{{ playlist.count }}</span>
+              </span>
+            </button>
+          }
+        </mat-menu>
+
+        <button
+          class="action-btn delete-btn"
+          [class.active]="deleteId() === track.id"
+          title="Supprimer"
+          (click)="toggleDelete(track.id)">
+          <mat-icon>remove_circle</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    @if (!last) {
+      <div class="row-divider"></div>
+    }
+  }
+</div>
+
+@if (totalPages() > 1) {
+  <div class="pagination">
+    <div class="page-range">{{ rangeLabel() }}</div>
+    <div class="page-buttons">
+      <button class="page-btn page-nav" [disabled]="page() === 1" (click)="setPage(page() - 1)">‹</button>
+      @for (pageNum of pageNumbers(); track pageNum) {
+        <button class="page-btn" [class.active]="pageNum === page()" (click)="setPage(pageNum)">{{ pageNum }}</button>
+      }
+      <button class="page-btn page-nav" [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">›</button>
+    </div>
+  </div>
+}

@@ -10,6 +10,14 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent)
       },
       {
+        path: 'generate',
+        loadComponent: () => import('./pages/generate/generate.component').then(m => m.GenerateComponent)
+      },
+      {
+        path: 'library',
+        loadComponent: () => import('./pages/library/library.component').then(m => m.LibraryComponent)
+      },
+      {
         path: '**',
         redirectTo: ''
       }
