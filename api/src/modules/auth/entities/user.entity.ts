@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+  ManyToMany,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Music } from '../../music/entities/music.entity';
 import { Playlist } from '../../playlist/entities/playlist.entity';
 
@@ -10,7 +18,8 @@ export class User {
   @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column({ type: 'varchar' })
+  @Exclude()
+  @Column({ type: 'varchar', select: false })
   password: string;
 
   @Column({ type: 'varchar' })
