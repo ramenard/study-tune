@@ -9,6 +9,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d musicdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   minio:
     image: minio/minio
@@ -21,6 +26,24 @@ services:
       - "9001:9001"   # Console web
     volumes:
       - miniodata:/data
+
+  api:
+    build: ../api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    env_file:
+      - ../api/.env
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+    ports:
+      - "3001:3001"
 
 volumes:
   pgdata:
