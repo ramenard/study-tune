@@ -9,7 +9,6 @@ export class ChatService {
 
   public async sendMessage(message: string) {
     const apiKey = process.env.HUGGING_TOKEN;
-    const model = 'tiiuae/falcon-7b-instruct';
 
     const response = await firstValueFrom(
       this.httpService.post(
