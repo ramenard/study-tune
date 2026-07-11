@@ -8,6 +8,7 @@
     "start": "npm run tw:build && concurrently \"npm run tw:watch\" \"ng serve\"",
     "build": "npm run tw:build && ng build",
     "watch": "ng build --watch --configuration development",
+    "generate:api": "ng-openapi-gen",
     "test": "ng test",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix"
@@ -40,6 +41,7 @@
     "@tailwindcss/postcss": "^4.3.0",
     "concurrently": "^9.2.1",
     "eslint": "^10.4.0",
+    "ng-openapi-gen": "^1.0.5",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.3.0",
     "typescript": "~5.9.2",

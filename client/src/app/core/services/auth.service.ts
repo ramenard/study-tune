@@ -1,41 +1,30 @@
-import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { from, Observable, tap } from 'rxjs';
+import { Api } from '../../api/api';
+import { authControllerLogin } from '../../api/fn/auth/auth-controller-login';
+import { authControllerRegister } from '../../api/fn/auth/auth-controller-register';
+import { AuthResponseDto } from '../../api/models/auth-response-dto';
+import { LoginDto } from '../../api/models/login-dto';
+import { RegisterDto } from '../../api/models/register-dto';
 import { AuthTokenService } from './auth-token.service';
-
-interface AuthResponse {
-  accessToken: string;
-}
-
-interface RegisterPayload {
-  email: string;
-  password: string;
-  username: string;
-}
-
-interface LoginPayload {
-  email: string;
-  password: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly http = inject(HttpClient);
+  private readonly api = inject(Api);
   private readonly tokenService = inject(AuthTokenService);
 
   readonly isAuthenticated = computed(() => this.tokenService.token() !== null);
 
-  login(payload: LoginPayload): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/login`, payload)
-      .pipe(tap((response) => this.tokenService.setToken(response.accessToken)));
+  login(payload: LoginDto): Observable<AuthResponseDto> {
+    return from(this.api.invoke(authControllerLogin, { body: payload })).pipe(
+      tap((response) => this.tokenService.setToken(response.accessToken)),
+    );
   }
 
-  register(payload: RegisterPayload): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/register`, payload)
-      .pipe(tap((response) => this.tokenService.setToken(response.accessToken)));
+  register(payload: RegisterDto): Observable<AuthResponseDto> {
+    return from(this.api.invoke(authControllerRegister, { body: payload })).pipe(
+      tap((response) => this.tokenService.setToken(response.accessToken)),
+    );
   }
 
   logout(): void {

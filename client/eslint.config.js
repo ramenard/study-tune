@@ -6,6 +6,9 @@ const templateParser = require('@angular-eslint/template-parser');
 
 module.exports = tseslint.config(
   {
+    ignores: ['src/app/api/**'],
+  },
+  {
     files: ['**/*.ts'],
     extends: [
       ...tseslint.configs.recommended,

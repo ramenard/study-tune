@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
+import { PaginatedPlaylistsDto } from './dto/paginated-playlists.dto';
 
 type AuthRequest = Request & { user: { id: string } };
 
@@ -24,11 +25,12 @@ export class PlaylistController {
   @Get()
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiOkResponse({ type: PaginatedPlaylistsDto })
   async findAll(
     @Req() req: AuthRequest,
     @Query('page') page = 1,
     @Query('limit') limit = 10,
-  ) {
+  ): Promise<PaginatedPlaylistsDto> {
     return this.playlistService.findAllByUser(req.user.id, Number(page), Number(limit));
   }
 

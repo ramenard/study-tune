@@ -1,9 +1,10 @@
 import { Body, Controller, Get, Param, Patch, Post, HttpCode, HttpStatus, UseGuards, Req, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { MusicService } from './music.service';
 import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
+import { PaginatedMusicDto } from './dto/paginated-music.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 type AuthRequest = Request & { user: { id: string } };
@@ -30,11 +31,12 @@ export class MusicController {
   @Get()
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiOkResponse({ type: PaginatedMusicDto })
   async findAll(
     @Req() req: AuthRequest,
     @Query('page') page = 1,
     @Query('limit') limit = 10,
-  ) {
+  ): Promise<PaginatedMusicDto> {
     return this.musicService.findAllByUser(req.user.id, Number(page), Number(limit));
   }
 
