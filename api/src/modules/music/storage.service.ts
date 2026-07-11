@@ -48,7 +48,7 @@ export class StorageService {
       this.bucket,
       objectName,
       stream,
-      contentLength ? parseInt(contentLength) : undefined,
+      contentLength ? Number(contentLength) : undefined,
       { 'Content-Type': 'audio/mpeg' },
     );
 

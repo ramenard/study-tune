@@ -1,7 +1,13 @@
+# dependencies
+node_modules
+
 # compiled output
+dist
 api/dist
 api/node_modules
 api/build
+client/dist
+client/node_modules
 
 # Logs
 logs
@@ -53,3 +59,4 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 CLAUDE.md
 .claude
+/md
