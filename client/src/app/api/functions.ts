@@ -45,6 +45,8 @@ export type { FriendshipControllerSendRequest$Params as FriendshipControllerSend
 export { friendshipControllerSendRequest as friendshipControllerSendRequest } from './fn/friendship/friendship-controller-send-request';
 export type { FriendshipControllerRespondToRequest$Params as FriendshipControllerRespondToRequest$Params } from './fn/friendship/friendship-controller-respond-to-request';
 export { friendshipControllerRespondToRequest as friendshipControllerRespondToRequest } from './fn/friendship/friendship-controller-respond-to-request';
+export type { FriendshipControllerSearch$Params as FriendshipControllerSearch$Params } from './fn/friendship/friendship-controller-search';
+export { friendshipControllerSearch as friendshipControllerSearch } from './fn/friendship/friendship-controller-search';
 export type { FriendshipControllerFindFriends$Params as FriendshipControllerFindFriends$Params } from './fn/friendship/friendship-controller-find-friends';
 export { friendshipControllerFindFriends as friendshipControllerFindFriends } from './fn/friendship/friendship-controller-find-friends';
 export type { FriendshipControllerFindPendingReceived$Params as FriendshipControllerFindPendingReceived$Params } from './fn/friendship/friendship-controller-find-pending-received';

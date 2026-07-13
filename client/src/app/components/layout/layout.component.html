@@ -24,6 +24,9 @@
          [routerLinkActiveOptions]="{ exact: item.route === '/' }">
         <mat-icon>{{ item.icon }}</mat-icon>
         <span>{{ item.label }}</span>
+        @if (item.id === 'friends' && pendingRequests() > 0) {
+          <span class="nav-badge" aria-label="Demandes d'amis en attente">{{ pendingRequests() }}</span>
+        }
       </a>
     }
 

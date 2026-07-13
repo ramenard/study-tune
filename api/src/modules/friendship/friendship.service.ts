@@ -1,10 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Not, Repository } from 'typeorm';
 import { Friendship, FriendshipStatus } from './entities/friendship.entity';
 import { User } from '../auth/entities/user.entity';
 import { SendRequestDto } from './dto/send-request.dto';
 import { RespondRequestDto } from './dto/respond-request.dto';
+import { UserSearchResultDto } from './dto/user-search-result.dto';
 
 @Injectable()
 export class FriendshipService {
@@ -14,6 +15,51 @@ export class FriendshipService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
   ) {}
+
+  async searchUsers(query: string, currentUserId: string): Promise<UserSearchResultDto[]> {
+    const trimmed = query.trim();
+
+    if (!trimmed) {
+      return [];
+    }
+
+    const users = await this.userRepo.find({
+      where: { username: ILike(`%${trimmed}%`), id: Not(currentUserId) },
+      take: 10,
+    });
+
+    const relationships = await this.friendshipRepo.find({
+      where: [{ requesterId: currentUserId }, { addresseeId: currentUserId }],
+    });
+
+    return users.map((user) => ({
+      id: user.id,
+      username: user.username,
+      relationship: this.resolveRelationship(relationships, currentUserId, user.id),
+    }));
+  }
+
+  private resolveRelationship(relationships: Friendship[], currentUserId: string, otherUserId: string): string {
+    const relationship = relationships.find(
+      (item) =>
+        (item.requesterId === currentUserId && item.addresseeId === otherUserId) ||
+        (item.requesterId === otherUserId && item.addresseeId === currentUserId),
+    );
+
+    if (!relationship) {
+      return 'none';
+    }
+
+    if (relationship.status === FriendshipStatus.ACCEPTED) {
+      return 'friends';
+    }
+
+    if (relationship.requesterId === currentUserId) {
+      return 'request_sent';
+    }
+
+    return 'request_received';
+  }
 
   async sendRequest(dto: SendRequestDto, requesterId: string): Promise<Friendship> {
     if (requesterId === dto.addresseeId) {
@@ -59,6 +105,10 @@ export class FriendshipService {
 
     if (friendship.status !== FriendshipStatus.PENDING) {
       throw new BadRequestException('This request has already been responded to');
+    }
+
+    if (dto.status === FriendshipStatus.DECLINED) {
+      return this.friendshipRepo.remove(friendship);
     }
 
     friendship.status = dto.status;

@@ -5,8 +5,8 @@
     <button class="tab" [class.tab--active]="activeTab() === 'friends'" (click)="selectTab('friends')">
       Mes amis ({{ friends().length }})
     </button>
-    <button class="tab" [class.tab--active]="activeTab() === 'suggestions'" (click)="selectTab('suggestions')">
-      Suggestions
+    <button class="tab" [class.tab--active]="activeTab() === 'add'" (click)="selectTab('add')">
+      Ajouter
     </button>
     <button class="tab" [class.tab--active]="activeTab() === 'requests'" (click)="selectTab('requests')">
       Demandes
@@ -16,36 +16,33 @@
     </button>
   </div>
 
-  <div class="search-wrap">
-    <mat-icon class="search-icon">search</mat-icon>
-    <input
-      #searchInput
-      class="search-input"
-      type="text"
-      placeholder="Chercher..."
-      [value]="search()"
-      (input)="onSearch(searchInput.value)" />
-  </div>
+  @if (activeTab() !== 'requests') {
+    <div class="search-wrap">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        #searchInput
+        class="search-input"
+        type="text"
+        [placeholder]="activeTab() === 'add' ? 'Rechercher par nom d’utilisateur…' : 'Filtrer mes amis…'"
+        [value]="search()"
+        (input)="onSearch(searchInput.value)" />
+    </div>
+  }
 
   @if (activeTab() === 'friends') {
     <div class="list-card">
       @if (filteredFriends().length === 0) {
-        <div class="empty-state">Aucun ami pour « {{ search() }} »</div>
+        <div class="empty-state">Aucun ami pour l'instant — ajoutes-en un !</div>
       }
       @for (friend of filteredFriends(); track friend.id; let last = $last) {
         <div class="list-item">
           <div class="avatar-wrap">
-            <div class="avatar" [style.background]="friend.color">{{ friend.initials }}</div>
-            <span class="status-dot" [class.status-dot--online]="friend.status === 'online'"></span>
+            <div class="avatar" [style.background]="colorFor(friend.id)">{{ initials(friend.username) }}</div>
           </div>
           <div class="item-content">
-            <div class="item-name">{{ friend.name }}</div>
-            <div class="item-sub">{{ friend.username }}</div>
+            <div class="item-name">{{ friend.username }}</div>
+            <div class="item-sub">Ami</div>
           </div>
-          <button mat-flat-button class="btn-tonal action-btn">
-            <mat-icon>share</mat-icon>
-            Partager
-          </button>
         </div>
         @if (!last) {
           <div class="divider"></div>
@@ -54,31 +51,50 @@
     </div>
   }
 
-  @if (activeTab() === 'suggestions') {
+  @if (activeTab() === 'add') {
     <div class="list-card">
-      @if (filteredSuggestions().length === 0) {
-        <div class="empty-state">Aucune suggestion disponible</div>
+      @if (searchResults().length === 0) {
+        <div class="empty-state">
+          @if (search().trim()) {
+            Aucun utilisateur trouvé pour « {{ search() }} »
+          } @else {
+            Recherche une personne par son nom d'utilisateur.
+          }
+        </div>
       }
-      @for (suggestion of filteredSuggestions(); track suggestion.id; let last = $last) {
+      @for (result of searchResults(); track result.id; let last = $last) {
         <div class="list-item">
           <div class="avatar-wrap">
-            <div class="avatar" [style.background]="suggestion.color">{{ suggestion.initials }}</div>
+            <div class="avatar" [style.background]="colorFor(result.id)">{{ initials(result.username) }}</div>
           </div>
           <div class="item-content">
-            <div class="item-name">{{ suggestion.name }}</div>
-            <div class="item-sub">{{ suggestion.mutualCount }} ami(s) en commun</div>
+            <div class="item-name">{{ result.username }}</div>
           </div>
-          @if (addedIds().includes(suggestion.id)) {
-            <button mat-stroked-button class="action-btn" disabled>
-              <mat-icon>check</mat-icon>
-              Demande envoyée
-            </button>
-          }
-          @if (!addedIds().includes(suggestion.id)) {
-            <button mat-flat-button color="primary" class="action-btn" (click)="addFriend(suggestion.id)">
-              <mat-icon>person_add</mat-icon>
-              Ajouter
-            </button>
+          @switch (result.relationship) {
+            @case ('friends') {
+              <button mat-stroked-button class="action-btn" disabled>
+                <mat-icon>check</mat-icon>
+                Amis
+              </button>
+            }
+            @case ('request_sent') {
+              <button mat-stroked-button class="action-btn" disabled>
+                <mat-icon>schedule</mat-icon>
+                Demande envoyée
+              </button>
+            }
+            @case ('request_received') {
+              <button mat-stroked-button class="action-btn" (click)="selectTab('requests')">
+                <mat-icon>inbox</mat-icon>
+                Répondre
+              </button>
+            }
+            @default {
+              <button mat-flat-button color="primary" class="action-btn" (click)="add(result.id)">
+                <mat-icon>person_add</mat-icon>
+                Ajouter
+              </button>
+            }
           }
         </div>
         @if (!last) {
@@ -90,23 +106,23 @@
 
   @if (activeTab() === 'requests') {
     <div class="list-card">
-      @if (filteredRequests().length === 0) {
+      @if (received().length === 0) {
         <div class="empty-state">Aucune demande en attente</div>
       }
-      @for (request of filteredRequests(); track request.id; let last = $last) {
+      @for (request of received(); track request.id; let last = $last) {
         <div class="list-item">
           <div class="avatar-wrap">
-            <div class="avatar" [style.background]="request.color">{{ request.initials }}</div>
+            <div class="avatar" [style.background]="colorFor(request.requester.id)">{{ initials(request.requester.username) }}</div>
           </div>
           <div class="item-content">
-            <div class="item-name">{{ request.name }}</div>
-            <div class="item-sub">{{ request.username }}</div>
+            <div class="item-name">{{ request.requester.username }}</div>
+            <div class="item-sub">Souhaite devenir ton ami</div>
           </div>
           <div class="request-actions">
-            <button mat-stroked-button class="action-btn" (click)="rejectRequest(request.id)">
+            <button mat-stroked-button class="action-btn" (click)="refuse(request.id)">
               Refuser
             </button>
-            <button mat-flat-button color="primary" class="action-btn" (click)="acceptRequest(request.id)">
+            <button mat-flat-button color="primary" class="action-btn" (click)="accept(request.id)">
               <mat-icon>check</mat-icon>
               Accepter
             </button>

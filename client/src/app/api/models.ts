@@ -18,3 +18,4 @@ export type { SendRequestDto } from './models/send-request-dto';
 export type { UpdateMusicDto } from './models/update-music-dto';
 export type { UpdatePlaylistDto } from './models/update-playlist-dto';
 export type { User } from './models/user';
+export type { UserSearchResultDto } from './models/user-search-result-dto';

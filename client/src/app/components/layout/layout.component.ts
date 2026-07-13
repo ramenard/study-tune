@@ -3,6 +3,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { PlayerBarComponent } from '../player-bar/player-bar.component';
 import { ProfileService } from '../../core/services/profile.service';
+import { FriendshipService } from '../../core/services/friendship.service';
 
 interface NavItem {
   id: string;
@@ -19,6 +20,7 @@ interface NavItem {
 })
 export class LayoutComponent implements OnInit {
   private readonly profileService = inject(ProfileService);
+  private readonly friendshipService = inject(FriendshipService);
 
   readonly navItems: NavItem[] = [
     { id: 'home',    icon: 'home',          label: 'Accueil',      route: '/' },
@@ -31,10 +33,12 @@ export class LayoutComponent implements OnInit {
   ];
 
   readonly generationsRemaining = this.profileService.generationsRemaining;
+  readonly pendingRequests = this.friendshipService.pendingReceivedCount;
   readonly dark = signal(false);
 
   ngOnInit(): void {
     void this.profileService.load();
+    void this.friendshipService.loadReceived();
   }
 
   toggleDark(): void {
