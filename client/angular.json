@@ -109,6 +109,15 @@
               "src/**/*.html"
             ]
           }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "buildTarget": "client:build:development",
+            "runner": "vitest",
+            "watch": false
+          }
         }
       }
     }
