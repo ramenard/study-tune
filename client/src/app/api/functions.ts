@@ -21,6 +21,10 @@ export type { AuthControllerLogin$Params as AuthControllerLogin$Params } from '.
 export { authControllerLogin as authControllerLogin } from './fn/auth/auth-controller-login';
 export type { AuthControllerMe$Params as AuthControllerMe$Params } from './fn/auth/auth-controller-me';
 export { authControllerMe as authControllerMe } from './fn/auth/auth-controller-me';
+export type { AuthControllerSubscribe$Params as AuthControllerSubscribe$Params } from './fn/auth/auth-controller-subscribe';
+export { authControllerSubscribe as authControllerSubscribe } from './fn/auth/auth-controller-subscribe';
+export type { AuthControllerUnsubscribe$Params as AuthControllerUnsubscribe$Params } from './fn/auth/auth-controller-unsubscribe';
+export { authControllerUnsubscribe as authControllerUnsubscribe } from './fn/auth/auth-controller-unsubscribe';
 export type { DocumentControllerProcess$Params as DocumentControllerProcess$Params } from './fn/document/document-controller-process';
 export { documentControllerProcess as documentControllerProcess } from './fn/document/document-controller-process';
 export type { PlaylistControllerFindAll$Params as PlaylistControllerFindAll$Params } from './fn/playlist/playlist-controller-find-all';

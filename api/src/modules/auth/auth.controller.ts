@@ -35,4 +35,22 @@ export class AuthController {
   me(@Req() req: AuthRequest): Promise<ProfileDto> {
     return this.authService.getProfile(req.user.id);
   }
+
+  @Post('subscribe')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: ProfileDto })
+  subscribe(@Req() req: AuthRequest): Promise<ProfileDto> {
+    return this.authService.subscribe(req.user.id);
+  }
+
+  @Post('unsubscribe')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: ProfileDto })
+  unsubscribe(@Req() req: AuthRequest): Promise<ProfileDto> {
+    return this.authService.unsubscribe(req.user.id);
+  }
 }

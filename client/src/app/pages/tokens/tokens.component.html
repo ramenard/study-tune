@@ -1,102 +1,66 @@
-@if (successPack()) {
-  <div class="toast">
-    <mat-icon class="toast__icon">check_circle</mat-icon>
-    +{{ successPack()!.tokens }} tokens ajoutés !
-  </div>
-}
-
-<div class="tokens">
+<div class="subscription">
   <div class="page-header">
-    <h1>Tokens</h1>
-    <p>Achète des tokens pour générer tes fiches et musiques</p>
+    <h1>Abonnement</h1>
+    <p>Génère tes musiques de révision chaque mois</p>
   </div>
 
-  <div class="balance-card">
-    <div class="balance-card__icon-wrap">
-      <mat-icon class="balance-card__icon">toll</mat-icon>
-    </div>
-    <div class="balance-card__main">
-      <div class="balance-card__label">Solde actuel</div>
-      <div class="balance-card__amount">
-        {{ balance() }}
-        <span class="balance-card__unit">tokens</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-bar__fill" [style.width.%]="balancePercent()"></div>
-      </div>
-      <div class="balance-card__hint">
-        ≈ {{ estimatedGenerations() }} générations ou {{ estimatedSheets() }} fiches
-      </div>
-    </div>
-    <div class="balance-card__costs">
-      <div class="cost-item">
-        <mat-icon>bolt</mat-icon>
-        Génération : 10 tokens
-      </div>
-      <div class="cost-item">
-        <mat-icon>description</mat-icon>
-        Fiche : 5 tokens
-      </div>
-    </div>
-  </div>
+  @if (message()) {
+    <p class="sub-message" role="status">{{ message() }}</p>
+  }
 
-  <div class="section-title">Choisir un pack</div>
-
-  <div class="packs-grid">
-    @for (pack of packs; track pack.id) {
-      <div class="pack-card"
-           [class.pack-card--selected]="selectedPackId() === pack.id"
-           [class.pack-card--popular]="pack.isPopular"
-           (click)="selectPack(pack.id)">
-        @if (pack.isPopular) {
-          <div class="pack-card__popular-badge">Populaire ⭐</div>
-        }
-        @if (selectedPackId() === pack.id) {
-          <div class="pack-card__check">
-            <mat-icon>check</mat-icon>
-          </div>
-        }
-        <div class="pack-card__label">{{ pack.label }}</div>
-        <div class="pack-card__tokens">{{ pack.tokens }}</div>
-        <div class="pack-card__tokens-unit">tokens</div>
-        <div class="pack-card__price">{{ pack.price }}</div>
-      </div>
-    }
-  </div>
-
-  <div class="cta-card">
-    <mat-icon class="cta-card__icon">credit_card</mat-icon>
-    <div class="cta-card__info">
-      <div class="cta-card__title">{{ ctaTitle() }}</div>
-      <div class="cta-card__sub">Paiement sécurisé · Stripe · Sans abonnement</div>
-    </div>
-    <button mat-flat-button color="primary" class="pay-btn"
-            [disabled]="!canPurchase()"
-            (click)="purchase()">
-      <mat-icon>{{ purchaseBtnIcon() }}</mat-icon>
-      {{ purchaseBtnLabel() }}
-    </button>
-  </div>
-
-  <div class="section-title">Historique</div>
-
-  <div class="history-card">
-    @for (entry of history; track entry.label; let last = $last) {
-      <div class="history-item">
-        <div class="history-item__icon-wrap" [class.history-item__icon-wrap--credit]="entry.amount > 0">
-          <mat-icon [class.history-item__icon--credit]="entry.amount > 0">{{ historyIcon(entry.amount) }}</mat-icon>
+  <div class="plan-card" [class.plan-card--premium]="isPremium()">
+    <div class="plan-card__top">
+      <div>
+        <span class="plan-card__badge">{{ planLabel() }}</span>
+        <div class="plan-card__title">
+          @if (isPremium()) {
+            Abonnement Premium
+          } @else {
+            Offre découverte
+          }
         </div>
-        <div class="history-item__content">
-          <div class="history-item__label">{{ entry.label }}</div>
-          <div class="history-item__date">{{ entry.date }}</div>
-        </div>
-        <span class="history-item__amount" [class.history-item__amount--credit]="entry.amount > 0">
-          {{ historyAmountLabel(entry.amount) }}
-        </span>
       </div>
-      @if (!last) {
-        <div class="divider"></div>
-      }
+      <mat-icon class="plan-card__icon">{{ isPremium() ? 'workspace_premium' : 'bolt' }}</mat-icon>
+    </div>
+
+    <div class="plan-card__quota">
+      <div class="plan-card__quota-head">
+        <span class="plan-card__count">{{ generationsRemaining() }}</span>
+        <span class="plan-card__count-label">/ {{ monthlyAllowance() }} génération{{ monthlyAllowance() > 1 ? 's' : '' }} ce mois</span>
+      </div>
+      <div class="plan-card__bar">
+        <div class="plan-card__bar-fill" [style.width.%]="quotaPercent()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="offer-card">
+    <div class="offer-card__price">
+      <span class="offer-card__amount">4,99 €</span>
+      <span class="offer-card__period">/ mois</span>
+    </div>
+
+    <ul class="offer-card__benefits">
+      <li><mat-icon>check</mat-icon> 2 générations de musique par mois</li>
+      <li><mat-icon>check</mat-icon> Fiches de révision illimitées</li>
+      <li><mat-icon>check</mat-icon> Playlists et partage entre amis</li>
+      <li><mat-icon>check</mat-icon> Résiliable à tout moment</li>
+    </ul>
+
+    @if (isPremium()) {
+      <button mat-stroked-button class="offer-card__cta" [disabled]="loading()" (click)="unsubscribe()">
+        <mat-icon>{{ loading() ? 'hourglass_empty' : 'cancel' }}</mat-icon>
+        Résilier l'abonnement
+      </button>
+    } @else {
+      <button mat-flat-button color="primary" class="offer-card__cta" [disabled]="loading()" (click)="subscribe()">
+        <mat-icon>{{ loading() ? 'hourglass_empty' : 'credit_card' }}</mat-icon>
+        S'abonner · 4,99 €
+      </button>
     }
+
+    <p class="offer-card__note">
+      Le premier mois, les comptes découverte disposent de 2 générations gratuites.
+    </p>
   </div>
 </div>

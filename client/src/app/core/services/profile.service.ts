@@ -1,6 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Api } from '../../api/api';
 import { authControllerMe } from '../../api/fn/auth/auth-controller-me';
+import { authControllerSubscribe } from '../../api/fn/auth/auth-controller-subscribe';
+import { authControllerUnsubscribe } from '../../api/fn/auth/auth-controller-unsubscribe';
 import { ProfileDto } from '../../api/models/profile-dto';
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +34,16 @@ export class ProfileService {
     } finally {
       this.loadingSignal.set(false);
     }
+  }
+
+  async subscribe(): Promise<void> {
+    const profile = await this.api.invoke(authControllerSubscribe);
+    this.profileSignal.set(profile);
+  }
+
+  async unsubscribe(): Promise<void> {
+    const profile = await this.api.invoke(authControllerUnsubscribe);
+    this.profileSignal.set(profile);
   }
 
   clear(): void {

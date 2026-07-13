@@ -59,6 +59,16 @@ export class AuthService {
     return this.generateToken(user);
   }
 
+  async subscribe(userId: string): Promise<ProfileDto> {
+    await this.subscriptionService.setPlan(userId, 'premium');
+    return this.getProfile(userId);
+  }
+
+  async unsubscribe(userId: string): Promise<ProfileDto> {
+    await this.subscriptionService.setPlan(userId, 'free');
+    return this.getProfile(userId);
+  }
+
   async getProfile(userId: string): Promise<ProfileDto> {
     const { user, monthlyAllowance, generationsRemaining } =
       await this.subscriptionService.getStatus(userId);

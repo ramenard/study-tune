@@ -43,6 +43,23 @@ export class SubscriptionService {
     await this.userRepository.save(user);
   }
 
+  async setPlan(userId: string, plan: 'free' | 'premium'): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.plan = plan;
+
+    if (plan === 'premium') {
+      user.generationsUsed = 0;
+      user.periodStart = new Date();
+    }
+
+    await this.userRepository.save(user);
+  }
+
   private async loadUserWithReset(userId: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ id: userId });
 
