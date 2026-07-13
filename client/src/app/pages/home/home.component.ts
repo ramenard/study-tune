@@ -1,9 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { Api } from '../../api/api';
+import { musicControllerFindAll } from '../../api/fn/music/music-controller-find-all';
+import { friendshipControllerFindFriends } from '../../api/fn/friendship/friendship-controller-find-friends';
+import { Music } from '../../api/models/music';
+import { ProfileService } from '../../core/services/profile.service';
 
-interface Song {
-  id: number;
+interface RecentSong {
+  id: string;
   title: string;
   subject: string;
   duration: string;
@@ -16,29 +22,98 @@ interface Stat {
   icon: string;
 }
 
+const THUMB_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#6c5ce7'];
+
 @Component({
   selector: 'app-home',
   imports: [MatIconModule, MatButtonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
-  readonly tokens = signal(350);
+export class HomeComponent implements OnInit {
+  private readonly api = inject(Api);
+  private readonly router = inject(Router);
+  private readonly profileService = inject(ProfileService);
 
-  readonly stats: Stat[] = [
-    { label: 'Musiques créées',   value: '28', icon: 'music_note' },
-    { label: 'Fiches générées',   value: '41', icon: 'description' },
-    { label: 'Amis',              value: '4',  icon: 'group' },
-  ];
+  readonly username = this.profileService.username;
+  readonly plan = this.profileService.plan;
+  readonly isPremium = this.profileService.isPremium;
+  readonly generationsRemaining = this.profileService.generationsRemaining;
+  readonly monthlyAllowance = this.profileService.monthlyAllowance;
 
-  readonly recentSongs = signal<Song[]>([
-    { id: 1, title: 'Thermodynamique Lo-Fi',    subject: 'Physique',      duration: '3:42', color: '#006A6A' },
-    { id: 2, title: 'Révolution Française',     subject: 'Histoire',      duration: '4:15', color: '#4B607C' },
-    { id: 3, title: 'Algorithmes & Structures', subject: 'Informatique',  duration: '2:58', color: '#7D5260' },
-    { id: 4, title: 'Cellules & ADN',           subject: 'Biologie',      duration: '3:21', color: '#365E3D' },
+  private readonly musicTotal = signal(0);
+  private readonly friendsCount = signal(0);
+  readonly recentSongs = signal<RecentSong[]>([]);
+
+  readonly greeting = computed(() => {
+    const name = this.username();
+    if (!name) {
+      return 'Bonjour 👋';
+    }
+    return `Bonjour, ${name} 👋`;
+  });
+
+  readonly planLabel = computed(() => {
+    if (this.isPremium()) {
+      return 'Abonné Premium';
+    }
+    return 'Offre découverte';
+  });
+
+  readonly generationPercent = computed(() => {
+    const allowance = this.monthlyAllowance();
+    if (allowance <= 0) {
+      return 0;
+    }
+    return Math.round((this.generationsRemaining() / allowance) * 100);
+  });
+
+  readonly stats = computed<Stat[]>(() => [
+    { label: 'Musiques créées', value: String(this.musicTotal()), icon: 'music_note' },
+    { label: 'Amis', value: String(this.friendsCount()), icon: 'group' },
   ]);
 
-  get tokenPercent(): number {
-    return Math.min(100, Math.round(this.tokens() / 500 * 100));
+  ngOnInit(): void {
+    void this.loadMusic();
+    void this.loadFriends();
+  }
+
+  goToGenerate(): void {
+    void this.router.navigate(['/generate']);
+  }
+
+  goToLibrary(): void {
+    void this.router.navigate(['/library']);
+  }
+
+  private async loadMusic(): Promise<void> {
+    const result = await this.api.invoke(musicControllerFindAll, { page: 1, limit: 5 });
+    this.musicTotal.set(result.total);
+    this.recentSongs.set(result.data.map((music, index) => this.toRecentSong(music, index)));
+  }
+
+  private async loadFriends(): Promise<void> {
+    const friends = await this.api.invoke(friendshipControllerFindFriends);
+    this.friendsCount.set(friends.length);
+  }
+
+  private toRecentSong(music: Music, index: number): RecentSong {
+    return {
+      id: music.id,
+      title: music.title ?? 'Sans titre',
+      subject: music.style ?? 'Révision',
+      duration: this.formatDuration(music.duration),
+      color: THUMB_COLORS[index % THUMB_COLORS.length],
+    };
+  }
+
+  private formatDuration(seconds: number): string {
+    if (!seconds) {
+      return '—';
+    }
+    const total = Math.round(seconds);
+    const minutes = Math.floor(total / 60);
+    const remainder = total % 60;
+    return `${minutes}:${remainder.toString().padStart(2, '0')}`;
   }
 }

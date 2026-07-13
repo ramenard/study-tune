@@ -21,6 +21,8 @@ export type { AuthControllerRegister$Params as AuthControllerRegister$Params } f
 export { authControllerRegister as authControllerRegister } from './fn/auth/auth-controller-register';
 export type { AuthControllerLogin$Params as AuthControllerLogin$Params } from './fn/auth/auth-controller-login';
 export { authControllerLogin as authControllerLogin } from './fn/auth/auth-controller-login';
+export type { AuthControllerMe$Params as AuthControllerMe$Params } from './fn/auth/auth-controller-me';
+export { authControllerMe as authControllerMe } from './fn/auth/auth-controller-me';
 export type { PlaylistControllerFindAll$Params as PlaylistControllerFindAll$Params } from './fn/playlist/playlist-controller-find-all';
 export { playlistControllerFindAll as playlistControllerFindAll } from './fn/playlist/playlist-controller-find-all';
 export type { PlaylistControllerCreate$Params as PlaylistControllerCreate$Params } from './fn/playlist/playlist-controller-create';
@@ -51,3 +53,5 @@ export type { FriendshipControllerFindPendingSent$Params as FriendshipController
 export { friendshipControllerFindPendingSent as friendshipControllerFindPendingSent } from './fn/friendship/friendship-controller-find-pending-sent';
 export type { FriendshipControllerRemoveFriend$Params as FriendshipControllerRemoveFriend$Params } from './fn/friendship/friendship-controller-remove-friend';
 export { friendshipControllerRemoveFriend as friendshipControllerRemoveFriend } from './fn/friendship/friendship-controller-remove-friend';
+export type { HealthControllerCheck$Params as HealthControllerCheck$Params } from './fn/health/health-controller-check';
+export { healthControllerCheck as healthControllerCheck } from './fn/health/health-controller-check';

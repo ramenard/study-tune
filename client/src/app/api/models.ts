@@ -11,6 +11,7 @@ export type { Music } from './models/music';
 export type { PaginatedMusicDto } from './models/paginated-music-dto';
 export type { PaginatedPlaylistsDto } from './models/paginated-playlists-dto';
 export type { Playlist } from './models/playlist';
+export type { ProfileDto } from './models/profile-dto';
 export type { RegisterDto } from './models/register-dto';
 export type { RespondRequestDto } from './models/respond-request-dto';
 export type { SendRequestDto } from './models/send-request-dto';

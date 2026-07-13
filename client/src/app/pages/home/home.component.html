@@ -1,38 +1,40 @@
 <div class="home">
   <header class="home-header">
     <div>
-      <h1 class="greeting">Bonjour, Alex 👋</h1>
+      <h1 class="greeting">{{ greeting() }}</h1>
       <p class="subtitle">Prêt à transformer tes cours en musique ?</p>
     </div>
-    <button mat-flat-button color="primary">Générer</button>
+    <button mat-flat-button color="primary" (click)="goToGenerate()">Générer</button>
   </header>
 
   <div class="flex items-center gap-6 rounded-2xl h-24 p-4 text-white bg-gradient-to-br from-[#6c5ce7] via-[#8b5cf6] to-[#a78bfa] shadow-lg">
-    <mat-icon class="token-card__icon opacity-90 shrink-0">toll</mat-icon>
+    <mat-icon class="token-card__icon opacity-90 shrink-0">bolt</mat-icon>
 
     <div class="flex-1">
       <div class="flex items-baseline gap-2 mb-2">
-        <span class="text-[2.25rem] font-black leading-none tracking-tight">{{ tokens() }}</span>
-        <span class="text-base opacity-80">tokens restants</span>
+        <span class="text-[2.25rem] font-black leading-none tracking-tight">{{ generationsRemaining() }}</span>
+        <span class="text-base opacity-80">génération{{ generationsRemaining() > 1 ? 's' : '' }} restante{{ generationsRemaining() > 1 ? 's' : '' }} ce mois</span>
       </div>
       <div class="max-w-[18.75rem] h-1 rounded-full bg-white/25 overflow-hidden mb-1.5">
         <div class="h-full bg-white/85 rounded-full transition-[width] duration-300"
-             [style.width.%]="tokenPercent"></div>
+             [style.width.%]="generationPercent()"></div>
       </div>
       <p class="text-[0.6875rem] font-medium opacity-70">
-        1 génération = 10 tokens · 1 fiche = 5 tokens
+        {{ planLabel() }} · {{ monthlyAllowance() }} génération{{ monthlyAllowance() > 1 ? 's' : '' }} / mois
       </p>
     </div>
 
-    <button class="shrink-0 h-10 px-6 rounded-full text-sm font-medium text-white
-                   bg-white/20 border border-white/35 cursor-pointer
-                   transition-colors hover:bg-white/30">
-      + Acheter
-    </button>
+    @if (!isPremium()) {
+      <button class="shrink-0 h-10 px-6 rounded-full text-sm font-medium text-white
+                     bg-white/20 border border-white/35 cursor-pointer
+                     transition-colors hover:bg-white/30">
+        S'abonner · 4,99 €
+      </button>
+    }
   </div>
 
   <div class="stats-grid">
-    @for (stat of stats; track stat.label) {
+    @for (stat of stats(); track stat.label) {
       <div class="stat-card">
         <mat-icon class="stat-card__icon">{{ stat.icon }}</mat-icon>
         <span class="stat-card__value">{{ stat.value }}</span>
@@ -44,26 +46,33 @@
   <section class="recent-section">
     <div class="recent-section__header">
       <h2 class="section-title">Musiques récentes</h2>
-      <button mat-button color="primary">Voir tout</button>
+      <button mat-button color="primary" (click)="goToLibrary()">Voir tout</button>
     </div>
 
-    <div class="songs-list">
-      @for (song of recentSongs(); track song.id; let last = $last) {
-        <div class="song-item">
-          <div class="song-thumb" [style.background]="song.color">
-            <mat-icon>music_note</mat-icon>
+    @if (recentSongs().length === 0) {
+      <div class="songs-empty">
+        <mat-icon>music_off</mat-icon>
+        <p>Aucune musique pour l'instant — génères-en une !</p>
+      </div>
+    } @else {
+      <div class="songs-list">
+        @for (song of recentSongs(); track song.id; let last = $last) {
+          <div class="song-item">
+            <div class="song-thumb" [style.background]="song.color">
+              <mat-icon>music_note</mat-icon>
+            </div>
+            <div class="song-meta">
+              <span class="song-title">{{ song.title }}</span>
+              <span class="song-subject">{{ song.subject }}</span>
+            </div>
+            <span class="song-duration">{{ song.duration }}</span>
+            <mat-icon class="song-play">play_circle</mat-icon>
           </div>
-          <div class="song-meta">
-            <span class="song-title">{{ song.title }}</span>
-            <span class="song-subject">{{ song.subject }}</span>
-          </div>
-          <span class="song-duration">{{ song.duration }}</span>
-          <mat-icon class="song-play">play_circle</mat-icon>
-        </div>
-        @if (!last) {
-          <div class="divider"></div>
+          @if (!last) {
+            <div class="divider"></div>
+          }
         }
-      }
-    </div>
+      </div>
+    }
   </section>
 </div>

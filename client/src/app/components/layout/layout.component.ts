@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { PlayerBarComponent } from '../player-bar/player-bar.component';
+import { ProfileService } from '../../core/services/profile.service';
 
 interface NavItem {
   id: string;
@@ -16,19 +17,25 @@ interface NavItem {
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
+  private readonly profileService = inject(ProfileService);
+
   readonly navItems: NavItem[] = [
     { id: 'home',    icon: 'home',          label: 'Accueil',      route: '/' },
     { id: 'gen',     icon: 'bolt',          label: 'Générer',      route: '/generate' },
     { id: 'lib',     icon: 'library_music', label: 'Bibliothèque', route: '/library' },
     { id: 'pl',      icon: 'queue_music',   label: 'Playlists',    route: '/playlists' },
     { id: 'friends', icon: 'group',         label: 'Amis',         route: '/friends' },
-    { id: 'tokens',  icon: 'toll',          label: 'Tokens',       route: '/tokens' },
+    { id: 'tokens',  icon: 'toll',          label: 'Abonnement',   route: '/tokens' },
     { id: 'profile', icon: 'person',        label: 'Profil',       route: '/profile' },
   ];
 
-  readonly tokens = signal(350);
+  readonly generationsRemaining = this.profileService.generationsRemaining;
   readonly dark = signal(false);
+
+  ngOnInit(): void {
+    void this.profileService.load();
+  }
 
   toggleDark(): void {
     this.dark.update(v => !v);

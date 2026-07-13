@@ -7,9 +7,12 @@ export interface User {
   createdAt: string;
   createdPlaylists: Array<Playlist>;
   email: string;
+  generationsUsed: number;
   id: string;
   musics: Array<Music>;
   password: string;
+  periodStart: string;
+  plan: string;
   sharedPlaylists: Array<Playlist>;
   username: string;
 }

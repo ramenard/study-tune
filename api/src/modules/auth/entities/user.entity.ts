@@ -25,6 +25,15 @@ export class User {
   @Column({ type: 'varchar' })
   username: string;
 
+  @Column({ type: 'varchar', default: 'free' })
+  plan: string;
+
+  @Column({ type: 'int', default: 0 })
+  generationsUsed: number;
+
+  @Column({ type: 'timestamptz', default: () => 'now()' })
+  periodStart: Date;
+
   @OneToMany(() => Music, (music) => music.user)
   musics: Music[];
 
