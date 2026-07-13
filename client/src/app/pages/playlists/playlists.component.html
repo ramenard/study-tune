@@ -2,7 +2,7 @@
   <div class="page-header">
     <div>
       <h1>Mes Playlists</h1>
-      <p>{{ playlists().length }} playlists créées</p>
+      <p>{{ playlists().length }} playlist{{ playlists().length > 1 ? 's' : '' }}</p>
     </div>
     <button mat-flat-button color="primary" (click)="openNewForm()">
       <mat-icon>add</mat-icon>
@@ -18,49 +18,76 @@
           #nameInput
           class="new-form-card__input"
           type="text"
-          placeholder="Nom de la playlist..."
+          placeholder="Nom de la playlist…"
           [value]="newPlaylistName()"
           (input)="onNameInput(nameInput.value)"
-          (keydown)="onCreateKeydown($event)"
-          autofocus />
-        <button mat-flat-button color="primary" (click)="createPlaylist()">Créer</button>
+          (keydown)="onCreateKeydown($event)" />
+        <button mat-flat-button color="primary" [disabled]="busy()" (click)="createPlaylist()">Créer</button>
         <button mat-stroked-button (click)="cancelNewForm()">Annuler</button>
       </div>
     </div>
   }
 
+  @if (playlists().length === 0) {
+    <div class="empty-state">
+      <mat-icon>queue_music</mat-icon>
+      <p>Aucune playlist — crée ta première !</p>
+    </div>
+  }
+
   <div class="grid">
     @for (playlist of playlists(); track playlist.id) {
-      <div class="playlist-card">
-        <div class="playlist-card__accent" [style.background]="playlist.color"></div>
+      <div class="playlist-card" [class.playlist-card--selected]="selectedId() === playlist.id" (click)="select(playlist.id)">
+        <div class="playlist-card__accent" [style.background]="colorFor(playlist.id)"></div>
 
         <div class="playlist-card__top">
-          <div class="playlist-card__icon" [style.background]="playlist.color">
+          <div class="playlist-card__icon" [style.background]="colorFor(playlist.id)">
             <mat-icon>music_note</mat-icon>
           </div>
           <div class="playlist-card__info">
             <div class="playlist-card__name">{{ playlist.name }}</div>
-            <div class="playlist-card__count">{{ playlist.count }} musiques</div>
+            <div class="playlist-card__count">{{ playlist.musics.length }} musique{{ playlist.musics.length > 1 ? 's' : '' }}</div>
           </div>
         </div>
 
         <div class="playlist-card__bottom">
-          <span class="visibility-badge" [class.visibility-badge--public]="playlist.isPublic">
-            @if (playlist.isPublic) {
-              <mat-icon>public</mat-icon>
-              Publique
-            }
-            @if (!playlist.isPublic) {
-              <mat-icon>lock</mat-icon>
-              Privée
-            }
-          </span>
-          <button mat-button color="primary" class="share-btn">
-            <mat-icon>share</mat-icon>
-            Partager
+          <span class="hint">{{ selectedId() === playlist.id ? 'Masquer' : 'Voir les titres' }}</span>
+          <button mat-icon-button aria-label="Supprimer la playlist" (click)="deletePlaylist($event, playlist.id)">
+            <mat-icon>delete_outline</mat-icon>
           </button>
         </div>
       </div>
     }
   </div>
+
+  @if (selectedPlaylist(); as playlist) {
+    <div class="detail-card">
+      <div class="detail-card__header">
+        <h2>{{ playlist.name }}</h2>
+        <span>{{ playlist.musics.length }} titre{{ playlist.musics.length > 1 ? 's' : '' }}</span>
+      </div>
+
+      @if (playlist.musics.length === 0) {
+        <div class="empty-state empty-state--inline">
+          <p>Cette playlist est vide. Ajoute des titres depuis la bibliothèque.</p>
+        </div>
+      } @else {
+        <div class="track-list">
+          @for (music of playlist.musics; track music.id) {
+            <div class="track-row">
+              <mat-icon class="track-row__icon">music_note</mat-icon>
+              <div class="track-row__meta">
+                <span class="track-row__title">{{ music.title || 'Sans titre' }}</span>
+                <span class="track-row__sub">{{ music.style || 'Révision' }}</span>
+              </div>
+              <span class="track-row__duration">{{ formatDuration(music.duration) }}</span>
+              <button mat-icon-button aria-label="Retirer de la playlist" (click)="removeMusic(playlist.id, music.id)">
+                <mat-icon>remove_circle_outline</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
 </div>

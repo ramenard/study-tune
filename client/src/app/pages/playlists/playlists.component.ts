@@ -1,21 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { PlaylistService } from '../../core/services/playlist.service';
 
-interface Playlist {
-  id: number;
-  name: string;
-  count: number;
-  color: string;
-  isPublic: boolean;
-}
-
-const INITIAL_PLAYLISTS: Playlist[] = [
-  { id: 1, name: 'Révisions Physique',  count: 8,  color: '#006A6A', isPublic: true  },
-  { id: 2, name: 'Histoire de France',  count: 5,  color: '#4B607C', isPublic: false },
-  { id: 3, name: 'Maths & Algos',       count: 12, color: '#7D5260', isPublic: true  },
-  { id: 4, name: 'Bio-Chimie Mix',      count: 6,  color: '#365E3D', isPublic: true  },
-];
+const ACCENT_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#7A4B2E'];
 
 @Component({
   selector: 'app-playlists',
@@ -23,13 +11,30 @@ const INITIAL_PLAYLISTS: Playlist[] = [
   templateUrl: './playlists.component.html',
   styleUrl: './playlists.component.scss',
 })
-export class PlaylistsComponent {
-  readonly playlists = signal<Playlist[]>(INITIAL_PLAYLISTS);
+export class PlaylistsComponent implements OnInit {
+  private readonly playlistService = inject(PlaylistService);
+
+  readonly playlists = this.playlistService.playlists;
   readonly showNewForm = signal(false);
   readonly newPlaylistName = signal('');
-  private nextId = INITIAL_PLAYLISTS.length + 1;
+  readonly selectedId = signal<string | null>(null);
+  readonly busy = signal(false);
 
-  readonly accentColors = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#7A4B2E'];
+  readonly selectedPlaylist = computed(() =>
+    this.playlists().find((playlist) => playlist.id === this.selectedId()) ?? null,
+  );
+
+  ngOnInit(): void {
+    void this.playlistService.load();
+  }
+
+  colorFor(id: string): string {
+    let hash = 0;
+    for (const char of id) {
+      hash = (hash + char.charCodeAt(0)) % ACCENT_COLORS.length;
+    }
+    return ACCENT_COLORS[hash];
+  }
 
   openNewForm(): void {
     this.showNewForm.set(true);
@@ -44,31 +49,54 @@ export class PlaylistsComponent {
     this.newPlaylistName.set(value);
   }
 
-  createPlaylist(): void {
+  async createPlaylist(): Promise<void> {
     const name = this.newPlaylistName().trim();
-    if (!name) {
+    if (!name || this.busy()) {
       return;
     }
-    const colorIndex = this.nextId % this.accentColors.length;
-    const newPlaylist: Playlist = {
-      id: this.nextId++,
-      name,
-      count: 0,
-      color: this.accentColors[colorIndex],
-      isPublic: false,
-    };
-    this.playlists.update(list => [...list, newPlaylist]);
-    this.showNewForm.set(false);
-    this.newPlaylistName.set('');
+
+    this.busy.set(true);
+    try {
+      await this.playlistService.create(name);
+      this.cancelNewForm();
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  select(id: string): void {
+    this.selectedId.update((current) => (current === id ? null : id));
+  }
+
+  async deletePlaylist(event: Event, id: string): Promise<void> {
+    event.stopPropagation();
+    await this.playlistService.remove(id);
+    if (this.selectedId() === id) {
+      this.selectedId.set(null);
+    }
+  }
+
+  async removeMusic(playlistId: string, musicId: string): Promise<void> {
+    await this.playlistService.removeMusic(playlistId, musicId);
   }
 
   onCreateKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
-      this.createPlaylist();
+      void this.createPlaylist();
       return;
     }
     if (event.key === 'Escape') {
       this.cancelNewForm();
     }
+  }
+
+  formatDuration(seconds: number | undefined): string {
+    if (!seconds) {
+      return '—';
+    }
+    const total = Math.round(seconds);
+    const minutes = Math.floor(total / 60);
+    const remainder = total % 60;
+    return `${minutes}:${remainder.toString().padStart(2, '0')}`;
   }
 }
