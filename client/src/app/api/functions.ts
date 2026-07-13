@@ -11,6 +11,8 @@ export type { MusicControllerFindAll$Params as MusicControllerFindAll$Params } f
 export { musicControllerFindAll as musicControllerFindAll } from './fn/music/music-controller-find-all';
 export type { MusicControllerFindOne$Params as MusicControllerFindOne$Params } from './fn/music/music-controller-find-one';
 export { musicControllerFindOne as musicControllerFindOne } from './fn/music/music-controller-find-one';
+export type { MusicControllerDelete$Params as MusicControllerDelete$Params } from './fn/music/music-controller-delete';
+export { musicControllerDelete as musicControllerDelete } from './fn/music/music-controller-delete';
 export type { MusicControllerUpdate$Params as MusicControllerUpdate$Params } from './fn/music/music-controller-update';
 export { musicControllerUpdate as musicControllerUpdate } from './fn/music/music-controller-update';
 export type { MusicControllerGetStreamUrl$Params as MusicControllerGetStreamUrl$Params } from './fn/music/music-controller-get-stream-url';

@@ -152,4 +152,10 @@ export class MusicService {
     const url = await this.storage.getPresignedUrl(music.objectName);
     return { url };
   }
+
+  async delete(id: string, userId: string): Promise<void> {
+    const music = await this.findOneByUser(id, userId);
+    await this.musicRepo.manager.query('DELETE FROM playlist_music WHERE "musicId" = $1', [music.id]);
+    await this.musicRepo.remove(music);
+  }
 }

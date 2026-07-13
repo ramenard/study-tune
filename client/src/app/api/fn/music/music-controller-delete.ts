@@ -7,26 +7,25 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { StreamUrlDto } from '../../models/stream-url-dto';
 
-export interface MusicControllerGetStreamUrl$Params {
+export interface MusicControllerDelete$Params {
   id: string;
 }
 
-export function musicControllerGetStreamUrl(http: HttpClient, rootUrl: string, params: MusicControllerGetStreamUrl$Params, context?: HttpContext): Observable<StrictHttpResponse<StreamUrlDto>> {
-  const rb = new RequestBuilder(rootUrl, musicControllerGetStreamUrl.PATH, 'get');
+export function musicControllerDelete(http: HttpClient, rootUrl: string, params: MusicControllerDelete$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, musicControllerDelete.PATH, 'delete');
   if (params) {
     rb.path('id', params.id, {});
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'application/json', context })
+    rb.build({ responseType: 'text', accept: '*/*', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<StreamUrlDto>;
+      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
     })
   );
 }
 
-musicControllerGetStreamUrl.PATH = '/api/music/{id}/stream';
+musicControllerDelete.PATH = '/api/music/{id}';

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, HttpCode, HttpStatus, UseGuards, Req, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, HttpCode, HttpStatus, UseGuards, Req, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { MusicService } from './music.service';
@@ -6,6 +6,7 @@ import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
 import { PaginatedMusicDto } from './dto/paginated-music.dto';
 import { GenerateMusicResponseDto } from './dto/generate-music-response.dto';
+import { StreamUrlDto } from './dto/stream-url.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 type AuthRequest = Request & { user: { id: string } };
@@ -53,7 +54,14 @@ export class MusicController {
   }
 
   @Get(':id/stream')
-  async getStreamUrl(@Param('id') id: string, @Req() req: AuthRequest) {
+  @ApiOkResponse({ type: StreamUrlDto })
+  async getStreamUrl(@Param('id') id: string, @Req() req: AuthRequest): Promise<StreamUrlDto> {
     return this.musicService.getStreamUrl(id, req.user.id);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id') id: string, @Req() req: AuthRequest): Promise<void> {
+    return this.musicService.delete(id, req.user.id);
   }
 }

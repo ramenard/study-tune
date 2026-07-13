@@ -1,25 +1,26 @@
 <div class="player-bar">
   <div class="track-info">
-    <div class="track-thumb" [style.background]="currentTrack().color">
+    <div class="track-thumb" [style.background]="currentTrack()?.color || 'var(--md-sys-color-surface-variant)'">
       <mat-icon>music_note</mat-icon>
     </div>
     <div class="track-meta">
-      <span class="track-title">{{ currentTrack().title }}</span>
-      <span class="track-subject">{{ currentTrack().subject }}</span>
+      <span class="track-title">{{ currentTrack()?.title || 'Aucune lecture' }}</span>
+      <span class="track-subject">{{ currentTrack()?.subject || '—' }}</span>
     </div>
-    <button class="icon-btn">
+    <button class="icon-btn" aria-label="Favori">
       <mat-icon>favorite_border</mat-icon>
     </button>
   </div>
 
   <div class="controls">
-    <button class="icon-btn">
+    <button class="icon-btn" aria-label="Précédent">
       <mat-icon>skip_previous</mat-icon>
     </button>
-    <button class="play-btn" (click)="togglePlay()">
+    <button class="play-btn" [disabled]="!currentTrack()" (click)="togglePlay()"
+            [attr.aria-label]="playing() ? 'Pause' : 'Lecture'">
       <mat-icon>{{ playing() ? 'pause' : 'play_arrow' }}</mat-icon>
     </button>
-    <button class="icon-btn">
+    <button class="icon-btn" aria-label="Suivant">
       <mat-icon>skip_next</mat-icon>
     </button>
   </div>

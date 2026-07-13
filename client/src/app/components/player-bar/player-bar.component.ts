@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { PlayerService } from '../../core/services/player.service';
 
 @Component({
   selector: 'app-player-bar',
@@ -8,10 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './player-bar.component.scss'
 })
 export class PlayerBarComponent {
-  readonly playing = signal(false);
-  readonly currentTrack = signal({ title: 'Thermodynamique Lo-Fi', subject: 'Physique', color: '#006A6A' });
+  private readonly player = inject(PlayerService);
+
+  readonly currentTrack = this.player.currentTrack;
+  readonly playing = this.player.playing;
 
   togglePlay(): void {
-    this.playing.update(v => !v);
+    this.player.toggle();
   }
 }
