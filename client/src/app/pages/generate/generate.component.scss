@@ -26,6 +26,66 @@
   }
 }
 
+.gen-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &--empty {
+    background: color-mix(in srgb, var(--md-sys-color-error) 15%, transparent);
+    color: var(--md-sys-color-error);
+  }
+}
+
+.quota-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--md-sys-color-error) 10%, var(--md-sys-color-surface-container-low));
+  border: 0.0625rem solid color-mix(in srgb, var(--md-sys-color-error) 35%, transparent);
+
+  > mat-icon {
+    color: var(--md-sys-color-error);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    font-size: 0.8125rem;
+    color: var(--md-sys-color-on-surface-variant);
+
+    strong {
+      color: var(--md-sys-color-on-surface);
+    }
+  }
+}
+
+.gen-error {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--md-sys-color-error);
+  background: color-mix(in srgb, var(--md-sys-color-error) 10%, transparent);
+}
+
 .stepper {
   display: flex;
   align-items: center;
@@ -310,6 +370,16 @@
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
+}
+
+.course-card__summary {
+  margin: 0;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--md-sys-color-on-surface-variant);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .course-section {

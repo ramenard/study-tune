@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Param, Patch, Post, HttpCode, HttpStatus, UseGuards, Req, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { MusicService } from './music.service';
 import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
 import { PaginatedMusicDto } from './dto/paginated-music.dto';
+import { GenerateMusicResponseDto } from './dto/generate-music-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 type AuthRequest = Request & { user: { id: string } };
@@ -18,7 +19,8 @@ export class MusicController {
 
   @Post('generate')
   @HttpCode(HttpStatus.ACCEPTED)
-  async generate(@Body() dto: CreateMusicDto, @Req() req: AuthRequest) {
+  @ApiResponse({ status: HttpStatus.ACCEPTED, type: GenerateMusicResponseDto })
+  async generate(@Body() dto: CreateMusicDto, @Req() req: AuthRequest): Promise<GenerateMusicResponseDto> {
     return this.musicService.generateAndStore(dto, req.user.id);
   }
 

@@ -15,14 +15,14 @@ export type { MusicControllerUpdate$Params as MusicControllerUpdate$Params } fro
 export { musicControllerUpdate as musicControllerUpdate } from './fn/music/music-controller-update';
 export type { MusicControllerGetStreamUrl$Params as MusicControllerGetStreamUrl$Params } from './fn/music/music-controller-get-stream-url';
 export { musicControllerGetStreamUrl as musicControllerGetStreamUrl } from './fn/music/music-controller-get-stream-url';
-export type { DocumentControllerProcess$Params as DocumentControllerProcess$Params } from './fn/document/document-controller-process';
-export { documentControllerProcess as documentControllerProcess } from './fn/document/document-controller-process';
 export type { AuthControllerRegister$Params as AuthControllerRegister$Params } from './fn/auth/auth-controller-register';
 export { authControllerRegister as authControllerRegister } from './fn/auth/auth-controller-register';
 export type { AuthControllerLogin$Params as AuthControllerLogin$Params } from './fn/auth/auth-controller-login';
 export { authControllerLogin as authControllerLogin } from './fn/auth/auth-controller-login';
 export type { AuthControllerMe$Params as AuthControllerMe$Params } from './fn/auth/auth-controller-me';
 export { authControllerMe as authControllerMe } from './fn/auth/auth-controller-me';
+export type { DocumentControllerProcess$Params as DocumentControllerProcess$Params } from './fn/document/document-controller-process';
+export { documentControllerProcess as documentControllerProcess } from './fn/document/document-controller-process';
 export type { PlaylistControllerFindAll$Params as PlaylistControllerFindAll$Params } from './fn/playlist/playlist-controller-find-all';
 export { playlistControllerFindAll as playlistControllerFindAll } from './fn/playlist/playlist-controller-find-all';
 export type { PlaylistControllerCreate$Params as PlaylistControllerCreate$Params } from './fn/playlist/playlist-controller-create';

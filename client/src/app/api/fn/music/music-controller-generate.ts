@@ -8,23 +8,24 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { CreateMusicDto } from '../../models/create-music-dto';
+import { GenerateMusicResponseDto } from '../../models/generate-music-response-dto';
 
 export interface MusicControllerGenerate$Params {
       body: CreateMusicDto
 }
 
-export function musicControllerGenerate(http: HttpClient, rootUrl: string, params: MusicControllerGenerate$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+export function musicControllerGenerate(http: HttpClient, rootUrl: string, params: MusicControllerGenerate$Params, context?: HttpContext): Observable<StrictHttpResponse<GenerateMusicResponseDto>> {
   const rb = new RequestBuilder(rootUrl, musicControllerGenerate.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/json');
   }
 
   return http.request(
-    rb.build({ responseType: 'text', accept: '*/*', context })
+    rb.build({ responseType: 'json', accept: 'application/json', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      return r as StrictHttpResponse<GenerateMusicResponseDto>;
     })
   );
 }

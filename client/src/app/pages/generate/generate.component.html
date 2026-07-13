@@ -1,8 +1,23 @@
 <div class="generate">
   <div class="page-header">
     <h1>Générateur</h1>
-    <p>Cours → fiche technique → musique</p>
+    <p>Cours → fiche de révision → musique</p>
+    <span class="gen-counter" [class.gen-counter--empty]="outOfGenerations()">
+      <mat-icon>bolt</mat-icon>
+      {{ generationsRemaining() }} génération{{ generationsRemaining() > 1 ? 's' : '' }} restante{{ generationsRemaining() > 1 ? 's' : '' }}
+    </span>
   </div>
+
+  @if (outOfGenerations()) {
+    <div class="quota-banner" role="alert">
+      <mat-icon>lock</mat-icon>
+      <div class="quota-banner__text">
+        <strong>Plus de génération ce mois-ci</strong>
+        <span>Abonne-toi (4,99 €/mois) pour 2 générations mensuelles.</span>
+      </div>
+      <button mat-flat-button color="primary" (click)="goToSubscription()">S'abonner</button>
+    </div>
+  }
 
   <div class="stepper">
     @for (label of steps; track label; let index = $index) {
@@ -13,8 +28,7 @@
              [class.step-circle--todo]="index > step()">
           @if (index < step()) {
             <mat-icon>check</mat-icon>
-          }
-          @if (index >= step()) {
+          } @else {
             <span>{{ index + 1 }}</span>
           }
         </div>
@@ -25,6 +39,10 @@
       }
     }
   </div>
+
+  @if (errorMessage()) {
+    <p class="gen-error" role="alert">{{ errorMessage() }}</p>
+  }
 
   @if (step() === 0) {
     <div class="step-content">
@@ -45,31 +63,10 @@
             <textarea
               #promptRef
               class="textarea"
-              placeholder="Colle ton cours ici..."
+              placeholder="Colle ton cours ici…"
               [value]="promptText()"
               (input)="onPromptInput(promptRef.value)"></textarea>
           </div>
-
-          <div class="style-section">
-            <div class="style-section__title">Style musical</div>
-            <div class="chips">
-              @for (style of musicStyles; track style) {
-                <button class="chip" [class.chip--selected]="selectedStyle() === style" (click)="selectStyle(style)">
-                  @if (selectedStyle() === style) {
-                    <mat-icon>check</mat-icon>
-                  }
-                  {{ style }}
-                </button>
-              }
-            </div>
-          </div>
-
-          <button mat-flat-button color="primary" class="generate-btn"
-                  [disabled]="!canGenerate()"
-                  (click)="generateSheet()">
-            <mat-icon>{{ sheetBtnIcon() }}</mat-icon>
-            {{ sheetBtnLabel() }}
-          </button>
         </div>
       }
 
@@ -81,39 +78,38 @@
                (click)="fileInput.click()">
             @if (hasPdfFile()) {
               <mat-icon class="upload-zone__icon upload-zone__icon--done">check_circle</mat-icon>
-              <div class="upload-zone__title">PDF chargé</div>
+              <div class="upload-zone__title">{{ selectedFile()?.name }}</div>
               <div class="upload-zone__sub">Cliquer pour changer</div>
-            }
-            @if (!hasPdfFile()) {
+            } @else {
               <mat-icon class="upload-zone__icon">upload_file</mat-icon>
               <div class="upload-zone__title">Glisse ton PDF ici</div>
               <div class="upload-zone__sub">ou <span class="upload-zone__link">parcourir les fichiers</span></div>
             }
             <input #fileInput type="file" accept=".pdf" class="file-input" (change)="onFileSelect(fileInput)">
           </div>
-
-          <div class="style-section">
-            <div class="style-section__title">Style musical</div>
-            <div class="chips">
-              @for (style of musicStyles; track style) {
-                <button class="chip" [class.chip--selected]="selectedStyle() === style" (click)="selectStyle(style)">
-                  @if (selectedStyle() === style) {
-                    <mat-icon>check</mat-icon>
-                  }
-                  {{ style }}
-                </button>
-              }
-            </div>
-          </div>
-
-          <button mat-flat-button color="primary" class="generate-btn"
-                  [disabled]="!canGenerate()"
-                  (click)="generateSheet()">
-            <mat-icon>{{ sheetBtnIcon() }}</mat-icon>
-            {{ sheetBtnLabel() }}
-          </button>
         </div>
       }
+
+      <div class="style-section">
+        <div class="style-section__title">Style musical</div>
+        <div class="chips">
+          @for (style of musicStyles; track style) {
+            <button class="chip" [class.chip--selected]="selectedStyle() === style" (click)="selectStyle(style)">
+              @if (selectedStyle() === style) {
+                <mat-icon>check</mat-icon>
+              }
+              {{ style }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <button mat-flat-button color="primary" class="generate-btn"
+              [disabled]="!canGenerateSheet()"
+              (click)="generateSheet()">
+        <mat-icon>{{ loadingSheet() ? 'hourglass_empty' : 'auto_awesome' }}</mat-icon>
+        {{ sheetBtnLabel() }}
+      </button>
     </div>
   }
 
@@ -121,19 +117,9 @@
     <div class="step-content">
       <div class="course-card">
         <div class="course-card__header">
-          <div class="course-card__title">Thermodynamique — Premier Principe</div>
-          <span class="course-card__subject">Physique</span>
+          <div class="course-card__title">{{ ficheTitle() || 'Fiche de révision' }}</div>
         </div>
-        @for (section of courseSections; track section.title) {
-          <div class="course-section">
-            <div class="course-section__title">● {{ section.title }}</div>
-            <ul class="course-section__list">
-              @for (bullet of section.bullets; track bullet) {
-                <li>{{ bullet }}</li>
-              }
-            </ul>
-          </div>
-        }
+        <pre class="course-card__summary">{{ ficheSummary() }}</pre>
       </div>
 
       <div class="step-actions">
@@ -142,9 +128,9 @@
           Recommencer
         </button>
         <button mat-flat-button color="primary"
-                [disabled]="isLoading()"
+                [disabled]="loadingMusic() || outOfGenerations()"
                 (click)="generateMusic()">
-          <mat-icon>{{ musicBtnIcon() }}</mat-icon>
+          <mat-icon>{{ loadingMusic() ? 'hourglass_empty' : 'music_note' }}</mat-icon>
           {{ musicBtnLabel() }}
         </button>
       </div>
@@ -157,13 +143,12 @@
         <mat-icon class="success__icon">music_note</mat-icon>
       </div>
       <div class="success__text">
-        <h2 class="success__title">Ta musique est prête !</h2>
-        <p class="success__meta">Thermodynamique {{ selectedStyle() }} · 3:42</p>
+        <h2 class="success__title">Ta musique est en cours de création !</h2>
+        <p class="success__meta">{{ ficheTitle() }} · {{ selectedStyle() }} — elle apparaîtra dans ta bibliothèque une fois prête.</p>
       </div>
       <div class="success__actions">
-        <button mat-stroked-button (click)="reset()">Nouveau</button>
-        <button mat-flat-button class="btn-tonal">+ Playlist</button>
-        <button mat-flat-button color="primary">Partager</button>
+        <button mat-stroked-button (click)="reset()">Nouvelle génération</button>
+        <button mat-flat-button color="primary" (click)="goToLibrary()">Voir la bibliothèque</button>
       </div>
     </div>
   }

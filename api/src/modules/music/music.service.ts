@@ -6,6 +6,7 @@ import { StorageService } from './storage.service';
 import { Music } from './entities/music.entity';
 import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
+import { SubscriptionService } from '../auth/subscription.service';
 
 @Injectable()
 export class MusicService {
@@ -16,9 +17,12 @@ export class MusicService {
     private readonly musicRepo: Repository<Music>,
     private readonly suno: SunoService,
     private readonly storage: StorageService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async generateAndStore(dto: CreateMusicDto, userId: string): Promise<{ id: string; taskId: string }> {
+    await this.subscriptionService.assertCanGenerate(userId);
+
     const music = await this.musicRepo.save(
       this.musicRepo.create({
         title: dto.title ?? 'Generating...',
@@ -40,6 +44,8 @@ export class MusicService {
     if (!taskId) {
       throw new Error('No taskId returned from kie.ai');
     }
+
+    await this.subscriptionService.consumeGeneration(userId);
 
     music.sunoId = taskId;
     music.status = 'generating';
