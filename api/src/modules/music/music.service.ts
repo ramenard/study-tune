@@ -194,7 +194,7 @@ export class MusicService {
     }
 
     const stream = await this.storage.getObjectStream(music.objectName);
-    const safeTitle = (music.title ?? 'musique').replace(/[^\w\-]+/g, '_');
+    const safeTitle = (music.title ?? 'musique').replace(/[^\w-]+/g, '_');
     return { stream, filename: `${safeTitle}.mp3` };
   }
 

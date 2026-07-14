@@ -59,7 +59,7 @@ export class MusicService {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `${(title || 'musique').replace(/[^\w\-]+/g, '_')}.mp3`;
+    anchor.download = `${(title || 'musique').replace(/[^\w-]+/g, '_')}.mp3`;
     anchor.click();
     URL.revokeObjectURL(url);
   }
