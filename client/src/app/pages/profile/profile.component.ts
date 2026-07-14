@@ -1,21 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
-interface Skill {
-  label: string;
-  percent: number;
-}
-
-interface Badge {
-  icon: string;
-  label: string;
-}
-
-interface ProfileStat {
-  value: string;
-  icon: string;
-}
+import { ProfileService } from '../../core/services/profile.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -23,61 +11,42 @@ interface ProfileStat {
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
-export class ProfileComponent {
-  readonly isEditing = signal(false);
-  readonly displayName = signal('Alex Martin');
-  readonly username = signal('@alexmartin');
-  editNameValue = '';
+export class ProfileComponent implements OnInit {
+  private readonly profileService = inject(ProfileService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  readonly stats: ProfileStat[] = [
-    { value: '28 musiques', icon: 'music_note'  },
-    { value: '41 fiches',   icon: 'description' },
-  ];
+  readonly profile = this.profileService.profile;
+  readonly username = this.profileService.username;
+  readonly isPremium = this.profileService.isPremium;
+  readonly generationsRemaining = this.profileService.generationsRemaining;
+  readonly monthlyAllowance = this.profileService.monthlyAllowance;
 
-  readonly skills: Skill[] = [
-    { label: 'Physique',     percent: 78 },
-    { label: 'Histoire',     percent: 55 },
-    { label: 'Informatique', percent: 92 },
-    { label: 'Biologie',     percent: 44 },
-  ];
+  readonly initials = computed(() => {
+    const name = this.username();
+    return name ? name.slice(0, 2).toUpperCase() : '?';
+  });
 
-  readonly badges: Badge[] = [
-    { icon: 'music_note',  label: 'Premier Beat'     },
-    { icon: 'description', label: '10 Fiches'        },
-    { icon: 'group',       label: '5 Amis'           },
-    { icon: 'bolt',        label: 'Power User'       },
-    { icon: 'star',        label: '100 Générations'  },
-    { icon: 'share',       label: 'Partageur'        },
-  ];
+  readonly planLabel = computed(() => (this.isPremium() ? 'Premium' : 'Découverte'));
 
-  startEdit(): void {
-    this.editNameValue = this.displayName();
-    this.isEditing.set(true);
-  }
-
-  cancelEdit(): void {
-    this.isEditing.set(false);
-  }
-
-  onEditInput(value: string): void {
-    this.editNameValue = value;
-  }
-
-  saveEdit(): void {
-    const trimmed = this.editNameValue.trim();
-    if (trimmed) {
-      this.displayName.set(trimmed);
+  readonly memberSince = computed(() => {
+    const current = this.profile();
+    if (!current) {
+      return '';
     }
-    this.isEditing.set(false);
+    return new Date(current.createdAt).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' });
+  });
+
+  ngOnInit(): void {
+    void this.profileService.load();
   }
 
-  onEditKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.saveEdit();
-      return;
-    }
-    if (event.key === 'Escape') {
-      this.cancelEdit();
-    }
+  goToSubscription(): void {
+    void this.router.navigate(['/tokens']);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    void this.router.navigate(['/login']);
   }
 }

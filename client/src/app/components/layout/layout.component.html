@@ -36,6 +36,11 @@
       <mat-icon>{{ dark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
       <span>{{ dark() ? 'Mode clair' : 'Mode sombre' }}</span>
     </button>
+
+    <button class="dark-toggle logout-btn" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Déconnexion</span>
+    </button>
   </nav>
 
   <div class="main-wrap">

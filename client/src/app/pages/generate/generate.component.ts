@@ -12,7 +12,7 @@ type GenerateStep = 0 | 1 | 2;
 type SourceTab = 'prompt' | 'pdf';
 
 const MUSIC_STYLES: string[] = [
-  'Lo-fi', 'Classique', 'Électronique', 'Cinématique', 'Rap', 'Ambiant',
+  'Pop', 'Rock', 'Rap', 'Électronique', 'Lo-fi', 'Jazz',
 ];
 
 @Component({
@@ -32,7 +32,7 @@ export class GenerateComponent {
   readonly step = signal<GenerateStep>(0);
   readonly activeTab = signal<SourceTab>('prompt');
   readonly promptText = signal('');
-  readonly selectedStyle = signal('Lo-fi');
+  readonly selectedStyle = signal('Pop');
   readonly selectedFile = signal<File | null>(null);
   readonly loadingSheet = signal(false);
   readonly loadingMusic = signal(false);

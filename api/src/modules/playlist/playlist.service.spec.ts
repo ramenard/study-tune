@@ -64,6 +64,12 @@ describe('PlaylistService', () => {
   });
 
   describe('addMusic', () => {
+    it('forbids a member (non-creator) from adding tracks', async () => {
+      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'owner', members: [{ id: 'u1' }], musics: [] });
+
+      await expect(service.addMusic('p1', 'm1', 'u1')).rejects.toBeInstanceOf(ForbiddenException);
+    });
+
     it('throws NotFound when the music does not exist', async () => {
       playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'u1', members: [], musics: [] });
       musicRepo.findOneBy.mockResolvedValue(null);

@@ -1,9 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { PlayerBarComponent } from '../player-bar/player-bar.component';
 import { ProfileService } from '../../core/services/profile.service';
 import { FriendshipService } from '../../core/services/friendship.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface NavItem {
   id: string;
@@ -21,6 +22,8 @@ interface NavItem {
 export class LayoutComponent implements OnInit {
   private readonly profileService = inject(ProfileService);
   private readonly friendshipService = inject(FriendshipService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   readonly navItems: NavItem[] = [
     { id: 'home',    icon: 'home',          label: 'Accueil',      route: '/' },
@@ -44,5 +47,10 @@ export class LayoutComponent implements OnInit {
   toggleDark(): void {
     this.dark.update(v => !v);
     document.documentElement.toggleAttribute('data-dark', !this.dark());
+  }
+
+  logout(): void {
+    this.authService.logout();
+    void this.router.navigate(['/login']);
   }
 }

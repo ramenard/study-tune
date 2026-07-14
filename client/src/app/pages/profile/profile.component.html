@@ -2,73 +2,39 @@
   <h1 class="page-title">Mon Profil</h1>
 
   <div class="identity-card">
-    <div class="avatar">AM</div>
-
+    <div class="avatar">{{ initials() }}</div>
     <div class="identity-card__info">
-      @if (isEditing()) {
-        <input
-          #nameInput
-          class="name-input"
-          type="text"
-          [value]="editNameValue"
-          (input)="onEditInput(nameInput.value)"
-          (keydown)="onEditKeydown($event)"
-          autofocus />
-      }
-      @if (!isEditing()) {
-        <div class="identity-card__name">{{ displayName() }}</div>
-      }
-      <div class="identity-card__username">{{ username() }}</div>
-      <div class="identity-card__stats">
-        @for (stat of stats; track stat.value) {
-          <span class="stat-chip">
-            <mat-icon>{{ stat.icon }}</mat-icon>
-            {{ stat.value }}
-          </span>
-        }
-      </div>
+      <div class="identity-card__name">{{ username() || '—' }}</div>
+      <div class="identity-card__email">{{ profile()?.email }}</div>
     </div>
+    <span class="plan-badge" [class.plan-badge--premium]="isPremium()">{{ planLabel() }}</span>
+  </div>
 
-    @if (isEditing()) {
-      <div class="edit-actions">
-        <button mat-flat-button color="primary" (click)="saveEdit()">Sauvegarder</button>
-        <button mat-stroked-button (click)="cancelEdit()">Annuler</button>
+  <div class="info-card">
+    <div class="info-row">
+      <span class="info-row__label"><mat-icon>bolt</mat-icon> Générations ce mois</span>
+      <span class="info-row__value">{{ generationsRemaining() }} / {{ monthlyAllowance() }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-row__label"><mat-icon>workspace_premium</mat-icon> Offre</span>
+      <span class="info-row__value">{{ planLabel() }}</span>
+    </div>
+    @if (memberSince()) {
+      <div class="info-row">
+        <span class="info-row__label"><mat-icon>calendar_today</mat-icon> Membre depuis</span>
+        <span class="info-row__value">{{ memberSince() }}</span>
       </div>
-    }
-    @if (!isEditing()) {
-      <button mat-stroked-button (click)="startEdit()">
-        <mat-icon>edit</mat-icon>
-        Modifier
-      </button>
     }
   </div>
 
-  <div class="two-col">
-    <div class="card">
-      <div class="card__title">Compétences</div>
-      @for (skill of skills; track skill.label) {
-        <div class="skill">
-          <div class="skill__header">
-            <span class="skill__label">{{ skill.label }}</span>
-            <span class="skill__percent">{{ skill.percent }}%</span>
-          </div>
-          <div class="skill__bar">
-            <div class="skill__bar-fill" [style.width.%]="skill.percent"></div>
-          </div>
-        </div>
-      }
-    </div>
-
-    <div class="card">
-      <div class="card__title">Badges 🏆</div>
-      <div class="badges-grid">
-        @for (badge of badges; track badge.label) {
-          <div class="badge-item">
-            <mat-icon class="badge-item__icon">{{ badge.icon }}</mat-icon>
-            <span class="badge-item__label">{{ badge.label }}</span>
-          </div>
-        }
-      </div>
-    </div>
+  <div class="profile-actions">
+    <button mat-flat-button color="primary" (click)="goToSubscription()">
+      <mat-icon>workspace_premium</mat-icon>
+      Gérer l'abonnement
+    </button>
+    <button mat-stroked-button class="logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Déconnexion
+    </button>
   </div>
 </div>

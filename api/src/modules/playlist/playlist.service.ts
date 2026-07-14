@@ -92,6 +92,11 @@ export class PlaylistService {
 
   async addMusic(id: string, musicId: string, userId: string): Promise<Playlist> {
     const playlist = await this.findOneByUser(id, userId);
+
+    if (playlist.creatorId !== userId) {
+      throw new ForbiddenException('Only the playlist creator can add tracks');
+    }
+
     const music = await this.musicRepo.findOneBy({ id: musicId });
 
     if (!music) {
@@ -110,6 +115,10 @@ export class PlaylistService {
 
   async removeMusic(id: string, musicId: string, userId: string): Promise<Playlist> {
     const playlist = await this.findOneByUser(id, userId);
+
+    if (playlist.creatorId !== userId) {
+      throw new ForbiddenException('Only the playlist creator can remove tracks');
+    }
 
     playlist.musics = playlist.musics.filter((m) => m.id !== musicId);
 
