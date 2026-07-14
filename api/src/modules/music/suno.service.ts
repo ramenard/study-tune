@@ -38,7 +38,7 @@ export class SunoService {
   async generate(dto: SunoGenerateDto): Promise<string> {
     this.logger.log(`Generating music for prompt: "${dto.prompt}"`);
 
-    const callBackUrl = `${process.env.APP_PUBLIC_URL}/music/webhook/kie`;
+    const callBackUrl = `${process.env.APP_PUBLIC_URL}/api/music/webhook/kie`;
 
     console.log('callBackUrl', callBackUrl);
 

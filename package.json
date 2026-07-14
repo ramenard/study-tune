@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": ["client", "api"],
   "scripts": {
+    "dev": "bash scripts/dev.sh",
     "dev:api": "npm run start:dev -w api",
     "dev:client": "npm run start -w client",
     "build": "npm run build -w api && npm run build -w client",
