@@ -5,6 +5,7 @@ import { PlayerBarComponent } from '../player-bar/player-bar.component';
 import { ProfileService } from '../../core/services/profile.service';
 import { FriendshipService } from '../../core/services/friendship.service';
 import { FavoritesService } from '../../core/services/favorites.service';
+import { GenerationStatusService } from '../../core/services/generation-status.service';
 import { AuthService } from '../../core/services/auth.service';
 
 interface NavItem {
@@ -24,6 +25,7 @@ export class LayoutComponent implements OnInit {
   private readonly profileService = inject(ProfileService);
   private readonly friendshipService = inject(FriendshipService);
   private readonly favoritesService = inject(FavoritesService);
+  private readonly generationStatus = inject(GenerationStatusService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -39,12 +41,15 @@ export class LayoutComponent implements OnInit {
 
   readonly generationsRemaining = this.profileService.generationsRemaining;
   readonly pendingRequests = this.friendshipService.pendingReceivedCount;
+  readonly generatingCount = this.generationStatus.pendingCount;
+  readonly isGenerating = this.generationStatus.isGenerating;
   readonly dark = signal(false);
 
   ngOnInit(): void {
     void this.profileService.load();
     void this.friendshipService.loadReceived();
     void this.favoritesService.load();
+    void this.generationStatus.checkNow();
   }
 
   toggleDark(): void {

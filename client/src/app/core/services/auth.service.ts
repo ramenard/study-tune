@@ -8,12 +8,14 @@ import { LoginDto } from '../../api/models/login-dto';
 import { RegisterDto } from '../../api/models/register-dto';
 import { AuthTokenService } from './auth-token.service';
 import { ProfileService } from './profile.service';
+import { GenerationStatusService } from './generation-status.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly api = inject(Api);
   private readonly tokenService = inject(AuthTokenService);
   private readonly profileService = inject(ProfileService);
+  private readonly generationStatus = inject(GenerationStatusService);
 
   readonly isAuthenticated = computed(() => this.tokenService.token() !== null);
 
@@ -32,5 +34,6 @@ export class AuthService {
   logout(): void {
     this.tokenService.clearToken();
     this.profileService.clear();
+    this.generationStatus.clear();
   }
 }

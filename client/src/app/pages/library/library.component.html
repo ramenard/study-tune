@@ -7,13 +7,21 @@
     <h1>Ma Bibliothèque</h1>
     <p>{{ tracks().length }} musique{{ tracks().length > 1 ? 's' : '' }} générée{{ tracks().length > 1 ? 's' : '' }}</p>
   </div>
-  <div class="sort-wrap">
-    <select class="sort-select" #sortSelect [value]="sort()" (change)="onSort(sortSelect.value)">
-      <option value="date">Plus récent</option>
-      <option value="title">Titre A→Z</option>
-      <option value="style">Style</option>
-    </select>
-    <mat-icon class="sort-icon">expand_more</mat-icon>
+  <div class="header-actions">
+    @if (hasPending()) {
+      <button class="refresh-btn" [disabled]="refreshing()" (click)="refreshAll()" aria-label="Rafraîchir les générations">
+        <mat-icon [class.spin]="refreshing()">refresh</mat-icon>
+        Rafraîchir
+      </button>
+    }
+    <div class="sort-wrap">
+      <select class="sort-select" #sortSelect [value]="sort()" (change)="onSort(sortSelect.value)">
+        <option value="date">Plus récent</option>
+        <option value="title">Titre A→Z</option>
+        <option value="style">Style</option>
+      </select>
+      <mat-icon class="sort-icon">expand_more</mat-icon>
+    </div>
   </div>
 </div>
 
@@ -50,7 +58,7 @@
     @for (track of paged(); track track.id; let last = $last) {
       <div class="table-row">
         <div class="thumb" [style.background]="colorFor(track.id)" (click)="play(track)">
-          <mat-icon>{{ isCurrent(track) ? 'pause' : (isPlayable(track) ? 'play_arrow' : 'music_note') }}</mat-icon>
+          <mat-icon [class.spin]="isPending(track)">{{ thumbIcon(track) }}</mat-icon>
         </div>
 
         <div class="title-cell">
@@ -86,12 +94,6 @@
         <div class="duration-cell">{{ formatDuration(track.duration) }}</div>
 
         <div class="actions-cell">
-          @if (track.status !== 'complete') {
-            <button class="action-btn" title="Rafraîchir le statut" [disabled]="syncingId() === track.id" (click)="refresh(track)">
-              <mat-icon>{{ syncingId() === track.id ? 'hourglass_empty' : 'refresh' }}</mat-icon>
-            </button>
-          }
-
           <button class="action-btn" [class.active]="editId() === track.id" title="Renommer" (click)="startEdit(track)">
             <mat-icon>edit</mat-icon>
           </button>

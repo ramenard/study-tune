@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MusicService } from '../../core/services/music.service';
 import { PlaylistService } from '../../core/services/playlist.service';
 import { PlayerService } from '../../core/services/player.service';
+import { GenerationStatusService } from '../../core/services/generation-status.service';
 import { Music } from '../../api/models/music';
 import { Playlist } from '../../api/models/playlist';
 
@@ -23,6 +24,7 @@ export class LibraryComponent implements OnInit {
   private readonly musicService = inject(MusicService);
   private readonly playlistService = inject(PlaylistService);
   private readonly player = inject(PlayerService);
+  private readonly generationStatus = inject(GenerationStatusService);
 
   readonly perPage = 8;
 
@@ -35,8 +37,12 @@ export class LibraryComponent implements OnInit {
   readonly page = signal(1);
   readonly editId = signal<string | null>(null);
   readonly deleteId = signal<string | null>(null);
-  readonly syncingId = signal<string | null>(null);
+  readonly refreshing = signal(false);
   readonly toast = signal<string | null>(null);
+
+  readonly hasPending = computed(() =>
+    this.tracks().some((track) => track.status !== 'complete' && track.status !== 'error'),
+  );
 
   editValueStr = '';
 
@@ -108,6 +114,23 @@ export class LibraryComponent implements OnInit {
     return track.status === 'complete';
   }
 
+  isPending(track: Music): boolean {
+    return track.status !== 'complete' && track.status !== 'error';
+  }
+
+  thumbIcon(track: Music): string {
+    if (this.isCurrent(track)) {
+      return 'pause';
+    }
+    if (this.isPlayable(track)) {
+      return 'play_arrow';
+    }
+    if (this.isPending(track)) {
+      return 'autorenew';
+    }
+    return 'music_note';
+  }
+
   isCurrent(track: Music): boolean {
     return this.player.currentTrack()?.id === track.id && this.player.playing();
   }
@@ -164,18 +187,15 @@ export class LibraryComponent implements OnInit {
     this.showToast(`Ajoutée à « ${playlist.name} »`);
   }
 
-  async refresh(track: Music): Promise<void> {
-    if (this.syncingId()) {
+  async refreshAll(): Promise<void> {
+    if (this.refreshing()) {
       return;
     }
-    this.syncingId.set(track.id);
+    this.refreshing.set(true);
     try {
-      await this.musicService.sync(track.id);
-      this.showToast('Statut mis à jour');
-    } catch {
-      this.showToast('Toujours en cours de génération…');
+      await this.generationStatus.checkNow();
     } finally {
-      this.syncingId.set(null);
+      this.refreshing.set(false);
     }
   }
 

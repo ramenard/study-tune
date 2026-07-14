@@ -180,3 +180,28 @@
     background: color-mix(in srgb, var(--md-sys-color-error) 10%, transparent);
   }
 }
+
+.generating-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0.25rem 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+}
+
+.generating-spinner {
+  font-size: 1.125rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  animation: generating-spin 1.2s linear infinite;
+}
+
+@keyframes generating-spin {
+  to { transform: rotate(360deg); }
+}

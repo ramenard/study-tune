@@ -7,6 +7,7 @@ import { Api } from '../../api/api';
 import { documentControllerProcess } from '../../api/fn/document/document-controller-process';
 import { musicControllerGenerate } from '../../api/fn/music/music-controller-generate';
 import { ProfileService } from '../../core/services/profile.service';
+import { GenerationStatusService } from '../../core/services/generation-status.service';
 
 type GenerateStep = 0 | 1 | 2;
 type SourceTab = 'prompt' | 'pdf';
@@ -25,6 +26,7 @@ export class GenerateComponent {
   private readonly api = inject(Api);
   private readonly router = inject(Router);
   private readonly profileService = inject(ProfileService);
+  private readonly generationStatus = inject(GenerationStatusService);
 
   readonly musicStyles = MUSIC_STYLES;
   readonly steps = ['Source', 'Fiche', 'Musique'];
@@ -134,13 +136,14 @@ export class GenerateComponent {
     this.errorMessage.set('');
 
     try {
-      await this.api.invoke(musicControllerGenerate, {
+      const result = await this.api.invoke(musicControllerGenerate, {
         body: {
           lyrics: this.ficheLyrics(),
           style: this.selectedStyle(),
           title: this.ficheTitle(),
         },
       });
+      this.generationStatus.watch(result.id, this.ficheTitle());
       await this.profileService.load();
       this.step.set(2);
     } catch (error) {

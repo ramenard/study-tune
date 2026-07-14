@@ -15,6 +15,13 @@
       </div>
     </div>
 
+    @if (isGenerating()) {
+      <div class="generating-pill" routerLink="/library">
+        <mat-icon class="generating-spinner">autorenew</mat-icon>
+        <span>{{ generatingCount() }} génération{{ generatingCount() > 1 ? 's' : '' }} en cours…</span>
+      </div>
+    }
+
     <div class="drawer-section">Navigation</div>
 
     @for (item of navItems; track item.id) {
