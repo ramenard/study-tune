@@ -182,6 +182,10 @@ export class LibraryComponent implements OnInit {
     this.showToast('Musique supprimée');
   }
 
+  async downloadTrack(track: Music): Promise<void> {
+    await this.musicService.download(track.id, track.title ?? 'musique');
+  }
+
   async addToPlaylist(track: Music, playlist: Playlist): Promise<void> {
     await this.playlistService.addMusic(playlist.id, track.id);
     this.showToast(`Ajoutée à « ${playlist.name} »`);

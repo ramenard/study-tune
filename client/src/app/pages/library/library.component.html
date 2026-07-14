@@ -98,6 +98,12 @@
             <mat-icon>edit</mat-icon>
           </button>
 
+          @if (track.status === 'complete') {
+            <button class="action-btn" title="Télécharger" (click)="downloadTrack(track)">
+              <mat-icon>download</mat-icon>
+            </button>
+          }
+
           <button class="action-btn" title="Ajouter à une playlist" [matMenuTriggerFor]="playlistMenu">
             <mat-icon>playlist_add</mat-icon>
           </button>

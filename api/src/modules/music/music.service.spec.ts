@@ -9,6 +9,7 @@ describe('MusicService', () => {
     remove: jest.Mock;
     manager: { query: jest.Mock };
   };
+  let playlistRepo: { createQueryBuilder: jest.Mock };
   let suno: { generate: jest.Mock };
   let storage: { getPresignedUrl: jest.Mock };
   let subscription: { assertCanGenerate: jest.Mock; consumeGeneration: jest.Mock };
@@ -22,10 +23,17 @@ describe('MusicService', () => {
       remove: jest.fn().mockResolvedValue(undefined),
       manager: { query: jest.fn().mockResolvedValue(undefined) },
     };
+    playlistRepo = { createQueryBuilder: jest.fn() };
     suno = { generate: jest.fn() };
     storage = { getPresignedUrl: jest.fn() };
     subscription = { assertCanGenerate: jest.fn(), consumeGeneration: jest.fn() };
-    service = new MusicService(musicRepo as never, suno as never, storage as never, subscription as never);
+    service = new MusicService(
+      musicRepo as never,
+      playlistRepo as never,
+      suno as never,
+      storage as never,
+      subscription as never,
+    );
   });
 
   describe('generateAndStore', () => {

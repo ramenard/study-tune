@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { AuthTokenService } from './auth-token.service';
 import { ProfileService } from './profile.service';
 import { GenerationStatusService } from './generation-status.service';
+import { PlayerService } from './player.service';
 import { Api } from '../../api/api';
 
 describe('AuthService (front)', () => {
@@ -23,6 +24,7 @@ describe('AuthService (front)', () => {
         { provide: Api, useValue: { invoke } },
         { provide: ProfileService, useValue: { clear } },
         { provide: GenerationStatusService, useValue: { clear: vi.fn() } },
+        { provide: PlayerService, useValue: { stop: vi.fn() } },
       ],
     });
     service = TestBed.inject(AuthService);

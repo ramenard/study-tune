@@ -4,6 +4,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { PlayerService } from '../../core/services/player.service';
 import { PlaylistService } from '../../core/services/playlist.service';
 import { FavoritesService } from '../../core/services/favorites.service';
+import { MusicService } from '../../core/services/music.service';
 
 @Component({
   selector: 'app-player-bar',
@@ -15,6 +16,7 @@ export class PlayerBarComponent {
   private readonly player = inject(PlayerService);
   private readonly playlistService = inject(PlaylistService);
   private readonly favoritesService = inject(FavoritesService);
+  private readonly musicService = inject(MusicService);
 
   readonly currentTrack = this.player.currentTrack;
   readonly playing = this.player.playing;
@@ -83,6 +85,14 @@ export class PlayerBarComponent {
       return;
     }
     await this.playlistService.addMusic(playlistId, track.id);
+  }
+
+  async downloadCurrent(): Promise<void> {
+    const track = this.currentTrack();
+    if (!track) {
+      return;
+    }
+    await this.musicService.download(track.id, track.title);
   }
 
   formatTime(seconds: number): string {

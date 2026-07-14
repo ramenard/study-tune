@@ -52,6 +52,10 @@
   </div>
 
   <div class="player-right">
+    <button class="icon-btn" [disabled]="!currentTrack()" (click)="downloadCurrent()" aria-label="Télécharger">
+      <mat-icon>download</mat-icon>
+    </button>
+
     <button class="icon-btn" [disabled]="!currentTrack()" [matMenuTriggerFor]="playlistMenu"
             (menuOpened)="loadPlaylists()" aria-label="Ajouter à une playlist">
       <mat-icon>playlist_add</mat-icon>

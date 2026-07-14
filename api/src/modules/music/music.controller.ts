@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, HttpCode, HttpStatus, UseGuards, Req, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, HttpCode, HttpStatus, StreamableFile, UseGuards, Req, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { MusicService } from './music.service';
@@ -72,6 +72,17 @@ export class MusicController {
   @ApiOkResponse({ type: StreamUrlDto })
   async getStreamUrl(@Param('id') id: string, @Req() req: AuthRequest): Promise<StreamUrlDto> {
     return this.musicService.getStreamUrl(id, req.user.id);
+  }
+
+  @Get(':id/download')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async download(@Param('id') id: string, @Req() req: AuthRequest): Promise<StreamableFile> {
+    const { stream, filename } = await this.musicService.getDownload(id, req.user.id);
+    return new StreamableFile(stream, {
+      type: 'audio/mpeg',
+      disposition: `attachment; filename="${filename}"`,
+    });
   }
 
   @Delete(':id')

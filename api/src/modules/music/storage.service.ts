@@ -64,4 +64,8 @@ export class StorageService {
   async getPresignedUrl(objectName: string, expirySeconds = 3600): Promise<string> {
     return this.client.presignedGetObject(this.bucket, objectName, expirySeconds);
   }
+
+  async getObjectStream(objectName: string): Promise<Readable> {
+    return this.client.getObject(this.bucket, objectName);
+  }
 }

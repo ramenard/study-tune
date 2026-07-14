@@ -1,5 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Api } from '../../api/api';
+import { environment } from '../../../environments/environment';
 import { musicControllerFindAll } from '../../api/fn/music/music-controller-find-all';
 import { musicControllerUpdate } from '../../api/fn/music/music-controller-update';
 import { musicControllerDelete } from '../../api/fn/music/music-controller-delete';
@@ -10,6 +13,7 @@ import { Music } from '../../api/models/music';
 @Injectable({ providedIn: 'root' })
 export class MusicService {
   private readonly api = inject(Api);
+  private readonly http = inject(HttpClient);
 
   private readonly musicsSignal = signal<Music[]>([]);
   private readonly loadingSignal = signal(false);
@@ -47,4 +51,17 @@ export class MusicService {
     const result = await this.api.invoke(musicControllerGetStreamUrl, { id });
     return result.url;
   }
+
+  async download(id: string, title: string): Promise<void> {
+    const blob = await firstValueFrom(
+      this.http.get(`${environment.apiUrl}/music/${id}/download`, { responseType: 'blob' }),
+    );
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${(title || 'musique').replace(/[^\w\-]+/g, '_')}.mp3`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
 }
+

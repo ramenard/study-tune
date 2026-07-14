@@ -6,10 +6,11 @@ import {SunoService} from './suno.service';
 import {StorageService} from './storage.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Music} from "./entities/music.entity";
+import {Playlist} from "../playlist/entities/playlist.entity";
 import {AuthModule} from "../auth/auth.module";
 
 @Module({
-  imports: [HttpModule, TypeOrmModule.forFeature([Music]), AuthModule],
+  imports: [HttpModule, TypeOrmModule.forFeature([Music, Playlist]), AuthModule],
   controllers: [MusicController],
   providers: [MusicService, SunoService, StorageService],
 })

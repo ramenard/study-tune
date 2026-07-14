@@ -1,9 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Readable } from 'stream';
 import { SunoService } from './suno.service';
 import { StorageService } from './storage.service';
 import { Music } from './entities/music.entity';
+import { Playlist } from '../playlist/entities/playlist.entity';
 import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
 import { SubscriptionService } from '../auth/subscription.service';
@@ -15,10 +17,28 @@ export class MusicService {
   constructor(
     @InjectRepository(Music)
     private readonly musicRepo: Repository<Music>,
+    @InjectRepository(Playlist)
+    private readonly playlistRepo: Repository<Playlist>,
     private readonly suno: SunoService,
     private readonly storage: StorageService,
     private readonly subscriptionService: SubscriptionService,
   ) {}
+
+  private async canAccessMusic(music: Music, userId: string): Promise<boolean> {
+    if (music.userId === userId) {
+      return true;
+    }
+
+    const shared = await this.playlistRepo
+      .createQueryBuilder('playlist')
+      .leftJoin('playlist.musics', 'music')
+      .leftJoin('playlist.members', 'member')
+      .where('music.id = :musicId', { musicId: music.id })
+      .andWhere('(playlist.creatorId = :userId OR member.id = :userId)', { userId })
+      .getCount();
+
+    return shared > 0;
+  }
 
   async generateAndStore(dto: CreateMusicDto, userId: string): Promise<{ id: string; taskId: string }> {
     await this.subscriptionService.assertCanGenerate(userId);
@@ -148,9 +168,34 @@ export class MusicService {
   }
 
   async getStreamUrl(id: string, userId: string): Promise<{ url: string }> {
-    const music = await this.findOneByUser(id, userId);
+    const music = await this.musicRepo.findOneBy({ id });
+
+    if (!music) {
+      throw new NotFoundException(`Music ${id} not found`);
+    }
+
+    if (!(await this.canAccessMusic(music, userId))) {
+      throw new ForbiddenException();
+    }
+
     const url = await this.storage.getPresignedUrl(music.objectName);
     return { url };
+  }
+
+  async getDownload(id: string, userId: string): Promise<{ stream: Readable; filename: string }> {
+    const music = await this.musicRepo.findOneBy({ id });
+
+    if (!music || !music.objectName) {
+      throw new NotFoundException(`Music ${id} not available`);
+    }
+
+    if (!(await this.canAccessMusic(music, userId))) {
+      throw new ForbiddenException();
+    }
+
+    const stream = await this.storage.getObjectStream(music.objectName);
+    const safeTitle = (music.title ?? 'musique').replace(/[^\w\-]+/g, '_');
+    return { stream, filename: `${safeTitle}.mp3` };
   }
 
   async syncFromKie(id: string, userId: string): Promise<Music> {

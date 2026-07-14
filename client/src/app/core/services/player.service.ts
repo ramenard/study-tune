@@ -105,6 +105,19 @@ export class PlayerService {
     this.repeatSignal.update((value) => !value);
   }
 
+  stop(): void {
+    this.audio.pause();
+    this.audio.removeAttribute('src');
+    this.audio.load();
+    this.currentTrackSignal.set(null);
+    this.playingSignal.set(false);
+    this.currentTimeSignal.set(0);
+    this.durationSignal.set(0);
+    this.queueSignal.set([]);
+    this.queueNameSignal.set(null);
+    this.queueIndex = 0;
+  }
+
   private setQueue(tracks: PlayableTrack[], startIndex: number, name: string | null): void {
     this.queueSignal.set(tracks);
     this.queueNameSignal.set(name);
