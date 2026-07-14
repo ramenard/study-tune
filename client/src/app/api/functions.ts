@@ -49,6 +49,8 @@ export type { PlaylistControllerAddMusic$Params as PlaylistControllerAddMusic$Pa
 export { playlistControllerAddMusic as playlistControllerAddMusic } from './fn/playlist/playlist-controller-add-music';
 export type { PlaylistControllerRemoveMusic$Params as PlaylistControllerRemoveMusic$Params } from './fn/playlist/playlist-controller-remove-music';
 export { playlistControllerRemoveMusic as playlistControllerRemoveMusic } from './fn/playlist/playlist-controller-remove-music';
+export type { PlaylistControllerShare$Params as PlaylistControllerShare$Params } from './fn/playlist/playlist-controller-share';
+export { playlistControllerShare as playlistControllerShare } from './fn/playlist/playlist-controller-share';
 export type { PlaylistControllerAddMember$Params as PlaylistControllerAddMember$Params } from './fn/playlist/playlist-controller-add-member';
 export { playlistControllerAddMember as playlistControllerAddMember } from './fn/playlist/playlist-controller-add-member';
 export type { PlaylistControllerRemoveMember$Params as PlaylistControllerRemoveMember$Params } from './fn/playlist/playlist-controller-remove-member';

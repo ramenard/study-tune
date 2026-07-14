@@ -18,6 +18,7 @@ export type { ProfileDto } from './models/profile-dto';
 export type { RegisterDto } from './models/register-dto';
 export type { RespondRequestDto } from './models/respond-request-dto';
 export type { SendRequestDto } from './models/send-request-dto';
+export type { SharePlaylistDto } from './models/share-playlist-dto';
 export type { StreamUrlDto } from './models/stream-url-dto';
 export type { UpdateMusicDto } from './models/update-music-dto';
 export type { UpdatePlaylistDto } from './models/update-playlist-dto';

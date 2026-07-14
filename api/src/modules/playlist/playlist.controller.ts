@@ -7,6 +7,7 @@ import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
 import { PaginatedPlaylistsDto } from './dto/paginated-playlists.dto';
 import { FavoriteToggleDto } from './dto/favorite-toggle.dto';
+import { SharePlaylistDto } from './dto/share-playlist.dto';
 import { Playlist } from './entities/playlist.entity';
 
 type AuthRequest = Request & { user: { id: string } };
@@ -74,6 +75,12 @@ export class PlaylistController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeMusic(@Param('id') id: string, @Param('musicId') musicId: string, @Req() req: AuthRequest) {
     return this.playlistService.removeMusic(id, musicId, req.user.id);
+  }
+
+  @Post(':id/share')
+  @ApiOkResponse({ type: Playlist })
+  async share(@Param('id') id: string, @Body() dto: SharePlaylistDto, @Req() req: AuthRequest): Promise<Playlist> {
+    return this.playlistService.shareWithMembers(id, dto.memberIds, req.user.id);
   }
 
   @Post(':id/member/:memberId')

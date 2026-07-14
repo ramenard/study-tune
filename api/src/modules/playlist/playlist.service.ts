@@ -78,6 +78,7 @@ export class PlaylistService {
       .createQueryBuilder('playlist')
       .leftJoinAndSelect('playlist.musics', 'music')
       .leftJoinAndSelect('playlist.members', 'member')
+      .leftJoinAndSelect('playlist.creator', 'creator')
       .where('playlist.creatorId = :userId', { userId })
       .orWhere('member.id = :userId', { userId })
       .orderBy('playlist.createdAt', 'DESC')
@@ -173,6 +174,41 @@ export class PlaylistService {
     playlist.musics = playlist.musics.filter((m) => m.id !== musicId);
 
     return this.playlistRepo.save(playlist);
+  }
+
+  async shareWithMembers(id: string, memberIds: string[], userId: string): Promise<Playlist> {
+    const playlist = await this.findOneByUser(id, userId);
+
+    if (playlist.creatorId !== userId) {
+      throw new ForbiddenException('Only the playlist creator can share it');
+    }
+
+    if (playlist.isDefault) {
+      throw new BadRequestException('The default playlist cannot be shared');
+    }
+
+    for (const memberId of memberIds) {
+      if (memberId === userId || playlist.members.some((m) => m.id === memberId)) {
+        continue;
+      }
+
+      const user = await this.userRepo.findOneBy({ id: memberId });
+
+      if (!user) {
+        throw new NotFoundException(`User ${memberId} not found`);
+      }
+
+      const friends = await this.friendshipService.areFriends(userId, memberId);
+
+      if (!friends) {
+        throw new BadRequestException('You can only share a playlist with a friend');
+      }
+
+      playlist.members.push(user);
+    }
+
+    await this.playlistRepo.save(playlist);
+    return this.findOneByUser(id, userId);
   }
 
   async addMember(id: string, memberId: string, userId: string): Promise<Playlist> {

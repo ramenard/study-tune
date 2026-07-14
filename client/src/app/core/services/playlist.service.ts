@@ -5,6 +5,8 @@ import { playlistControllerCreate } from '../../api/fn/playlist/playlist-control
 import { playlistControllerDelete } from '../../api/fn/playlist/playlist-controller-delete';
 import { playlistControllerAddMusic } from '../../api/fn/playlist/playlist-controller-add-music';
 import { playlistControllerRemoveMusic } from '../../api/fn/playlist/playlist-controller-remove-music';
+import { playlistControllerShare } from '../../api/fn/playlist/playlist-controller-share';
+import { playlistControllerRemoveMember } from '../../api/fn/playlist/playlist-controller-remove-member';
 import { Playlist } from '../../api/models/playlist';
 
 @Injectable({ providedIn: 'root' })
@@ -36,6 +38,16 @@ export class PlaylistService {
 
   async removeMusic(playlistId: string, musicId: string): Promise<void> {
     await this.api.invoke(playlistControllerRemoveMusic, { id: playlistId, musicId });
+    await this.load();
+  }
+
+  async share(playlistId: string, memberIds: string[]): Promise<void> {
+    await this.api.invoke(playlistControllerShare, { id: playlistId, body: { memberIds } });
+    await this.load();
+  }
+
+  async removeMember(playlistId: string, memberId: string): Promise<void> {
+    await this.api.invoke(playlistControllerRemoveMember, { id: playlistId, memberId });
     await this.load();
   }
 }

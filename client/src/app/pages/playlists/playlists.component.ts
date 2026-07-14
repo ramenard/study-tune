@@ -3,6 +3,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { PlaylistService } from '../../core/services/playlist.service';
 import { PlayerService } from '../../core/services/player.service';
+import { ProfileService } from '../../core/services/profile.service';
+import { FriendshipService } from '../../core/services/friendship.service';
 import { Playlist } from '../../api/models/playlist';
 
 const ACCENT_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#7A4B2E'];
@@ -16,19 +18,42 @@ const ACCENT_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#
 export class PlaylistsComponent implements OnInit {
   private readonly playlistService = inject(PlaylistService);
   private readonly player = inject(PlayerService);
+  private readonly profileService = inject(ProfileService);
+  private readonly friendshipService = inject(FriendshipService);
 
   readonly playlists = this.playlistService.playlists;
+  readonly friends = this.friendshipService.friends;
   readonly showNewForm = signal(false);
   readonly newPlaylistName = signal('');
   readonly selectedId = signal<string | null>(null);
+  readonly sharingId = signal<string | null>(null);
+  readonly selectedFriendIds = signal<ReadonlySet<string>>(new Set());
   readonly busy = signal(false);
+
+  private readonly myId = computed(() => this.profileService.profile()?.id ?? '');
+
+  readonly ownedPlaylists = computed(() =>
+    this.playlists().filter((playlist) => playlist.creatorId === this.myId()),
+  );
+
+  readonly sharedPlaylists = computed(() =>
+    this.playlists().filter((playlist) => playlist.creatorId !== this.myId()),
+  );
 
   readonly selectedPlaylist = computed(() =>
     this.playlists().find((playlist) => playlist.id === this.selectedId()) ?? null,
   );
 
+  readonly sharingPlaylist = computed(() =>
+    this.playlists().find((playlist) => playlist.id === this.sharingId()) ?? null,
+  );
+
   ngOnInit(): void {
     void this.playlistService.load();
+  }
+
+  isOwner(playlist: Playlist): boolean {
+    return playlist.creatorId === this.myId();
   }
 
   colorFor(id: string): string {
@@ -37,6 +62,14 @@ export class PlaylistsComponent implements OnInit {
       hash = (hash + char.charCodeAt(0)) % ACCENT_COLORS.length;
     }
     return ACCENT_COLORS[hash];
+  }
+
+  creatorName(playlist: Playlist): string {
+    return playlist.creator?.username ?? 'un ami';
+  }
+
+  initials(username: string): string {
+    return username.slice(0, 2).toUpperCase();
   }
 
   openNewForm(): void {
@@ -81,6 +114,56 @@ export class PlaylistsComponent implements OnInit {
 
   async removeMusic(playlistId: string, musicId: string): Promise<void> {
     await this.playlistService.removeMusic(playlistId, musicId);
+  }
+
+  openShare(event: Event, id: string): void {
+    event.stopPropagation();
+    this.selectedFriendIds.set(new Set());
+    this.sharingId.set(id);
+    void this.friendshipService.loadFriendsAndReceived();
+  }
+
+  closeShare(): void {
+    this.sharingId.set(null);
+    this.selectedFriendIds.set(new Set());
+  }
+
+  toggleFriend(friendId: string): void {
+    const next = new Set(this.selectedFriendIds());
+    if (next.has(friendId)) {
+      next.delete(friendId);
+    } else {
+      next.add(friendId);
+    }
+    this.selectedFriendIds.set(next);
+  }
+
+  isFriendSelected(friendId: string): boolean {
+    return this.selectedFriendIds().has(friendId);
+  }
+
+  isMember(playlist: Playlist, friendId: string): boolean {
+    return playlist.members.some((member) => member.id === friendId);
+  }
+
+  async confirmShare(): Promise<void> {
+    const id = this.sharingId();
+    const memberIds = [...this.selectedFriendIds()];
+    if (!id || memberIds.length === 0 || this.busy()) {
+      return;
+    }
+
+    this.busy.set(true);
+    try {
+      await this.playlistService.share(id, memberIds);
+      this.closeShare();
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  async unshareMember(playlistId: string, memberId: string): Promise<void> {
+    await this.playlistService.removeMember(playlistId, memberId);
   }
 
   onCreateKeydown(event: KeyboardEvent): void {

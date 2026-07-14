@@ -35,44 +35,131 @@
     </div>
   }
 
-  <div class="grid">
-    @for (playlist of playlists(); track playlist.id) {
-      <div class="playlist-card" [class.playlist-card--selected]="selectedId() === playlist.id" (click)="select(playlist.id)">
-        <div class="playlist-card__accent" [style.background]="colorFor(playlist.id)"></div>
-
-        <div class="playlist-card__top">
-          <div class="playlist-card__icon" [style.background]="colorFor(playlist.id)">
-            <mat-icon>music_note</mat-icon>
-          </div>
-          <div class="playlist-card__info">
-            <div class="playlist-card__name">
-              @if (playlist.isDefault) {
-                <mat-icon class="default-icon">favorite</mat-icon>
-              }
-              {{ playlist.name }}
+  @if (ownedPlaylists().length > 0) {
+    <div class="section-title">Créées par moi</div>
+    <div class="grid">
+      @for (playlist of ownedPlaylists(); track playlist.id) {
+        <div class="playlist-card" [class.playlist-card--selected]="selectedId() === playlist.id" (click)="select(playlist.id)">
+          <div class="playlist-card__accent" [style.background]="colorFor(playlist.id)"></div>
+          <div class="playlist-card__top">
+            <div class="playlist-card__icon" [style.background]="colorFor(playlist.id)">
+              <mat-icon>{{ playlist.isDefault ? 'favorite' : 'music_note' }}</mat-icon>
             </div>
-            <div class="playlist-card__count">{{ playlist.musics.length }} musique{{ playlist.musics.length > 1 ? 's' : '' }}</div>
+            <div class="playlist-card__info">
+              <div class="playlist-card__name">{{ playlist.name }}</div>
+              <div class="playlist-card__count">
+                {{ playlist.musics.length }} musique{{ playlist.musics.length > 1 ? 's' : '' }}
+                @if (playlist.members.length > 0) {
+                  · partagée avec {{ playlist.members.length }}
+                }
+              </div>
+            </div>
+          </div>
+          <div class="playlist-card__bottom">
+            <span class="hint">{{ selectedId() === playlist.id ? 'Masquer' : 'Voir les titres' }}</span>
+            <div class="card-actions">
+              @if (playableCount(playlist) > 0) {
+                <button mat-icon-button aria-label="Lire la playlist" (click)="playPlaylist($event, playlist)">
+                  <mat-icon>play_circle</mat-icon>
+                </button>
+              }
+              @if (!playlist.isDefault) {
+                <button mat-icon-button aria-label="Partager la playlist" (click)="openShare($event, playlist.id)">
+                  <mat-icon>person_add</mat-icon>
+                </button>
+                <button mat-icon-button aria-label="Supprimer la playlist" (click)="deletePlaylist($event, playlist.id)">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              }
+            </div>
           </div>
         </div>
+      }
+    </div>
+  }
 
-        <div class="playlist-card__bottom">
-          <span class="hint">{{ selectedId() === playlist.id ? 'Masquer' : 'Voir les titres' }}</span>
-          <div class="card-actions">
-            @if (playableCount(playlist) > 0) {
-              <button mat-icon-button aria-label="Lire la playlist" (click)="playPlaylist($event, playlist)">
-                <mat-icon>play_circle</mat-icon>
-              </button>
-            }
-            @if (!playlist.isDefault) {
-              <button mat-icon-button aria-label="Supprimer la playlist" (click)="deletePlaylist($event, playlist.id)">
-                <mat-icon>delete_outline</mat-icon>
-              </button>
-            }
+  @if (sharedPlaylists().length > 0) {
+    <div class="section-title">Partagées avec moi</div>
+    <div class="grid">
+      @for (playlist of sharedPlaylists(); track playlist.id) {
+        <div class="playlist-card" [class.playlist-card--selected]="selectedId() === playlist.id" (click)="select(playlist.id)">
+          <div class="playlist-card__accent" [style.background]="colorFor(playlist.id)"></div>
+          <div class="playlist-card__top">
+            <div class="playlist-card__icon" [style.background]="colorFor(playlist.id)">
+              <mat-icon>group</mat-icon>
+            </div>
+            <div class="playlist-card__info">
+              <div class="playlist-card__name">{{ playlist.name }}</div>
+              <div class="playlist-card__count">
+                {{ playlist.musics.length }} musique{{ playlist.musics.length > 1 ? 's' : '' }} · par {{ creatorName(playlist) }}
+              </div>
+            </div>
+          </div>
+          <div class="playlist-card__bottom">
+            <span class="hint">{{ selectedId() === playlist.id ? 'Masquer' : 'Voir les titres' }}</span>
+            <div class="card-actions">
+              @if (playableCount(playlist) > 0) {
+                <button mat-icon-button aria-label="Lire la playlist" (click)="playPlaylist($event, playlist)">
+                  <mat-icon>play_circle</mat-icon>
+                </button>
+              }
+            </div>
           </div>
         </div>
+      }
+    </div>
+  }
+
+  @if (sharingPlaylist(); as playlist) {
+    <div class="share-panel">
+      <div class="share-panel__header">
+        <h2>Partager « {{ playlist.name }} »</h2>
+        <button mat-icon-button aria-label="Fermer" (click)="closeShare()"><mat-icon>close</mat-icon></button>
       </div>
-    }
-  </div>
+
+      <div class="share-subtitle">Sélectionne des amis</div>
+      @if (friends().length === 0) {
+        <div class="empty-state empty-state--inline">
+          <p>Ajoute des amis pour pouvoir partager une playlist.</p>
+        </div>
+      } @else {
+        <div class="friend-list">
+          @for (friend of friends(); track friend.id) {
+            <button class="friend-row" [class.friend-row--selected]="isFriendSelected(friend.id)"
+                    [disabled]="isMember(playlist, friend.id)" (click)="toggleFriend(friend.id)">
+              <span class="friend-avatar" [style.background]="colorFor(friend.id)">{{ initials(friend.username) }}</span>
+              <span class="friend-name">{{ friend.username }}</span>
+              @if (isMember(playlist, friend.id)) {
+                <span class="friend-tag">Déjà membre</span>
+              } @else if (isFriendSelected(friend.id)) {
+                <mat-icon class="friend-check">check_circle</mat-icon>
+              }
+            </button>
+          }
+        </div>
+      }
+
+      @if (playlist.members.length > 0) {
+        <div class="share-subtitle">Déjà partagée avec</div>
+        <div class="member-list">
+          @for (member of playlist.members; track member.id) {
+            <div class="member-row">
+              <span class="friend-avatar" [style.background]="colorFor(member.id)">{{ initials(member.username) }}</span>
+              <span class="friend-name">{{ member.username }}</span>
+              <button mat-icon-button aria-label="Retirer l'accès" (click)="unshareMember(playlist.id, member.id)">
+                <mat-icon>remove_circle_outline</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="share-panel__actions">
+        <button mat-stroked-button (click)="closeShare()">Annuler</button>
+        <button mat-flat-button color="primary" [disabled]="busy()" (click)="confirmShare()">Partager</button>
+      </div>
+    </div>
+  }
 
   @if (selectedPlaylist(); as playlist) {
     <div class="detail-card">
@@ -83,7 +170,7 @@
 
       @if (playlist.musics.length === 0) {
         <div class="empty-state empty-state--inline">
-          <p>Cette playlist est vide. Ajoute des titres depuis la bibliothèque.</p>
+          <p>Cette playlist est vide.</p>
         </div>
       } @else {
         <div class="track-list">
@@ -95,9 +182,11 @@
                 <span class="track-row__sub">{{ music.style || 'Révision' }}</span>
               </div>
               <span class="track-row__duration">{{ formatDuration(music.duration) }}</span>
-              <button mat-icon-button aria-label="Retirer de la playlist" (click)="removeMusic(playlist.id, music.id)">
-                <mat-icon>remove_circle_outline</mat-icon>
-              </button>
+              @if (isOwner(playlist)) {
+                <button mat-icon-button aria-label="Retirer de la playlist" (click)="removeMusic(playlist.id, music.id)">
+                  <mat-icon>remove_circle_outline</mat-icon>
+                </button>
+              }
             </div>
           }
         </div>

@@ -99,6 +99,33 @@ describe('PlaylistService', () => {
     });
   });
 
+  describe('shareWithMembers', () => {
+    it('shares the playlist with a friend', async () => {
+      const playlist = { id: 'p1', creatorId: 'u1', isDefault: false, members: [] as { id: string }[], musics: [] };
+      playlistRepo.findOne.mockResolvedValue(playlist);
+      userRepo.findOneBy.mockResolvedValue({ id: 'friend' });
+      friendship.areFriends.mockResolvedValue(true);
+
+      const result = await service.shareWithMembers('p1', ['friend'], 'u1');
+
+      expect(result.members).toContainEqual({ id: 'friend' });
+    });
+
+    it('refuses to share with a non-friend', async () => {
+      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'u1', isDefault: false, members: [], musics: [] });
+      userRepo.findOneBy.mockResolvedValue({ id: 'stranger' });
+      friendship.areFriends.mockResolvedValue(false);
+
+      await expect(service.shareWithMembers('p1', ['stranger'], 'u1')).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('forbids a non-creator from sharing', async () => {
+      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'owner', isDefault: false, members: [{ id: 'u1' }], musics: [] });
+
+      await expect(service.shareWithMembers('p1', ['friend'], 'u1')).rejects.toBeInstanceOf(ForbiddenException);
+    });
+  });
+
   describe('addMusic', () => {
     it('forbids a member (non-creator) from adding tracks', async () => {
       playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'owner', members: [{ id: 'u1' }], musics: [] });
