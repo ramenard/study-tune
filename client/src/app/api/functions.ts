@@ -3,12 +3,14 @@
 
 export type { ChatControllerChat$Params as ChatControllerChat$Params } from './fn/chat/chat-controller-chat';
 export { chatControllerChat as chatControllerChat } from './fn/chat/chat-controller-chat';
-export type { MusicControllerGenerate$Params as MusicControllerGenerate$Params } from './fn/music/music-controller-generate';
-export { musicControllerGenerate as musicControllerGenerate } from './fn/music/music-controller-generate';
 export type { MusicControllerKieWebhook$Params as MusicControllerKieWebhook$Params } from './fn/music/music-controller-kie-webhook';
 export { musicControllerKieWebhook as musicControllerKieWebhook } from './fn/music/music-controller-kie-webhook';
+export type { MusicControllerGenerate$Params as MusicControllerGenerate$Params } from './fn/music/music-controller-generate';
+export { musicControllerGenerate as musicControllerGenerate } from './fn/music/music-controller-generate';
 export type { MusicControllerFindAll$Params as MusicControllerFindAll$Params } from './fn/music/music-controller-find-all';
 export { musicControllerFindAll as musicControllerFindAll } from './fn/music/music-controller-find-all';
+export type { MusicControllerSync$Params as MusicControllerSync$Params } from './fn/music/music-controller-sync';
+export { musicControllerSync as musicControllerSync } from './fn/music/music-controller-sync';
 export type { MusicControllerFindOne$Params as MusicControllerFindOne$Params } from './fn/music/music-controller-find-one';
 export { musicControllerFindOne as musicControllerFindOne } from './fn/music/music-controller-find-one';
 export type { MusicControllerDelete$Params as MusicControllerDelete$Params } from './fn/music/music-controller-delete';

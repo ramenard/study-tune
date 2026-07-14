@@ -3,6 +3,7 @@ import { Api } from '../../api/api';
 import { musicControllerFindAll } from '../../api/fn/music/music-controller-find-all';
 import { musicControllerUpdate } from '../../api/fn/music/music-controller-update';
 import { musicControllerDelete } from '../../api/fn/music/music-controller-delete';
+import { musicControllerSync } from '../../api/fn/music/music-controller-sync';
 import { musicControllerGetStreamUrl } from '../../api/fn/music/music-controller-get-stream-url';
 import { Music } from '../../api/models/music';
 
@@ -34,6 +35,11 @@ export class MusicService {
 
   async remove(id: string): Promise<void> {
     await this.api.invoke(musicControllerDelete, { id });
+    await this.load();
+  }
+
+  async sync(id: string): Promise<void> {
+    await this.api.invoke(musicControllerSync, { id });
     await this.load();
   }
 

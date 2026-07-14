@@ -81,6 +81,31 @@ export class SunoService {
     return taskId;
   }
 
+  async getGeneratedTracks(taskId: string): Promise<{ status: string; tracks: KieTrack[] }> {
+    const { data } = await firstValueFrom(
+      this.http.get(`${this.baseUrl}/api/v1/generate/record-info`, {
+        params: { taskId },
+        headers: this.headers,
+      }),
+    );
+
+    const status: string = data?.data?.status ?? 'UNKNOWN';
+    const rawTracks = data?.data?.response?.sunoData ?? data?.data?.response?.data ?? [];
+
+    const tracks: KieTrack[] = rawTracks.map((track: any) => ({
+      id: track.id,
+      title: track.title ?? 'Untitled',
+      audioUrl: track.audioUrl ?? track.audio_url ?? '',
+      streamAudioUrl: track.streamAudioUrl ?? '',
+      imageUrl: track.imageUrl ?? '',
+      status: this.mapStatus(status),
+      duration: track.duration,
+      tags: track.tags,
+    }));
+
+    return { status, tracks };
+  }
+
   async pollUntilComplete(
     ids: string[],
     maxRetries = 40,

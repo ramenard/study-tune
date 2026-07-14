@@ -35,6 +35,7 @@ export class LibraryComponent implements OnInit {
   readonly page = signal(1);
   readonly editId = signal<string | null>(null);
   readonly deleteId = signal<string | null>(null);
+  readonly syncingId = signal<string | null>(null);
   readonly toast = signal<string | null>(null);
 
   editValueStr = '';
@@ -161,6 +162,21 @@ export class LibraryComponent implements OnInit {
   async addToPlaylist(track: Music, playlist: Playlist): Promise<void> {
     await this.playlistService.addMusic(playlist.id, track.id);
     this.showToast(`Ajoutée à « ${playlist.name} »`);
+  }
+
+  async refresh(track: Music): Promise<void> {
+    if (this.syncingId()) {
+      return;
+    }
+    this.syncingId.set(track.id);
+    try {
+      await this.musicService.sync(track.id);
+      this.showToast('Statut mis à jour');
+    } catch {
+      this.showToast('Toujours en cours de génération…');
+    } finally {
+      this.syncingId.set(null);
+    }
   }
 
   async play(track: Music): Promise<void> {

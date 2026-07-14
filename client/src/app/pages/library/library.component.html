@@ -86,6 +86,12 @@
         <div class="duration-cell">{{ formatDuration(track.duration) }}</div>
 
         <div class="actions-cell">
+          @if (track.status !== 'complete') {
+            <button class="action-btn" title="Rafraîchir le statut" [disabled]="syncingId() === track.id" (click)="refresh(track)">
+              <mat-icon>{{ syncingId() === track.id ? 'hourglass_empty' : 'refresh' }}</mat-icon>
+            </button>
+          }
+
           <button class="action-btn" [class.active]="editId() === track.id" title="Renommer" (click)="startEdit(track)">
             <mat-icon>edit</mat-icon>
           </button>

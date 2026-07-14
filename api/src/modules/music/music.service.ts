@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SunoService } from './suno.service';
@@ -151,6 +151,41 @@ export class MusicService {
     const music = await this.findOneByUser(id, userId);
     const url = await this.storage.getPresignedUrl(music.objectName);
     return { url };
+  }
+
+  async syncFromKie(id: string, userId: string): Promise<Music> {
+    const music = await this.findOneByUser(id, userId);
+
+    if (music.status === 'complete') {
+      return music;
+    }
+
+    if (!music.sunoId) {
+      throw new BadRequestException('No generation task associated with this track');
+    }
+
+    const { tracks } = await this.suno.getGeneratedTracks(music.sunoId);
+    const ready = tracks.find((track) => !!track.audioUrl);
+
+    if (!ready) {
+      this.logger.log(`Track ${id} not ready yet on kie.ai`);
+      return music;
+    }
+
+    await this.storage.ensureBucket();
+    const objectName = await this.storage.downloadAndStore(ready.audioUrl, music.userId, music.id);
+
+    music.title = ready.title ?? music.title;
+    if (ready.duration !== undefined) {
+      music.duration = ready.duration;
+    }
+    music.objectName = objectName;
+    music.publicUrl = this.storage.getPublicUrl(objectName);
+    music.status = 'complete';
+
+    await this.musicRepo.save(music);
+    this.logger.log(`Track ${id} synced from kie.ai — MinIO: ${objectName}`);
+    return music;
   }
 
   async delete(id: string, userId: string): Promise<void> {
