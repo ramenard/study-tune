@@ -179,7 +179,7 @@ export class LibraryComponent implements OnInit {
     }
   }
 
-  async play(track: Music): Promise<void> {
+  play(track: Music): void {
     if (!this.isPlayable(track)) {
       return;
     }
@@ -187,16 +187,12 @@ export class LibraryComponent implements OnInit {
       this.player.toggle();
       return;
     }
-    const url = await this.musicService.getStreamUrl(track.id);
-    this.player.play(
-      {
-        id: track.id,
-        title: track.title ?? 'Sans titre',
-        subject: track.style ?? 'Révision',
-        color: this.colorFor(track.id),
-      },
-      url,
-    );
+    this.player.play({
+      id: track.id,
+      title: track.title ?? 'Sans titre',
+      subject: track.style ?? 'Révision',
+      color: this.colorFor(track.id),
+    });
   }
 
   setPage(pageNum: number): void {

@@ -52,9 +52,16 @@
 
         <div class="playlist-card__bottom">
           <span class="hint">{{ selectedId() === playlist.id ? 'Masquer' : 'Voir les titres' }}</span>
-          <button mat-icon-button aria-label="Supprimer la playlist" (click)="deletePlaylist($event, playlist.id)">
-            <mat-icon>delete_outline</mat-icon>
-          </button>
+          <div class="card-actions">
+            @if (playableCount(playlist) > 0) {
+              <button mat-icon-button aria-label="Lire la playlist" (click)="playPlaylist($event, playlist)">
+                <mat-icon>play_circle</mat-icon>
+              </button>
+            }
+            <button mat-icon-button aria-label="Supprimer la playlist" (click)="deletePlaylist($event, playlist.id)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
         </div>
       </div>
     }

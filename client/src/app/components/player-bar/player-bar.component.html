@@ -6,26 +6,75 @@
     <div class="track-meta">
       <span class="track-title">{{ currentTrack()?.title || 'Aucune lecture' }}</span>
       <span class="track-subject">{{ currentTrack()?.subject || '—' }}</span>
+      @if (queueName()) {
+        <span class="track-queue"><mat-icon>queue_music</mat-icon>{{ queueName() }}</span>
+      }
     </div>
-    <button class="icon-btn" aria-label="Favori">
-      <mat-icon>favorite_border</mat-icon>
-    </button>
   </div>
 
-  <div class="controls">
-    <button class="icon-btn" aria-label="Précédent">
-      <mat-icon>skip_previous</mat-icon>
-    </button>
-    <button class="play-btn" [disabled]="!currentTrack()" (click)="togglePlay()"
-            [attr.aria-label]="playing() ? 'Pause' : 'Lecture'">
-      <mat-icon>{{ playing() ? 'pause' : 'play_arrow' }}</mat-icon>
-    </button>
-    <button class="icon-btn" aria-label="Suivant">
-      <mat-icon>skip_next</mat-icon>
-    </button>
+  <div class="player-center">
+    <div class="controls">
+      <button class="icon-btn" [disabled]="!currentTrack()" (click)="previous()" aria-label="Précédent">
+        <mat-icon>skip_previous</mat-icon>
+      </button>
+      <button class="play-btn" [disabled]="!currentTrack()" (click)="togglePlay()"
+              [attr.aria-label]="playing() ? 'Pause' : 'Lecture'">
+        <mat-icon>{{ playing() ? 'pause' : 'play_arrow' }}</mat-icon>
+      </button>
+      <button class="icon-btn" [disabled]="!currentTrack()" (click)="next()" aria-label="Suivant">
+        <mat-icon>skip_next</mat-icon>
+      </button>
+      <button class="icon-btn" [class.icon-btn--active]="repeat()" (click)="toggleRepeat()"
+              [attr.aria-label]="repeat() ? 'Répétition activée' : 'Répétition désactivée'">
+        <mat-icon>repeat</mat-icon>
+      </button>
+    </div>
+
+    <div class="seekbar">
+      <span class="time">{{ formatTime(currentTime()) }}</span>
+      <input
+        #seek
+        class="range seek-range"
+        type="range"
+        min="0"
+        [max]="duration() || 0"
+        step="1"
+        [value]="currentTime()"
+        [disabled]="!currentTrack()"
+        (input)="onSeek(seek.value)"
+        aria-label="Position dans la piste" />
+      <span class="time">{{ formatTime(duration()) }}</span>
+    </div>
   </div>
 
-  <div class="volume">
-    <mat-icon class="volume-icon">volume_up</mat-icon>
+  <div class="player-right">
+    <button class="icon-btn" [disabled]="!currentTrack()" [matMenuTriggerFor]="playlistMenu"
+            (menuOpened)="loadPlaylists()" aria-label="Ajouter à une playlist">
+      <mat-icon>playlist_add</mat-icon>
+    </button>
+
+    <mat-menu #playlistMenu="matMenu" xPosition="before">
+      <div class="pl-menu-header">Ajouter la piste à</div>
+      @if (playlists().length === 0) {
+        <button mat-menu-item disabled>Aucune playlist</button>
+      }
+      @for (playlist of playlists(); track playlist.id) {
+        <button mat-menu-item (click)="addCurrentToPlaylist(playlist.id)">{{ playlist.name }}</button>
+      }
+    </mat-menu>
+
+    <div class="volume">
+      <mat-icon class="volume-icon">{{ volumeIcon() }}</mat-icon>
+      <input
+        #vol
+        class="range volume-range"
+        type="range"
+        min="0"
+        max="1"
+        step="0.05"
+        [value]="volume()"
+        (input)="onVolume(vol.value)"
+        aria-label="Volume" />
+    </div>
   </div>
 </div>

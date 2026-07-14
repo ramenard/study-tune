@@ -2,6 +2,8 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { PlaylistService } from '../../core/services/playlist.service';
+import { PlayerService } from '../../core/services/player.service';
+import { Playlist } from '../../api/models/playlist';
 
 const ACCENT_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#7A4B2E'];
 
@@ -13,6 +15,7 @@ const ACCENT_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#
 })
 export class PlaylistsComponent implements OnInit {
   private readonly playlistService = inject(PlaylistService);
+  private readonly player = inject(PlayerService);
 
   readonly playlists = this.playlistService.playlists;
   readonly showNewForm = signal(false);
@@ -88,6 +91,27 @@ export class PlaylistsComponent implements OnInit {
     if (event.key === 'Escape') {
       this.cancelNewForm();
     }
+  }
+
+  playableCount(playlist: Playlist): number {
+    return playlist.musics.filter((music) => music.status === 'complete').length;
+  }
+
+  playPlaylist(event: Event, playlist: Playlist): void {
+    event.stopPropagation();
+    const tracks = playlist.musics
+      .filter((music) => music.status === 'complete')
+      .map((music) => ({
+        id: music.id,
+        title: music.title || 'Sans titre',
+        subject: music.style || 'Révision',
+        color: this.colorFor(music.id),
+      }));
+
+    if (tracks.length === 0) {
+      return;
+    }
+    this.player.playQueue(tracks, 0, playlist.name);
   }
 
   formatDuration(seconds: number | undefined): string {
