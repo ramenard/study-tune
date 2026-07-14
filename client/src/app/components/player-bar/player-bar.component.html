@@ -10,6 +10,10 @@
         <span class="track-queue"><mat-icon>queue_music</mat-icon>{{ queueName() }}</span>
       }
     </div>
+    <button class="icon-btn like-btn" [class.like-btn--active]="isLiked()" [disabled]="!currentTrack()"
+            (click)="toggleLike()" [attr.aria-label]="isLiked() ? 'Retirer des favoris' : 'Ajouter aux favoris'">
+      <mat-icon>{{ isLiked() ? 'favorite' : 'favorite_border' }}</mat-icon>
+    </button>
   </div>
 
   <div class="player-center">

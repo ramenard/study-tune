@@ -35,6 +35,10 @@ export type { PlaylistControllerFindAll$Params as PlaylistControllerFindAll$Para
 export { playlistControllerFindAll as playlistControllerFindAll } from './fn/playlist/playlist-controller-find-all';
 export type { PlaylistControllerCreate$Params as PlaylistControllerCreate$Params } from './fn/playlist/playlist-controller-create';
 export { playlistControllerCreate as playlistControllerCreate } from './fn/playlist/playlist-controller-create';
+export type { PlaylistControllerFavorites$Params as PlaylistControllerFavorites$Params } from './fn/playlist/playlist-controller-favorites';
+export { playlistControllerFavorites as playlistControllerFavorites } from './fn/playlist/playlist-controller-favorites';
+export type { PlaylistControllerToggleFavorite$Params as PlaylistControllerToggleFavorite$Params } from './fn/playlist/playlist-controller-toggle-favorite';
+export { playlistControllerToggleFavorite as playlistControllerToggleFavorite } from './fn/playlist/playlist-controller-toggle-favorite';
 export type { PlaylistControllerFindOne$Params as PlaylistControllerFindOne$Params } from './fn/playlist/playlist-controller-find-one';
 export { playlistControllerFindOne as playlistControllerFindOne } from './fn/playlist/playlist-controller-find-one';
 export type { PlaylistControllerDelete$Params as PlaylistControllerDelete$Params } from './fn/playlist/playlist-controller-delete';

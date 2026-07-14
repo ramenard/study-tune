@@ -20,6 +20,48 @@ export class PlaylistService {
     private readonly friendshipService: FriendshipService,
   ) {}
 
+  async getOrCreateFavorites(userId: string): Promise<Playlist> {
+    const existing = await this.playlistRepo.findOne({
+      where: { creatorId: userId, isDefault: true },
+      relations: ['musics', 'members'],
+    });
+
+    if (existing) {
+      return existing;
+    }
+
+    return this.playlistRepo.save(
+      this.playlistRepo.create({
+        name: 'Favoris',
+        creatorId: userId,
+        isDefault: true,
+        members: [],
+        musics: [],
+      }),
+    );
+  }
+
+  async toggleFavorite(userId: string, musicId: string): Promise<{ liked: boolean }> {
+    const favorites = await this.getOrCreateFavorites(userId);
+    const music = await this.musicRepo.findOneBy({ id: musicId });
+
+    if (!music) {
+      throw new NotFoundException(`Music ${musicId} not found`);
+    }
+
+    const alreadyLiked = favorites.musics.some((m) => m.id === musicId);
+
+    if (alreadyLiked) {
+      favorites.musics = favorites.musics.filter((m) => m.id !== musicId);
+      await this.playlistRepo.save(favorites);
+      return { liked: false };
+    }
+
+    favorites.musics.push(music);
+    await this.playlistRepo.save(favorites);
+    return { liked: true };
+  }
+
   async create(dto: CreatePlaylistDto, userId: string): Promise<Playlist> {
     const playlist = this.playlistRepo.create({
       name: dto.name,
@@ -73,6 +115,10 @@ export class PlaylistService {
       throw new ForbiddenException();
     }
 
+    if (playlist.isDefault) {
+      throw new BadRequestException('The default playlist cannot be modified');
+    }
+
     if (dto.name) {
       playlist.name = dto.name;
     }
@@ -85,6 +131,10 @@ export class PlaylistService {
 
     if (playlist.creatorId !== userId) {
       throw new ForbiddenException();
+    }
+
+    if (playlist.isDefault) {
+      throw new BadRequestException('The default playlist cannot be deleted');
     }
 
     await this.playlistRepo.remove(playlist);

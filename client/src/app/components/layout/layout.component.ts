@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { PlayerBarComponent } from '../player-bar/player-bar.component';
 import { ProfileService } from '../../core/services/profile.service';
 import { FriendshipService } from '../../core/services/friendship.service';
+import { FavoritesService } from '../../core/services/favorites.service';
 import { AuthService } from '../../core/services/auth.service';
 
 interface NavItem {
@@ -22,6 +23,7 @@ interface NavItem {
 export class LayoutComponent implements OnInit {
   private readonly profileService = inject(ProfileService);
   private readonly friendshipService = inject(FriendshipService);
+  private readonly favoritesService = inject(FavoritesService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -42,6 +44,7 @@ export class LayoutComponent implements OnInit {
   ngOnInit(): void {
     void this.profileService.load();
     void this.friendshipService.loadReceived();
+    void this.favoritesService.load();
   }
 
   toggleDark(): void {

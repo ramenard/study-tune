@@ -63,6 +63,42 @@ describe('PlaylistService', () => {
     });
   });
 
+  describe('favorites', () => {
+    it('creates a default Favoris playlist when none exists', async () => {
+      playlistRepo.findOne.mockResolvedValue(null);
+
+      await service.getOrCreateFavorites('u1');
+
+      expect(playlistRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Favoris', creatorId: 'u1', isDefault: true }),
+      );
+    });
+
+    it('likes a track that is not yet favorited', async () => {
+      playlistRepo.findOne.mockResolvedValue({ id: 'fav', creatorId: 'u1', isDefault: true, musics: [] });
+      musicRepo.findOneBy.mockResolvedValue({ id: 'm1' });
+
+      const result = await service.toggleFavorite('u1', 'm1');
+
+      expect(result).toEqual({ liked: true });
+    });
+
+    it('unlikes a track that is already favorited', async () => {
+      playlistRepo.findOne.mockResolvedValue({ id: 'fav', creatorId: 'u1', isDefault: true, musics: [{ id: 'm1' }] });
+      musicRepo.findOneBy.mockResolvedValue({ id: 'm1' });
+
+      const result = await service.toggleFavorite('u1', 'm1');
+
+      expect(result).toEqual({ liked: false });
+    });
+
+    it('refuses to delete the default playlist', async () => {
+      playlistRepo.findOne.mockResolvedValue({ id: 'fav', creatorId: 'u1', isDefault: true, members: [], musics: [] });
+
+      await expect(service.delete('fav', 'u1')).rejects.toBeInstanceOf(BadRequestException);
+    });
+  });
+
   describe('addMusic', () => {
     it('forbids a member (non-creator) from adding tracks', async () => {
       playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'owner', members: [{ id: 'u1' }], musics: [] });

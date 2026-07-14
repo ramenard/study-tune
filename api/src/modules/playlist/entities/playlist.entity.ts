@@ -13,6 +13,9 @@ export class Playlist {
   @Column({ type: 'varchar' })
   creatorId: string;
 
+  @Column({ type: 'boolean', default: false })
+  isDefault: boolean;
+
   @ManyToOne(() => User, (user) => user.createdPlaylists)
   @JoinColumn({ name: 'creatorId' })
   creator: User;

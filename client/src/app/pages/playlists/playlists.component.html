@@ -45,7 +45,12 @@
             <mat-icon>music_note</mat-icon>
           </div>
           <div class="playlist-card__info">
-            <div class="playlist-card__name">{{ playlist.name }}</div>
+            <div class="playlist-card__name">
+              @if (playlist.isDefault) {
+                <mat-icon class="default-icon">favorite</mat-icon>
+              }
+              {{ playlist.name }}
+            </div>
             <div class="playlist-card__count">{{ playlist.musics.length }} musique{{ playlist.musics.length > 1 ? 's' : '' }}</div>
           </div>
         </div>
@@ -58,9 +63,11 @@
                 <mat-icon>play_circle</mat-icon>
               </button>
             }
-            <button mat-icon-button aria-label="Supprimer la playlist" (click)="deletePlaylist($event, playlist.id)">
-              <mat-icon>delete_outline</mat-icon>
-            </button>
+            @if (!playlist.isDefault) {
+              <button mat-icon-button aria-label="Supprimer la playlist" (click)="deletePlaylist($event, playlist.id)">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            }
           </div>
         </div>
       </div>

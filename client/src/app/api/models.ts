@@ -6,6 +6,7 @@ export type { ChatDto } from './models/chat-dto';
 export type { CreateMusicDto } from './models/create-music-dto';
 export type { CreatePlaylistDto } from './models/create-playlist-dto';
 export type { DocumentResultDto } from './models/document-result-dto';
+export type { FavoriteToggleDto } from './models/favorite-toggle-dto';
 export type { Friendship } from './models/friendship';
 export type { GenerateMusicResponseDto } from './models/generate-music-response-dto';
 export type { LoginDto } from './models/login-dto';

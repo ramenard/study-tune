@@ -3,6 +3,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { PlayerService } from '../../core/services/player.service';
 import { PlaylistService } from '../../core/services/playlist.service';
+import { FavoritesService } from '../../core/services/favorites.service';
 
 @Component({
   selector: 'app-player-bar',
@@ -13,6 +14,7 @@ import { PlaylistService } from '../../core/services/playlist.service';
 export class PlayerBarComponent {
   private readonly player = inject(PlayerService);
   private readonly playlistService = inject(PlaylistService);
+  private readonly favoritesService = inject(FavoritesService);
 
   readonly currentTrack = this.player.currentTrack;
   readonly playing = this.player.playing;
@@ -22,6 +24,11 @@ export class PlayerBarComponent {
   readonly repeat = this.player.repeat;
   readonly queueName = this.player.queueName;
   readonly playlists = this.playlistService.playlists;
+
+  readonly isLiked = computed(() => {
+    const track = this.currentTrack();
+    return track ? this.favoritesService.isFavorite(track.id) : false;
+  });
 
   readonly volumeIcon = computed(() => {
     const value = this.volume();
@@ -52,6 +59,14 @@ export class PlayerBarComponent {
 
   toggleRepeat(): void {
     this.player.toggleRepeat();
+  }
+
+  toggleLike(): void {
+    const track = this.currentTrack();
+    if (!track) {
+      return;
+    }
+    void this.favoritesService.toggle(track.id);
   }
 
   onSeek(value: string): void {

@@ -8,6 +8,7 @@ export interface Playlist {
   creator: User;
   creatorId: string;
   id: string;
+  isDefault: boolean;
   members: Array<User>;
   musics: Array<Music>;
   name: string;

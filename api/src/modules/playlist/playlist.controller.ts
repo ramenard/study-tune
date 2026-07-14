@@ -6,6 +6,8 @@ import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
 import { PaginatedPlaylistsDto } from './dto/paginated-playlists.dto';
+import { FavoriteToggleDto } from './dto/favorite-toggle.dto';
+import { Playlist } from './entities/playlist.entity';
 
 type AuthRequest = Request & { user: { id: string } };
 
@@ -32,6 +34,19 @@ export class PlaylistController {
     @Query('limit') limit = 10,
   ): Promise<PaginatedPlaylistsDto> {
     return this.playlistService.findAllByUser(req.user.id, Number(page), Number(limit));
+  }
+
+  @Get('favorites')
+  @ApiOkResponse({ type: Playlist })
+  async favorites(@Req() req: AuthRequest): Promise<Playlist> {
+    return this.playlistService.getOrCreateFavorites(req.user.id);
+  }
+
+  @Post('favorites/tracks/:musicId/toggle')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: FavoriteToggleDto })
+  async toggleFavorite(@Param('musicId') musicId: string, @Req() req: AuthRequest): Promise<FavoriteToggleDto> {
+    return this.playlistService.toggleFavorite(req.user.id, musicId);
   }
 
   @Get(':id')
