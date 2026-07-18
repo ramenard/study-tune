@@ -36,6 +36,7 @@ import * as Joi from 'joi';
         CORS_ORIGIN: Joi.string().optional(),
         APP_PUBLIC_URL: Joi.string().uri().optional(),
         KIE_API_KEY: Joi.string().optional(),
+        KIE_WEBHOOK_SECRET: Joi.string().optional(),
         MISTRAL_API_KEY: Joi.string().optional(),
         MINIO_ENDPOINT: Joi.string().optional(),
         MINIO_PORT: Joi.number().optional(),

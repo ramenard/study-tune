@@ -28,6 +28,7 @@ import { PaginatedMusicDto } from './dto/paginated-music.dto';
 import { GenerateMusicResponseDto } from './dto/generate-music-response.dto';
 import { StreamUrlDto } from './dto/stream-url.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { KieWebhookGuard } from './kie-webhook.guard';
 
 type AuthRequest = Request & { user: { id: string } };
 
@@ -36,7 +37,8 @@ type AuthRequest = Request & { user: { id: string } };
 export class MusicController {
   constructor(private readonly musicService: MusicService) {}
 
-  @Post('webhook/kie')
+  @Post('webhook/kie/:secret')
+  @UseGuards(KieWebhookGuard)
   @HttpCode(HttpStatus.OK)
   async kieWebhook(@Body() payload: any) {
     return this.musicService.handleKieWebhook(payload);
