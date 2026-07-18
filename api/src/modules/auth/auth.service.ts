@@ -6,12 +6,16 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ProfileDto } from './dto/profile.dto';
+import { AuthResponseDto } from './dto/auth-response.dto';
 import { SubscriptionService } from './subscription.service';
+
+const REFRESH_TOKEN_EXPIRES_IN = '7d';
 
 @Injectable()
 export class AuthService {
@@ -19,10 +23,11 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     private readonly subscriptionService: SubscriptionService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<{ accessToken: string }> {
+  async register(dto: RegisterDto): Promise<AuthResponseDto> {
     const existing = await this.userRepository.findOneBy({ email: dto.email });
 
     if (existing) {
@@ -37,10 +42,10 @@ export class AuthService {
     });
     await this.userRepository.save(user);
 
-    return this.generateToken(user);
+    return this.generateTokens(user);
   }
 
-  async login(dto: LoginDto): Promise<{ accessToken: string }> {
+  async login(dto: LoginDto): Promise<AuthResponseDto> {
     const user = await this.userRepository.findOne({
       where: { email: dto.email },
       select: ['id', 'email', 'password', 'username'],
@@ -56,7 +61,32 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.generateToken(user);
+    return this.generateTokens(user);
+  }
+
+  async refresh(refreshToken: string): Promise<AuthResponseDto> {
+    const payload = this.verifyRefreshToken(refreshToken);
+
+    const user = await this.userRepository.findOne({
+      where: { id: payload.sub },
+      select: ['id', 'email', 'username', 'refreshTokenHash'],
+    });
+
+    if (!user || !user.refreshTokenHash) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const matches = await bcrypt.compare(refreshToken, user.refreshTokenHash);
+
+    if (!matches) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    return this.generateTokens(user);
+  }
+
+  async logout(userId: string): Promise<void> {
+    await this.userRepository.update(userId, { refreshTokenHash: null });
   }
 
   async subscribe(userId: string): Promise<ProfileDto> {
@@ -84,11 +114,40 @@ export class AuthService {
     };
   }
 
-  private generateToken(user: User): { accessToken: string } {
+  private async generateTokens(user: User): Promise<AuthResponseDto> {
     const accessToken = this.jwtService.sign({
       sub: user.id,
       email: user.email,
     });
-    return { accessToken };
+
+    const refreshToken = this.jwtService.sign(
+      { sub: user.id },
+      {
+        secret: this.getRefreshSecret(),
+        expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+      },
+    );
+
+    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.update(user.id, { refreshTokenHash });
+
+    return { accessToken, refreshToken };
+  }
+
+  private verifyRefreshToken(refreshToken: string): { sub: string } {
+    try {
+      return this.jwtService.verify<{ sub: string }>(refreshToken, {
+        secret: this.getRefreshSecret(),
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  private getRefreshSecret(): string {
+    return (
+      this.configService.get<string>('JWT_REFRESH_SECRET') ??
+      this.configService.getOrThrow<string>('JWT_SECRET')
+    );
   }
 }

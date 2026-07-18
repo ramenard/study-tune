@@ -33,6 +33,7 @@ import * as Joi from 'joi';
         DB_PASSWORD: Joi.string().default('password'),
         DB_NAME: Joi.string().default('musicdb'),
         JWT_SECRET: Joi.string().required(),
+        JWT_REFRESH_SECRET: Joi.string().optional(),
         CORS_ORIGIN: Joi.string().optional(),
         APP_PUBLIC_URL: Joi.string().uri().optional(),
         KIE_API_KEY: Joi.string().optional(),
