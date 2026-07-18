@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -18,7 +18,8 @@ const THUMB_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#7
   selector: 'app-library',
   imports: [FormsModule, MatIconModule, MatMenuModule, MatButtonModule],
   templateUrl: './library.component.html',
-  styleUrl: './library.component.scss'
+  styleUrl: './library.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LibraryComponent implements OnInit {
   private readonly musicService = inject(MusicService);

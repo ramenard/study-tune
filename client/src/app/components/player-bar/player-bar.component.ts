@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { PlayerService } from '../../core/services/player.service';
@@ -10,7 +10,8 @@ import { MusicService } from '../../core/services/music.service';
   selector: 'app-player-bar',
   imports: [MatIconModule, MatMenuModule],
   templateUrl: './player-bar.component.html',
-  styleUrl: './player-bar.component.scss'
+  styleUrl: './player-bar.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlayerBarComponent {
   private readonly player = inject(PlayerService);

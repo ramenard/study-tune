@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ProfileService } from '../../core/services/profile.service';
@@ -8,6 +8,7 @@ import { ProfileService } from '../../core/services/profile.service';
   imports: [MatIconModule, MatButtonModule],
   templateUrl: './tokens.component.html',
   styleUrl: './tokens.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TokensComponent implements OnInit {
   private readonly profileService = inject(ProfileService);

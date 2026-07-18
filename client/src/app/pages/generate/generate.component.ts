@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,6 +21,7 @@ const MUSIC_STYLES: string[] = [
   imports: [MatIconModule, MatButtonModule],
   templateUrl: './generate.component.html',
   styleUrl: './generate.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenerateComponent {
   private readonly api = inject(Api);

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { PlaylistService } from '../../core/services/playlist.service';
@@ -14,6 +14,7 @@ const ACCENT_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#
   imports: [MatIconModule, MatButtonModule],
   templateUrl: './playlists.component.html',
   styleUrl: './playlists.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlaylistsComponent implements OnInit {
   private readonly playlistService = inject(PlaylistService);

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { FriendshipService } from '../../core/services/friendship.service';
@@ -12,6 +12,7 @@ const AVATAR_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#
   imports: [MatIconModule, MatButtonModule],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FriendsComponent implements OnInit {
   private readonly friendship = inject(FriendshipService);
