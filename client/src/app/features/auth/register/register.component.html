@@ -19,11 +19,15 @@
       <mat-hint>8 caractères minimum</mat-hint>
     </mat-form-field>
 
+    <mat-checkbox formControlName="consent" class="auth-consent">
+      J'accepte les <a href="#" target="_blank" rel="noopener">CGU</a> et le traitement de mes données.
+    </mat-checkbox>
+
     @if (errorMessage()) {
       <p class="auth-error" role="alert">{{ errorMessage() }}</p>
     }
 
-    <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
+    <button mat-flat-button color="primary" type="submit" [disabled]="loading() || form.invalid">
       {{ loading() ? 'Création…' : 'Créer mon compte' }}
     </button>
 

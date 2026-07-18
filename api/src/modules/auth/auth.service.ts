@@ -39,6 +39,7 @@ export class AuthService {
       email: dto.email,
       password: hashed,
       username: dto.username,
+      consentAt: new Date(),
     });
     await this.userRepository.save(user);
 

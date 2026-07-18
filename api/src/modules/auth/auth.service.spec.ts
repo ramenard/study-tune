@@ -53,6 +53,7 @@ describe('AuthService', () => {
           email: 'a@b.c',
           password: 'password123',
           username: 'al',
+          consent: true,
         }),
       ).rejects.toBeInstanceOf(ConflictException);
     });
@@ -65,6 +66,7 @@ describe('AuthService', () => {
         email: 'a@b.c',
         password: 'password123',
         username: 'al',
+        consent: true,
       });
 
       expect(mockedBcrypt.hash).toHaveBeenCalledWith('password123', 10);

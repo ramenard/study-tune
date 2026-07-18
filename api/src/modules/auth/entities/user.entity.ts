@@ -38,6 +38,9 @@ export class User {
   @Column({ type: 'timestamptz', default: () => 'now()' })
   periodStart: Date;
 
+  @Column({ type: 'timestamptz', nullable: true })
+  consentAt: Date | null;
+
   @OneToMany(() => Music, (music) => music.user)
   musics: Music[];
 
