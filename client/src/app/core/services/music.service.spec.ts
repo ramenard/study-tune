@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MusicService } from './music.service';
-import { Api } from '../../api/api';
+import { Api } from '@api/api';
 
 describe('MusicService (front)', () => {
   let invoke: ReturnType<typeof vi.fn>;

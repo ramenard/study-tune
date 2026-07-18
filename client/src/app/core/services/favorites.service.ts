@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { Api } from '../../api/api';
-import { playlistControllerFavorites } from '../../api/fn/playlist/playlist-controller-favorites';
-import { playlistControllerToggleFavorite } from '../../api/fn/playlist/playlist-controller-toggle-favorite';
+import { Api } from '@api/api';
+import { playlistControllerFavorites } from '@api/fn/playlist/playlist-controller-favorites';
+import { playlistControllerToggleFavorite } from '@api/fn/playlist/playlist-controller-toggle-favorite';
 
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {

@@ -1,11 +1,11 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { from, Observable, tap } from 'rxjs';
-import { Api } from '../../api/api';
-import { authControllerLogin } from '../../api/fn/auth/auth-controller-login';
-import { authControllerRegister } from '../../api/fn/auth/auth-controller-register';
-import { AuthResponseDto } from '../../api/models/auth-response-dto';
-import { LoginDto } from '../../api/models/login-dto';
-import { RegisterDto } from '../../api/models/register-dto';
+import { Api } from '@api/api';
+import { authControllerLogin } from '@api/fn/auth/auth-controller-login';
+import { authControllerRegister } from '@api/fn/auth/auth-controller-register';
+import { AuthResponseDto } from '@api/models/auth-response-dto';
+import { LoginDto } from '@api/models/login-dto';
+import { RegisterDto } from '@api/models/register-dto';
 import { AuthTokenService } from './auth-token.service';
 import { ProfileService } from './profile.service';
 import { GenerationStatusService } from './generation-status.service';

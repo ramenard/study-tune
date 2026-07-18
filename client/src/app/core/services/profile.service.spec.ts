@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ProfileService } from './profile.service';
-import { Api } from '../../api/api';
-import { ProfileDto } from '../../api/models/profile-dto';
+import { Api } from '@api/api';
+import { ProfileDto } from '@api/models/profile-dto';
 
 function profile(overrides: Partial<ProfileDto> = {}): ProfileDto {
   return {

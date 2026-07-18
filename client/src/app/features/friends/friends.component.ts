@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { FriendshipService } from '../../core/services/friendship.service';
+import { FriendshipService } from '@core/services/friendship.service';
 
 type ActiveTab = 'friends' | 'add' | 'requests';
 

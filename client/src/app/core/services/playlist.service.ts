@@ -1,13 +1,13 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { Api } from '../../api/api';
-import { playlistControllerFindAll } from '../../api/fn/playlist/playlist-controller-find-all';
-import { playlistControllerCreate } from '../../api/fn/playlist/playlist-controller-create';
-import { playlistControllerDelete } from '../../api/fn/playlist/playlist-controller-delete';
-import { playlistControllerAddMusic } from '../../api/fn/playlist/playlist-controller-add-music';
-import { playlistControllerRemoveMusic } from '../../api/fn/playlist/playlist-controller-remove-music';
-import { playlistControllerShare } from '../../api/fn/playlist/playlist-controller-share';
-import { playlistControllerRemoveMember } from '../../api/fn/playlist/playlist-controller-remove-member';
-import { Playlist } from '../../api/models/playlist';
+import { Api } from '@api/api';
+import { playlistControllerFindAll } from '@api/fn/playlist/playlist-controller-find-all';
+import { playlistControllerCreate } from '@api/fn/playlist/playlist-controller-create';
+import { playlistControllerDelete } from '@api/fn/playlist/playlist-controller-delete';
+import { playlistControllerAddMusic } from '@api/fn/playlist/playlist-controller-add-music';
+import { playlistControllerRemoveMusic } from '@api/fn/playlist/playlist-controller-remove-music';
+import { playlistControllerShare } from '@api/fn/playlist/playlist-controller-share';
+import { playlistControllerRemoveMember } from '@api/fn/playlist/playlist-controller-remove-member';
+import { Playlist } from '@api/models/playlist';
 
 @Injectable({ providedIn: 'root' })
 export class PlaylistService {

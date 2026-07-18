@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@a
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { ProfileService } from '../../core/services/profile.service';
-import { AuthService } from '../../core/services/auth.service';
+import { ProfileService } from '@core/services/profile.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-profile',

@@ -5,7 +5,7 @@ import { AuthTokenService } from './auth-token.service';
 import { ProfileService } from './profile.service';
 import { GenerationStatusService } from './generation-status.service';
 import { PlayerService } from './player.service';
-import { Api } from '../../api/api';
+import { Api } from '@api/api';
 
 describe('AuthService (front)', () => {
   let invoke: ReturnType<typeof vi.fn>;

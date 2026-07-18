@@ -4,16 +4,16 @@ import { Router, RouterLink } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
-  selector: 'app-register',
+  selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatButtonModule],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.scss',
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegisterComponent {
+export class LoginComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -22,9 +22,8 @@ export class RegisterComponent {
   readonly errorMessage = signal('');
 
   readonly form = this.formBuilder.nonNullable.group({
-    username: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required]],
   });
 
   submit(): void {
@@ -35,14 +34,14 @@ export class RegisterComponent {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.authService.register(this.form.getRawValue()).subscribe({
+    this.authService.login(this.form.getRawValue()).subscribe({
       next: () => {
         this.loading.set(false);
         void this.router.navigate(['/']);
       },
       error: () => {
         this.loading.set(false);
-        this.errorMessage.set('Impossible de créer le compte. Cet email est peut-être déjà utilisé.');
+        this.errorMessage.set('Email ou mot de passe incorrect.');
       },
     });
   }

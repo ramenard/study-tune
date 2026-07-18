@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GenerationStatusService } from './generation-status.service';
 import { MusicService } from './music.service';
-import { Api } from '../../api/api';
-import { Music } from '../../api/models/music';
+import { Api } from '@api/api';
+import { Music } from '@api/models/music';
 
 describe('GenerationStatusService', () => {
   let invoke: ReturnType<typeof vi.fn>;

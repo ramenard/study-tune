@@ -1,12 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { MusicService } from './music.service';
-
-export interface PlayableTrack {
-  id: string;
-  title: string;
-  subject: string;
-  color: string;
-}
+import { PlayableTrack } from '@shared/models/playable-track';
 
 @Injectable({ providedIn: 'root' })
 export class PlayerService {

@@ -2,25 +2,13 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Api } from '../../api/api';
-import { musicControllerFindAll } from '../../api/fn/music/music-controller-find-all';
-import { friendshipControllerFindFriends } from '../../api/fn/friendship/friendship-controller-find-friends';
-import { Music } from '../../api/models/music';
-import { ProfileService } from '../../core/services/profile.service';
-
-interface RecentSong {
-  id: string;
-  title: string;
-  subject: string;
-  duration: string;
-  color: string;
-}
-
-interface Stat {
-  label: string;
-  value: string;
-  icon: string;
-}
+import { Api } from '@api/api';
+import { musicControllerFindAll } from '@api/fn/music/music-controller-find-all';
+import { friendshipControllerFindFriends } from '@api/fn/friendship/friendship-controller-find-friends';
+import { Music } from '@api/models/music';
+import { ProfileService } from '@core/services/profile.service';
+import { RecentSong } from '@shared/models/recent-song';
+import { Stat } from '@shared/models/stat';
 
 const THUMB_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#6c5ce7'];
 

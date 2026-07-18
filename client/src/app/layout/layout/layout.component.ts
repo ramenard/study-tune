@@ -2,19 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/cor
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { PlayerBarComponent } from '../player-bar/player-bar.component';
-import { ProfileService } from '../../core/services/profile.service';
-import { FriendshipService } from '../../core/services/friendship.service';
-import { FavoritesService } from '../../core/services/favorites.service';
-import { GenerationStatusService } from '../../core/services/generation-status.service';
-import { AuthService } from '../../core/services/auth.service';
-import { ThemeService } from '../../core/services/theme.service';
-
-interface NavItem {
-  id: string;
-  icon: string;
-  label: string;
-  route: string;
-}
+import { ProfileService } from '@core/services/profile.service';
+import { FriendshipService } from '@core/services/friendship.service';
+import { FavoritesService } from '@core/services/favorites.service';
+import { GenerationStatusService } from '@core/services/generation-status.service';
+import { AuthService } from '@core/services/auth.service';
+import { ThemeService } from '@core/services/theme.service';
+import { NavItem } from '@shared/models/nav-item';
 
 @Component({
   selector: 'app-layout',

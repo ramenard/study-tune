@@ -1,14 +1,14 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Api } from '../../api/api';
-import { environment } from '../../../environments/environment';
-import { musicControllerFindAll } from '../../api/fn/music/music-controller-find-all';
-import { musicControllerUpdate } from '../../api/fn/music/music-controller-update';
-import { musicControllerDelete } from '../../api/fn/music/music-controller-delete';
-import { musicControllerSync } from '../../api/fn/music/music-controller-sync';
-import { musicControllerGetStreamUrl } from '../../api/fn/music/music-controller-get-stream-url';
-import { Music } from '../../api/models/music';
+import { Api } from '@api/api';
+import { environment } from '@env/environment';
+import { musicControllerFindAll } from '@api/fn/music/music-controller-find-all';
+import { musicControllerUpdate } from '@api/fn/music/music-controller-update';
+import { musicControllerDelete } from '@api/fn/music/music-controller-delete';
+import { musicControllerSync } from '@api/fn/music/music-controller-sync';
+import { musicControllerGetStreamUrl } from '@api/fn/music/music-controller-get-stream-url';
+import { Music } from '@api/models/music';
 
 @Injectable({ providedIn: 'root' })
 export class MusicService {

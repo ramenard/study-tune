@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { PlayerService } from '../../core/services/player.service';
-import { PlaylistService } from '../../core/services/playlist.service';
-import { FavoritesService } from '../../core/services/favorites.service';
-import { MusicService } from '../../core/services/music.service';
+import { PlayerService } from '@core/services/player.service';
+import { PlaylistService } from '@core/services/playlist.service';
+import { FavoritesService } from '@core/services/favorites.service';
+import { MusicService } from '@core/services/music.service';
 
 @Component({
   selector: 'app-player-bar',

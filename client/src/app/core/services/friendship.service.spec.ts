@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FriendshipService } from './friendship.service';
-import { Api } from '../../api/api';
+import { Api } from '@api/api';
 
 describe('FriendshipService (front)', () => {
   let invoke: ReturnType<typeof vi.fn>;

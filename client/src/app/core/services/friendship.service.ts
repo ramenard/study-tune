@@ -1,13 +1,13 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Api } from '../../api/api';
-import { friendshipControllerFindFriends } from '../../api/fn/friendship/friendship-controller-find-friends';
-import { friendshipControllerFindPendingReceived } from '../../api/fn/friendship/friendship-controller-find-pending-received';
-import { friendshipControllerSearch } from '../../api/fn/friendship/friendship-controller-search';
-import { friendshipControllerSendRequest } from '../../api/fn/friendship/friendship-controller-send-request';
-import { friendshipControllerRespondToRequest } from '../../api/fn/friendship/friendship-controller-respond-to-request';
-import { Friendship } from '../../api/models/friendship';
-import { User } from '../../api/models/user';
-import { UserSearchResultDto } from '../../api/models/user-search-result-dto';
+import { Api } from '@api/api';
+import { friendshipControllerFindFriends } from '@api/fn/friendship/friendship-controller-find-friends';
+import { friendshipControllerFindPendingReceived } from '@api/fn/friendship/friendship-controller-find-pending-received';
+import { friendshipControllerSearch } from '@api/fn/friendship/friendship-controller-search';
+import { friendshipControllerSendRequest } from '@api/fn/friendship/friendship-controller-send-request';
+import { friendshipControllerRespondToRequest } from '@api/fn/friendship/friendship-controller-respond-to-request';
+import { Friendship } from '@api/models/friendship';
+import { User } from '@api/models/user';
+import { UserSearchResultDto } from '@api/models/user-search-result-dto';
 
 @Injectable({ providedIn: 'root' })
 export class FriendshipService {

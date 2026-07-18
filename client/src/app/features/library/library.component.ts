@@ -3,12 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
-import { MusicService } from '../../core/services/music.service';
-import { PlaylistService } from '../../core/services/playlist.service';
-import { PlayerService } from '../../core/services/player.service';
-import { GenerationStatusService } from '../../core/services/generation-status.service';
-import { Music } from '../../api/models/music';
-import { Playlist } from '../../api/models/playlist';
+import { MusicService } from '@core/services/music.service';
+import { PlaylistService } from '@core/services/playlist.service';
+import { PlayerService } from '@core/services/player.service';
+import { GenerationStatusService } from '@core/services/generation-status.service';
+import { Music } from '@api/models/music';
+import { Playlist } from '@api/models/playlist';
 
 type SortKey = 'date' | 'title' | 'style';
 

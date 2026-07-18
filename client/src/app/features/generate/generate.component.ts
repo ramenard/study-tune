@@ -3,11 +3,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Api } from '../../api/api';
-import { documentControllerProcess } from '../../api/fn/document/document-controller-process';
-import { musicControllerGenerate } from '../../api/fn/music/music-controller-generate';
-import { ProfileService } from '../../core/services/profile.service';
-import { GenerationStatusService } from '../../core/services/generation-status.service';
+import { Api } from '@api/api';
+import { documentControllerProcess } from '@api/fn/document/document-controller-process';
+import { musicControllerGenerate } from '@api/fn/music/music-controller-generate';
+import { ProfileService } from '@core/services/profile.service';
+import { GenerationStatusService } from '@core/services/generation-status.service';
 
 type GenerateStep = 0 | 1 | 2;
 type SourceTab = 'prompt' | 'pdf';

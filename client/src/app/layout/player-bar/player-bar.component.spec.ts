@@ -1,10 +1,11 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { PlayerBarComponent } from './player-bar.component';
-import { PlayerService, PlayableTrack } from '../../core/services/player.service';
-import { PlaylistService } from '../../core/services/playlist.service';
-import { FavoritesService } from '../../core/services/favorites.service';
-import { MusicService } from '../../core/services/music.service';
+import { PlayerService } from '@core/services/player.service';
+import { PlayableTrack } from '@shared/models/playable-track';
+import { PlaylistService } from '@core/services/playlist.service';
+import { FavoritesService } from '@core/services/favorites.service';
+import { MusicService } from '@core/services/music.service';
 
 describe('PlayerBarComponent', () => {
   const currentTrack = signal<PlayableTrack | null>(null);

@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Api } from '../../api/api';
-import { musicControllerSync } from '../../api/fn/music/music-controller-sync';
+import { Api } from '@api/api';
+import { musicControllerSync } from '@api/fn/music/music-controller-sync';
 import { MusicService } from './music.service';
 
 interface PendingGeneration {

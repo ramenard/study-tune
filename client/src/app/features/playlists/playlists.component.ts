@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { PlaylistService } from '../../core/services/playlist.service';
-import { PlayerService } from '../../core/services/player.service';
-import { ProfileService } from '../../core/services/profile.service';
-import { FriendshipService } from '../../core/services/friendship.service';
-import { Playlist } from '../../api/models/playlist';
+import { PlaylistService } from '@core/services/playlist.service';
+import { PlayerService } from '@core/services/player.service';
+import { ProfileService } from '@core/services/profile.service';
+import { FriendshipService } from '@core/services/friendship.service';
+import { Playlist } from '@api/models/playlist';
 
 const ACCENT_COLORS = ['#006A6A', '#4B607C', '#7D5260', '#365E3D', '#5B4C8A', '#7A4B2E'];
 
