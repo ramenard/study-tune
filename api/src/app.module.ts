@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MusicModule } from './modules/music/music.module';
 import { DocumentModule } from './modules/document/document.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -11,6 +13,7 @@ import * as Joi from 'joi';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     MusicModule,
     DocumentModule,
     AuthModule,
@@ -59,6 +62,12 @@ import * as Joi from 'joi';
         migrationsRun: config.get('NODE_ENV') === 'production',
       }),
     }),
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
