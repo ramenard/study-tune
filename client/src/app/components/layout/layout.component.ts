@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { PlayerBarComponent } from '../player-bar/player-bar.component';
@@ -7,6 +7,7 @@ import { FriendshipService } from '../../core/services/friendship.service';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { GenerationStatusService } from '../../core/services/generation-status.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 interface NavItem {
   id: string;
@@ -19,7 +20,8 @@ interface NavItem {
   selector: 'app-layout',
   imports: [RouterOutlet, RouterLink, RouterLinkActive, MatIconModule, PlayerBarComponent],
   templateUrl: './layout.component.html',
-  styleUrl: './layout.component.scss'
+  styleUrl: './layout.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LayoutComponent implements OnInit {
   private readonly profileService = inject(ProfileService);
@@ -27,6 +29,7 @@ export class LayoutComponent implements OnInit {
   private readonly favoritesService = inject(FavoritesService);
   private readonly generationStatus = inject(GenerationStatusService);
   private readonly authService = inject(AuthService);
+  private readonly themeService = inject(ThemeService);
   private readonly router = inject(Router);
 
   readonly navItems: NavItem[] = [
@@ -43,7 +46,7 @@ export class LayoutComponent implements OnInit {
   readonly pendingRequests = this.friendshipService.pendingReceivedCount;
   readonly generatingCount = this.generationStatus.pendingCount;
   readonly isGenerating = this.generationStatus.isGenerating;
-  readonly dark = signal(false);
+  readonly dark = this.themeService.dark;
 
   ngOnInit(): void {
     void this.profileService.load();
@@ -53,8 +56,7 @@ export class LayoutComponent implements OnInit {
   }
 
   toggleDark(): void {
-    this.dark.update(v => !v);
-    document.documentElement.toggleAttribute('data-dark', !this.dark());
+    this.themeService.toggle();
   }
 
   logout(): void {
