@@ -1,0 +1,29 @@
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 60vh;
+  text-align: center;
+  padding: 24px;
+}
+
+.not-found-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: var(--md-sys-color-primary);
+}
+
+.not-found-code {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--md-sys-color-on-surface);
+}
+
+.not-found-message {
+  margin: 0 0 12px;
+  color: var(--md-sys-color-on-surface-variant);
+}
