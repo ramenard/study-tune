@@ -27,7 +27,11 @@ export class StorageService {
     }
   }
 
-  async downloadAndStore(audioUrl: string, userId: string, musicId: string): Promise<string> {
+  async downloadAndStore(
+    audioUrl: string,
+    userId: string,
+    musicId: string,
+  ): Promise<string> {
     this.logger.log(`Downloading audio from: ${audioUrl}`);
 
     const response = await firstValueFrom(
@@ -61,8 +65,15 @@ export class StorageService {
     return `${host}/${this.bucket}/${objectName}`;
   }
 
-  async getPresignedUrl(objectName: string, expirySeconds = 3600): Promise<string> {
-    return this.client.presignedGetObject(this.bucket, objectName, expirySeconds);
+  async getPresignedUrl(
+    objectName: string,
+    expirySeconds = 3600,
+  ): Promise<string> {
+    return this.client.presignedGetObject(
+      this.bucket,
+      objectName,
+      expirySeconds,
+    );
   }
 
   async getObjectStream(objectName: string): Promise<Readable> {

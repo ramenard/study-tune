@@ -1,5 +1,25 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, HttpCode, HttpStatus, StreamableFile, UseGuards, Req, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  HttpCode,
+  HttpStatus,
+  StreamableFile,
+  UseGuards,
+  Req,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { MusicService } from './music.service';
 import { CreateMusicDto } from './dto/create-music.dto';
@@ -27,7 +47,10 @@ export class MusicController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiResponse({ status: HttpStatus.ACCEPTED, type: GenerateMusicResponseDto })
-  async generate(@Body() dto: CreateMusicDto, @Req() req: AuthRequest): Promise<GenerateMusicResponseDto> {
+  async generate(
+    @Body() dto: CreateMusicDto,
+    @Req() req: AuthRequest,
+  ): Promise<GenerateMusicResponseDto> {
     return this.musicService.generateAndStore(dto, req.user.id);
   }
 
@@ -42,7 +65,11 @@ export class MusicController {
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ): Promise<PaginatedMusicDto> {
-    return this.musicService.findAllByUser(req.user.id, Number(page), Number(limit));
+    return this.musicService.findAllByUser(
+      req.user.id,
+      Number(page),
+      Number(limit),
+    );
   }
 
   @Post(':id/sync')
@@ -62,7 +89,11 @@ export class MusicController {
   @Patch(':id')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async update(@Param('id') id: string, @Body() dto: UpdateMusicDto, @Req() req: AuthRequest) {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateMusicDto,
+    @Req() req: AuthRequest,
+  ) {
     return this.musicService.update(id, dto, req.user.id);
   }
 
@@ -70,15 +101,24 @@ export class MusicController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: StreamUrlDto })
-  async getStreamUrl(@Param('id') id: string, @Req() req: AuthRequest): Promise<StreamUrlDto> {
+  async getStreamUrl(
+    @Param('id') id: string,
+    @Req() req: AuthRequest,
+  ): Promise<StreamUrlDto> {
     return this.musicService.getStreamUrl(id, req.user.id);
   }
 
   @Get(':id/download')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async download(@Param('id') id: string, @Req() req: AuthRequest): Promise<StreamableFile> {
-    const { stream, filename } = await this.musicService.getDownload(id, req.user.id);
+  async download(
+    @Param('id') id: string,
+    @Req() req: AuthRequest,
+  ): Promise<StreamableFile> {
+    const { stream, filename } = await this.musicService.getDownload(
+      id,
+      req.user.id,
+    );
     return new StreamableFile(stream, {
       type: 'audio/mpeg',
       disposition: `attachment; filename="${filename}"`,
@@ -89,7 +129,10 @@ export class MusicController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('id') id: string, @Req() req: AuthRequest): Promise<void> {
+  async delete(
+    @Param('id') id: string,
+    @Req() req: AuthRequest,
+  ): Promise<void> {
     return this.musicService.delete(id, req.user.id);
   }
 }

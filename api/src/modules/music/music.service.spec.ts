@@ -12,13 +12,18 @@ describe('MusicService', () => {
   let playlistRepo: { createQueryBuilder: jest.Mock };
   let suno: { generate: jest.Mock };
   let storage: { getPresignedUrl: jest.Mock };
-  let subscription: { assertCanGenerate: jest.Mock; consumeGeneration: jest.Mock };
+  let subscription: {
+    assertCanGenerate: jest.Mock;
+    consumeGeneration: jest.Mock;
+  };
   let service: MusicService;
 
   beforeEach(() => {
     musicRepo = {
       create: jest.fn().mockImplementation((v: unknown) => v),
-      save: jest.fn().mockImplementation((v: object) => Promise.resolve({ id: 'm1', ...v })),
+      save: jest
+        .fn()
+        .mockImplementation((v: object) => Promise.resolve({ id: 'm1', ...v })),
       findOneBy: jest.fn(),
       remove: jest.fn().mockResolvedValue(undefined),
       manager: { query: jest.fn().mockResolvedValue(undefined) },
@@ -26,7 +31,10 @@ describe('MusicService', () => {
     playlistRepo = { createQueryBuilder: jest.fn() };
     suno = { generate: jest.fn() };
     storage = { getPresignedUrl: jest.fn() };
-    subscription = { assertCanGenerate: jest.fn(), consumeGeneration: jest.fn() };
+    subscription = {
+      assertCanGenerate: jest.fn(),
+      consumeGeneration: jest.fn(),
+    };
     service = new MusicService(
       musicRepo as never,
       playlistRepo as never,
@@ -40,7 +48,9 @@ describe('MusicService', () => {
     it('checks quota before calling Suno', async () => {
       subscription.assertCanGenerate.mockRejectedValue(new Error('402'));
 
-      await expect(service.generateAndStore({ lyrics: 'some lyrics here' }, 'u1')).rejects.toThrow();
+      await expect(
+        service.generateAndStore({ lyrics: 'some lyrics here' }, 'u1'),
+      ).rejects.toThrow();
       expect(suno.generate).not.toHaveBeenCalled();
       expect(subscription.consumeGeneration).not.toHaveBeenCalled();
     });
@@ -49,7 +59,10 @@ describe('MusicService', () => {
       subscription.assertCanGenerate.mockResolvedValue(undefined);
       suno.generate.mockResolvedValue('task-1');
 
-      const result = await service.generateAndStore({ lyrics: 'some lyrics here', style: 'Lo-fi' }, 'u1');
+      const result = await service.generateAndStore(
+        { lyrics: 'some lyrics here', style: 'Lo-fi' },
+        'u1',
+      );
 
       expect(subscription.consumeGeneration).toHaveBeenCalledWith('u1');
       expect(result).toEqual({ id: 'm1', taskId: 'task-1' });
@@ -60,19 +73,29 @@ describe('MusicService', () => {
     it('throws NotFound when the track does not exist', async () => {
       musicRepo.findOneBy.mockResolvedValue(null);
 
-      await expect(service.findOneByUser('x', 'u1')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.findOneByUser('x', 'u1')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
 
     it('forbids access to another user track', async () => {
-      musicRepo.findOneBy.mockResolvedValue({ id: 'x', userId: 'someone-else' });
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'x',
+        userId: 'someone-else',
+      });
 
-      await expect(service.findOneByUser('x', 'u1')).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(service.findOneByUser('x', 'u1')).rejects.toBeInstanceOf(
+        ForbiddenException,
+      );
     });
 
     it('returns the track for its owner', async () => {
       musicRepo.findOneBy.mockResolvedValue({ id: 'x', userId: 'u1' });
 
-      await expect(service.findOneByUser('x', 'u1')).resolves.toEqual({ id: 'x', userId: 'u1' });
+      await expect(service.findOneByUser('x', 'u1')).resolves.toEqual({
+        id: 'x',
+        userId: 'u1',
+      });
     });
   });
 

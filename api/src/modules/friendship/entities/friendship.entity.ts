@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
 
 export enum FriendshipStatus {
@@ -26,7 +33,11 @@ export class Friendship {
   @JoinColumn({ name: 'addresseeId' })
   addressee: User;
 
-  @Column({ type: 'enum', enum: FriendshipStatus, default: FriendshipStatus.PENDING })
+  @Column({
+    type: 'enum',
+    enum: FriendshipStatus,
+    default: FriendshipStatus.PENDING,
+  })
   status: FriendshipStatus;
 
   @CreateDateColumn()

@@ -8,7 +8,10 @@ import { User } from '../auth/entities/user.entity';
 import { FriendshipModule } from '../friendship/friendship.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Playlist, Music, User]), FriendshipModule],
+  imports: [
+    TypeOrmModule.forFeature([Playlist, Music, User]),
+    FriendshipModule,
+  ],
   controllers: [PlaylistController],
   providers: [PlaylistService],
 })

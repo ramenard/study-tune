@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
 
 describe('PlaylistService', () => {
@@ -37,29 +41,49 @@ describe('PlaylistService', () => {
     it('throws NotFound when the playlist is missing', async () => {
       playlistRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.findOneByUser('p1', 'u1')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.findOneByUser('p1', 'u1')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
 
     it('forbids a user who is neither creator nor member', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'owner', members: [] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'p1',
+        creatorId: 'owner',
+        members: [],
+      });
 
-      await expect(service.findOneByUser('p1', 'stranger')).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        service.findOneByUser('p1', 'stranger'),
+      ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
     it('allows a member', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'owner', members: [{ id: 'u1' }] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'p1',
+        creatorId: 'owner',
+        members: [{ id: 'u1' }],
+      });
 
-      await expect(service.findOneByUser('p1', 'u1')).resolves.toMatchObject({ id: 'p1' });
+      await expect(service.findOneByUser('p1', 'u1')).resolves.toMatchObject({
+        id: 'p1',
+      });
     });
   });
 
   describe('addMember', () => {
     it('only lets a friend be added to a playlist', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'u1', members: [] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'p1',
+        creatorId: 'u1',
+        members: [],
+      });
       userRepo.findOneBy.mockResolvedValue({ id: 'friend' });
       friendship.areFriends.mockResolvedValue(false);
 
-      await expect(service.addMember('p1', 'friend', 'u1')).rejects.toBeInstanceOf(BadRequestException);
+      await expect(
+        service.addMember('p1', 'friend', 'u1'),
+      ).rejects.toBeInstanceOf(BadRequestException);
     });
   });
 
@@ -70,12 +94,21 @@ describe('PlaylistService', () => {
       await service.getOrCreateFavorites('u1');
 
       expect(playlistRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'Favoris', creatorId: 'u1', isDefault: true }),
+        expect.objectContaining({
+          name: 'Favoris',
+          creatorId: 'u1',
+          isDefault: true,
+        }),
       );
     });
 
     it('likes a track that is not yet favorited', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'fav', creatorId: 'u1', isDefault: true, musics: [] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'fav',
+        creatorId: 'u1',
+        isDefault: true,
+        musics: [],
+      });
       musicRepo.findOneBy.mockResolvedValue({ id: 'm1' });
 
       const result = await service.toggleFavorite('u1', 'm1');
@@ -84,7 +117,12 @@ describe('PlaylistService', () => {
     });
 
     it('unlikes a track that is already favorited', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'fav', creatorId: 'u1', isDefault: true, musics: [{ id: 'm1' }] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'fav',
+        creatorId: 'u1',
+        isDefault: true,
+        musics: [{ id: 'm1' }],
+      });
       musicRepo.findOneBy.mockResolvedValue({ id: 'm1' });
 
       const result = await service.toggleFavorite('u1', 'm1');
@@ -93,15 +131,29 @@ describe('PlaylistService', () => {
     });
 
     it('refuses to delete the default playlist', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'fav', creatorId: 'u1', isDefault: true, members: [], musics: [] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'fav',
+        creatorId: 'u1',
+        isDefault: true,
+        members: [],
+        musics: [],
+      });
 
-      await expect(service.delete('fav', 'u1')).rejects.toBeInstanceOf(BadRequestException);
+      await expect(service.delete('fav', 'u1')).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
     });
   });
 
   describe('shareWithMembers', () => {
     it('shares the playlist with a friend', async () => {
-      const playlist = { id: 'p1', creatorId: 'u1', isDefault: false, members: [] as { id: string }[], musics: [] };
+      const playlist = {
+        id: 'p1',
+        creatorId: 'u1',
+        isDefault: false,
+        members: [] as { id: string }[],
+        musics: [],
+      };
       playlistRepo.findOne.mockResolvedValue(playlist);
       userRepo.findOneBy.mockResolvedValue({ id: 'friend' });
       friendship.areFriends.mockResolvedValue(true);
@@ -112,36 +164,71 @@ describe('PlaylistService', () => {
     });
 
     it('refuses to share with a non-friend', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'u1', isDefault: false, members: [], musics: [] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'p1',
+        creatorId: 'u1',
+        isDefault: false,
+        members: [],
+        musics: [],
+      });
       userRepo.findOneBy.mockResolvedValue({ id: 'stranger' });
       friendship.areFriends.mockResolvedValue(false);
 
-      await expect(service.shareWithMembers('p1', ['stranger'], 'u1')).rejects.toBeInstanceOf(BadRequestException);
+      await expect(
+        service.shareWithMembers('p1', ['stranger'], 'u1'),
+      ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     it('forbids a non-creator from sharing', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'owner', isDefault: false, members: [{ id: 'u1' }], musics: [] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'p1',
+        creatorId: 'owner',
+        isDefault: false,
+        members: [{ id: 'u1' }],
+        musics: [],
+      });
 
-      await expect(service.shareWithMembers('p1', ['friend'], 'u1')).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        service.shareWithMembers('p1', ['friend'], 'u1'),
+      ).rejects.toBeInstanceOf(ForbiddenException);
     });
   });
 
   describe('addMusic', () => {
     it('forbids a member (non-creator) from adding tracks', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'owner', members: [{ id: 'u1' }], musics: [] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'p1',
+        creatorId: 'owner',
+        members: [{ id: 'u1' }],
+        musics: [],
+      });
 
-      await expect(service.addMusic('p1', 'm1', 'u1')).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(service.addMusic('p1', 'm1', 'u1')).rejects.toBeInstanceOf(
+        ForbiddenException,
+      );
     });
 
     it('throws NotFound when the music does not exist', async () => {
-      playlistRepo.findOne.mockResolvedValue({ id: 'p1', creatorId: 'u1', members: [], musics: [] });
+      playlistRepo.findOne.mockResolvedValue({
+        id: 'p1',
+        creatorId: 'u1',
+        members: [],
+        musics: [],
+      });
       musicRepo.findOneBy.mockResolvedValue(null);
 
-      await expect(service.addMusic('p1', 'missing', 'u1')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(
+        service.addMusic('p1', 'missing', 'u1'),
+      ).rejects.toBeInstanceOf(NotFoundException);
     });
 
     it('adds the music when it exists and is not already present', async () => {
-      const playlist = { id: 'p1', creatorId: 'u1', members: [], musics: [] as { id: string }[] };
+      const playlist = {
+        id: 'p1',
+        creatorId: 'u1',
+        members: [],
+        musics: [] as { id: string }[],
+      };
       playlistRepo.findOne.mockResolvedValue(playlist);
       musicRepo.findOneBy.mockResolvedValue({ id: 'm1' });
 

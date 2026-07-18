@@ -35,15 +35,22 @@ export class DocumentService {
 
   constructor(private readonly mistral: MistralService) {}
 
-  private extractTitleAndLyrics(raw: string): { title: string; lyrics: string } {
+  private extractTitleAndLyrics(raw: string): {
+    title: string;
+    lyrics: string;
+  } {
     const lines = raw.split('\n');
     const titleLine = lines[0] ?? '';
-    const title = titleLine.startsWith('TITRE:') ? titleLine.replace('TITRE:', '').trim() : '';
+    const title = titleLine.startsWith('TITRE:')
+      ? titleLine.replace('TITRE:', '').trim()
+      : '';
     const lyrics = lines.slice(1).join('\n').trim();
     return { title, lyrics };
   }
 
-  async processText(text: string): Promise<{ title: string; summary: string; lyrics: string }> {
+  async processText(
+    text: string,
+  ): Promise<{ title: string; summary: string; lyrics: string }> {
     this.logger.log('Processing raw text');
     const summary = await this.mistral.generateText(SUMMARY_PROMPT + text);
     const raw = await this.mistral.generateText(LYRICS_PROMPT + summary);
@@ -51,20 +58,27 @@ export class DocumentService {
     return { title, summary, lyrics };
   }
 
-  async processPdf(fileBuffer: Buffer): Promise<{ title: string; summary: string; lyrics: string }> {
+  async processPdf(
+    fileBuffer: Buffer,
+  ): Promise<{ title: string; summary: string; lyrics: string }> {
     this.logger.log('Processing PDF');
     const parser = new PDFParse({ data: fileBuffer });
     const parsed = await parser.getText();
     return this.processText(parsed.text);
   }
 
-  async process(text?: string, fileBuffer?: Buffer): Promise<{ title: string; summary: string; lyrics: string }> {
+  async process(
+    text?: string,
+    fileBuffer?: Buffer,
+  ): Promise<{ title: string; summary: string; lyrics: string }> {
     if (fileBuffer) {
       return this.processPdf(fileBuffer);
     }
 
     if (!text) {
-      throw new BadRequestException('Provide either a PDF file or a text content');
+      throw new BadRequestException(
+        'Provide either a PDF file or a text content',
+      );
     }
 
     return this.processText(text);

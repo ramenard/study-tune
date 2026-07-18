@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ChatModule } from './modules/chat/chat.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MusicModule } from './modules/music/music.module';
 import { DocumentModule } from './modules/document/document.module';
@@ -12,7 +11,6 @@ import * as Joi from 'joi';
 
 @Module({
   imports: [
-    ChatModule,
     MusicModule,
     DocumentModule,
     AuthModule,
@@ -36,8 +34,6 @@ import * as Joi from 'joi';
         APP_PUBLIC_URL: Joi.string().uri().optional(),
         KIE_API_KEY: Joi.string().optional(),
         MISTRAL_API_KEY: Joi.string().optional(),
-        GEMINI_API_KEY: Joi.string().optional(),
-        HUGGING_TOKEN: Joi.string().optional(),
         MINIO_ENDPOINT: Joi.string().optional(),
         MINIO_PORT: Joi.number().optional(),
         MINIO_ACCESS_KEY: Joi.string().optional(),

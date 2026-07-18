@@ -22,7 +22,7 @@ function makeUser(overrides: Partial<User> = {}): User {
     createdPlaylists: [],
     sharedPlaylists: [],
     ...overrides,
-  } as User;
+  };
 }
 
 describe('SubscriptionService', () => {
@@ -39,7 +39,9 @@ describe('SubscriptionService', () => {
 
   describe('getStatus', () => {
     it('gives a free user 2 generations during the first month', async () => {
-      repo.findOneBy.mockResolvedValue(makeUser({ plan: 'free', generationsUsed: 0 }));
+      repo.findOneBy.mockResolvedValue(
+        makeUser({ plan: 'free', generationsUsed: 0 }),
+      );
 
       const status = await service.getStatus('user-1');
 
@@ -64,7 +66,12 @@ describe('SubscriptionService', () => {
       const created = new Date();
       created.setMonth(created.getMonth() - 6);
       repo.findOneBy.mockResolvedValue(
-        makeUser({ plan: 'premium', createdAt: created, periodStart: new Date(), generationsUsed: 1 }),
+        makeUser({
+          plan: 'premium',
+          createdAt: created,
+          periodStart: new Date(),
+          generationsUsed: 1,
+        }),
       );
 
       const status = await service.getStatus('user-1');
@@ -77,7 +84,11 @@ describe('SubscriptionService', () => {
       const oldPeriod = new Date();
       oldPeriod.setMonth(oldPeriod.getMonth() - 2);
       repo.findOneBy.mockResolvedValue(
-        makeUser({ plan: 'premium', periodStart: oldPeriod, generationsUsed: 2 }),
+        makeUser({
+          plan: 'premium',
+          periodStart: oldPeriod,
+          generationsUsed: 2,
+        }),
       );
 
       const status = await service.getStatus('user-1');
@@ -89,16 +100,26 @@ describe('SubscriptionService', () => {
 
   describe('assertCanGenerate', () => {
     it('throws 402 when no generation remains', async () => {
-      repo.findOneBy.mockResolvedValue(makeUser({ plan: 'free', generationsUsed: 2 }));
+      repo.findOneBy.mockResolvedValue(
+        makeUser({ plan: 'free', generationsUsed: 2 }),
+      );
 
-      await expect(service.assertCanGenerate('user-1')).rejects.toBeInstanceOf(HttpException);
-      await expect(service.assertCanGenerate('user-1')).rejects.toMatchObject({ status: 402 });
+      await expect(service.assertCanGenerate('user-1')).rejects.toBeInstanceOf(
+        HttpException,
+      );
+      await expect(service.assertCanGenerate('user-1')).rejects.toMatchObject({
+        status: 402,
+      });
     });
 
     it('passes when a generation is available', async () => {
-      repo.findOneBy.mockResolvedValue(makeUser({ plan: 'free', generationsUsed: 0 }));
+      repo.findOneBy.mockResolvedValue(
+        makeUser({ plan: 'free', generationsUsed: 0 }),
+      );
 
-      await expect(service.assertCanGenerate('user-1')).resolves.toBeUndefined();
+      await expect(
+        service.assertCanGenerate('user-1'),
+      ).resolves.toBeUndefined();
     });
   });
 

@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 import { Friendship, FriendshipStatus } from './entities/friendship.entity';
 
@@ -44,18 +48,30 @@ describe('FriendshipService', () => {
     it('marks a user as request_sent when the current user is the requester', async () => {
       userRepo.find.mockResolvedValue([{ id: 'other', username: 'bob' }]);
       friendshipRepo.find.mockResolvedValue([
-        { requesterId: 'me', addresseeId: 'other', status: FriendshipStatus.PENDING },
+        {
+          requesterId: 'me',
+          addresseeId: 'other',
+          status: FriendshipStatus.PENDING,
+        },
       ]);
 
       const [result] = await service.searchUsers('bob', 'me');
 
-      expect(result).toEqual({ id: 'other', username: 'bob', relationship: 'request_sent' });
+      expect(result).toEqual({
+        id: 'other',
+        username: 'bob',
+        relationship: 'request_sent',
+      });
     });
 
     it('marks a user as friends when an accepted friendship exists', async () => {
       userRepo.find.mockResolvedValue([{ id: 'other', username: 'bob' }]);
       friendshipRepo.find.mockResolvedValue([
-        { requesterId: 'other', addresseeId: 'me', status: FriendshipStatus.ACCEPTED },
+        {
+          requesterId: 'other',
+          addresseeId: 'me',
+          status: FriendshipStatus.ACCEPTED,
+        },
       ]);
 
       const [result] = await service.searchUsers('bob', 'me');
@@ -66,7 +82,11 @@ describe('FriendshipService', () => {
     it('marks a user as request_received when they sent a pending request', async () => {
       userRepo.find.mockResolvedValue([{ id: 'other', username: 'bob' }]);
       friendshipRepo.find.mockResolvedValue([
-        { requesterId: 'other', addresseeId: 'me', status: FriendshipStatus.PENDING },
+        {
+          requesterId: 'other',
+          addresseeId: 'me',
+          status: FriendshipStatus.PENDING,
+        },
       ]);
 
       const [result] = await service.searchUsers('bob', 'me');
@@ -77,18 +97,18 @@ describe('FriendshipService', () => {
 
   describe('sendRequest', () => {
     it('rejects a request to oneself', async () => {
-      await expect(service.sendRequest({ addresseeId: 'me' }, 'me')).rejects.toBeInstanceOf(
-        BadRequestException,
-      );
+      await expect(
+        service.sendRequest({ addresseeId: 'me' }, 'me'),
+      ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     it('rejects when a friendship already exists', async () => {
       userRepo.findOneBy.mockResolvedValue({ id: 'other' });
       friendshipRepo.findOne.mockResolvedValue({ id: 'existing' });
 
-      await expect(service.sendRequest({ addresseeId: 'other' }, 'me')).rejects.toBeInstanceOf(
-        BadRequestException,
-      );
+      await expect(
+        service.sendRequest({ addresseeId: 'other' }, 'me'),
+      ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     it('creates a pending request otherwise', async () => {
@@ -98,7 +118,11 @@ describe('FriendshipService', () => {
       await service.sendRequest({ addresseeId: 'other' }, 'me');
 
       expect(friendshipRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ requesterId: 'me', addresseeId: 'other', status: FriendshipStatus.PENDING }),
+        expect.objectContaining({
+          requesterId: 'me',
+          addresseeId: 'other',
+          status: FriendshipStatus.PENDING,
+        }),
       );
     });
   });
@@ -113,17 +137,28 @@ describe('FriendshipService', () => {
 
     it('forbids responding to a request addressed to someone else', async () => {
       friendshipRepo.findOne = jest.fn();
-      friendshipRepo.findOneBy.mockResolvedValue({ ...pending, addresseeId: 'someone-else' });
+      friendshipRepo.findOneBy.mockResolvedValue({
+        ...pending,
+        addresseeId: 'someone-else',
+      });
 
       await expect(
-        service.respondToRequest('f1', { status: FriendshipStatus.ACCEPTED }, 'me'),
+        service.respondToRequest(
+          'f1',
+          { status: FriendshipStatus.ACCEPTED },
+          'me',
+        ),
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
     it('removes the friendship row when declined', async () => {
       friendshipRepo.findOneBy.mockResolvedValue({ ...pending });
 
-      await service.respondToRequest('f1', { status: FriendshipStatus.DECLINED }, 'me');
+      await service.respondToRequest(
+        'f1',
+        { status: FriendshipStatus.DECLINED },
+        'me',
+      );
 
       expect(friendshipRepo.remove).toHaveBeenCalled();
       expect(friendshipRepo.save).not.toHaveBeenCalled();
@@ -132,7 +167,11 @@ describe('FriendshipService', () => {
     it('saves an accepted friendship', async () => {
       friendshipRepo.findOneBy.mockResolvedValue({ ...pending });
 
-      await service.respondToRequest('f1', { status: FriendshipStatus.ACCEPTED }, 'me');
+      await service.respondToRequest(
+        'f1',
+        { status: FriendshipStatus.ACCEPTED },
+        'me',
+      );
 
       expect(friendshipRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({ status: FriendshipStatus.ACCEPTED }),
@@ -143,7 +182,11 @@ describe('FriendshipService', () => {
       friendshipRepo.findOneBy.mockResolvedValue(null);
 
       await expect(
-        service.respondToRequest('missing', { status: FriendshipStatus.ACCEPTED }, 'me'),
+        service.respondToRequest(
+          'missing',
+          { status: FriendshipStatus.ACCEPTED },
+          'me',
+        ),
       ).rejects.toBeInstanceOf(NotFoundException);
     });
   });

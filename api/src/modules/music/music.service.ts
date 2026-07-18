@@ -1,4 +1,10 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Readable } from 'stream';
@@ -34,13 +40,18 @@ export class MusicService {
       .leftJoin('playlist.musics', 'music')
       .leftJoin('playlist.members', 'member')
       .where('music.id = :musicId', { musicId: music.id })
-      .andWhere('(playlist.creatorId = :userId OR member.id = :userId)', { userId })
+      .andWhere('(playlist.creatorId = :userId OR member.id = :userId)', {
+        userId,
+      })
       .getCount();
 
     return shared > 0;
   }
 
-  async generateAndStore(dto: CreateMusicDto, userId: string): Promise<{ id: string; taskId: string }> {
+  async generateAndStore(
+    dto: CreateMusicDto,
+    userId: string,
+  ): Promise<{ id: string; taskId: string }> {
     await this.subscriptionService.assertCanGenerate(userId);
 
     const music = await this.musicRepo.save(
@@ -106,11 +117,17 @@ export class MusicService {
       const music = await this.musicRepo.findOneBy({ sunoId: taskId });
 
       if (!music) {
-        this.logger.warn(`No music found for taskId ${taskId}, skipping track ${track.id}`);
+        this.logger.warn(
+          `No music found for taskId ${taskId}, skipping track ${track.id}`,
+        );
         continue;
       }
 
-      const objectName = await this.storage.downloadAndStore(audioUrl, music.userId, music.id);
+      const objectName = await this.storage.downloadAndStore(
+        audioUrl,
+        music.userId,
+        music.id,
+      );
 
       music.sunoId = track.id;
       music.title = track.title ?? music.title;
@@ -124,7 +141,11 @@ export class MusicService {
     }
   }
 
-  async findAllByUser(userId: string, page: number, limit: number): Promise<{ data: Music[]; total: number; page: number; limit: number }> {
+  async findAllByUser(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<{ data: Music[]; total: number; page: number; limit: number }> {
     const [data, total] = await this.musicRepo.findAndCount({
       where: { userId },
       order: { createdAt: 'DESC' },
@@ -149,7 +170,11 @@ export class MusicService {
     return music;
   }
 
-  async update(id: string, dto: UpdateMusicDto, userId: string): Promise<Music> {
+  async update(
+    id: string,
+    dto: UpdateMusicDto,
+    userId: string,
+  ): Promise<Music> {
     const music = await this.findOneByUser(id, userId);
 
     if (dto.title) {
@@ -182,7 +207,10 @@ export class MusicService {
     return { url };
   }
 
-  async getDownload(id: string, userId: string): Promise<{ stream: Readable; filename: string }> {
+  async getDownload(
+    id: string,
+    userId: string,
+  ): Promise<{ stream: Readable; filename: string }> {
     const music = await this.musicRepo.findOneBy({ id });
 
     if (!music || !music.objectName) {
@@ -206,7 +234,9 @@ export class MusicService {
     }
 
     if (!music.sunoId) {
-      throw new BadRequestException('No generation task associated with this track');
+      throw new BadRequestException(
+        'No generation task associated with this track',
+      );
     }
 
     const { tracks } = await this.suno.getGeneratedTracks(music.sunoId);
@@ -218,7 +248,11 @@ export class MusicService {
     }
 
     await this.storage.ensureBucket();
-    const objectName = await this.storage.downloadAndStore(ready.audioUrl, music.userId, music.id);
+    const objectName = await this.storage.downloadAndStore(
+      ready.audioUrl,
+      music.userId,
+      music.id,
+    );
 
     music.title = ready.title ?? music.title;
     if (ready.duration !== undefined) {
@@ -235,7 +269,10 @@ export class MusicService {
 
   async delete(id: string, userId: string): Promise<void> {
     const music = await this.findOneByUser(id, userId);
-    await this.musicRepo.manager.query('DELETE FROM playlist_music WHERE "musicId" = $1', [music.id]);
+    await this.musicRepo.manager.query(
+      'DELETE FROM playlist_music WHERE "musicId" = $1',
+      [music.id],
+    );
     await this.musicRepo.remove(music);
   }
 }

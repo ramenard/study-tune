@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Not, Repository } from 'typeorm';
 import { Friendship, FriendshipStatus } from './entities/friendship.entity';
@@ -16,7 +21,10 @@ export class FriendshipService {
     private readonly userRepo: Repository<User>,
   ) {}
 
-  async searchUsers(query: string, currentUserId: string): Promise<UserSearchResultDto[]> {
+  async searchUsers(
+    query: string,
+    currentUserId: string,
+  ): Promise<UserSearchResultDto[]> {
     const trimmed = query.trim();
 
     if (!trimmed) {
@@ -35,15 +43,25 @@ export class FriendshipService {
     return users.map((user) => ({
       id: user.id,
       username: user.username,
-      relationship: this.resolveRelationship(relationships, currentUserId, user.id),
+      relationship: this.resolveRelationship(
+        relationships,
+        currentUserId,
+        user.id,
+      ),
     }));
   }
 
-  private resolveRelationship(relationships: Friendship[], currentUserId: string, otherUserId: string): string {
+  private resolveRelationship(
+    relationships: Friendship[],
+    currentUserId: string,
+    otherUserId: string,
+  ): string {
     const relationship = relationships.find(
       (item) =>
-        (item.requesterId === currentUserId && item.addresseeId === otherUserId) ||
-        (item.requesterId === otherUserId && item.addresseeId === currentUserId),
+        (item.requesterId === currentUserId &&
+          item.addresseeId === otherUserId) ||
+        (item.requesterId === otherUserId &&
+          item.addresseeId === currentUserId),
     );
 
     if (!relationship) {
@@ -61,9 +79,14 @@ export class FriendshipService {
     return 'request_received';
   }
 
-  async sendRequest(dto: SendRequestDto, requesterId: string): Promise<Friendship> {
+  async sendRequest(
+    dto: SendRequestDto,
+    requesterId: string,
+  ): Promise<Friendship> {
     if (requesterId === dto.addresseeId) {
-      throw new BadRequestException('You cannot send a friend request to yourself');
+      throw new BadRequestException(
+        'You cannot send a friend request to yourself',
+      );
     }
 
     const addressee = await this.userRepo.findOneBy({ id: dto.addresseeId });
@@ -80,7 +103,9 @@ export class FriendshipService {
     });
 
     if (existing) {
-      throw new BadRequestException('A friendship request already exists between these users');
+      throw new BadRequestException(
+        'A friendship request already exists between these users',
+      );
     }
 
     return this.friendshipRepo.save(
@@ -92,7 +117,11 @@ export class FriendshipService {
     );
   }
 
-  async respondToRequest(id: string, dto: RespondRequestDto, userId: string): Promise<Friendship> {
+  async respondToRequest(
+    id: string,
+    dto: RespondRequestDto,
+    userId: string,
+  ): Promise<Friendship> {
     const friendship = await this.friendshipRepo.findOneBy({ id });
 
     if (!friendship) {
@@ -104,7 +133,9 @@ export class FriendshipService {
     }
 
     if (friendship.status !== FriendshipStatus.PENDING) {
-      throw new BadRequestException('This request has already been responded to');
+      throw new BadRequestException(
+        'This request has already been responded to',
+      );
     }
 
     if (dto.status === FriendshipStatus.DECLINED) {
@@ -151,8 +182,16 @@ export class FriendshipService {
   async areFriends(userIdA: string, userIdB: string): Promise<boolean> {
     const friendship = await this.friendshipRepo.findOne({
       where: [
-        { requesterId: userIdA, addresseeId: userIdB, status: FriendshipStatus.ACCEPTED },
-        { requesterId: userIdB, addresseeId: userIdA, status: FriendshipStatus.ACCEPTED },
+        {
+          requesterId: userIdA,
+          addresseeId: userIdB,
+          status: FriendshipStatus.ACCEPTED,
+        },
+        {
+          requesterId: userIdB,
+          addresseeId: userIdA,
+          status: FriendshipStatus.ACCEPTED,
+        },
       ],
     });
 
@@ -166,7 +205,8 @@ export class FriendshipService {
       throw new NotFoundException(`Friendship ${id} not found`);
     }
 
-    const isInvolved = friendship.requesterId === userId || friendship.addresseeId === userId;
+    const isInvolved =
+      friendship.requesterId === userId || friendship.addresseeId === userId;
 
     if (!isInvolved) {
       throw new ForbiddenException();

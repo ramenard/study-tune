@@ -10,7 +10,7 @@ export class RegisterDto {
   @IsString()
   @MinLength(8)
   password: string;
-  
+
   @ApiProperty()
   @IsString()
   username: string;

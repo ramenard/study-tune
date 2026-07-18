@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Playlist } from './entities/playlist.entity';
@@ -41,7 +46,10 @@ export class PlaylistService {
     );
   }
 
-  async toggleFavorite(userId: string, musicId: string): Promise<{ liked: boolean }> {
+  async toggleFavorite(
+    userId: string,
+    musicId: string,
+  ): Promise<{ liked: boolean }> {
     const favorites = await this.getOrCreateFavorites(userId);
     const music = await this.musicRepo.findOneBy({ id: musicId });
 
@@ -73,7 +81,11 @@ export class PlaylistService {
     return this.playlistRepo.save(playlist);
   }
 
-  async findAllByUser(userId: string, page: number, limit: number): Promise<{ data: Playlist[]; total: number; page: number; limit: number }> {
+  async findAllByUser(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<{ data: Playlist[]; total: number; page: number; limit: number }> {
     const [data, total] = await this.playlistRepo
       .createQueryBuilder('playlist')
       .leftJoinAndSelect('playlist.musics', 'music')
@@ -109,7 +121,11 @@ export class PlaylistService {
     return playlist;
   }
 
-  async update(id: string, dto: UpdatePlaylistDto, userId: string): Promise<Playlist> {
+  async update(
+    id: string,
+    dto: UpdatePlaylistDto,
+    userId: string,
+  ): Promise<Playlist> {
     const playlist = await this.findOneByUser(id, userId);
 
     if (playlist.creatorId !== userId) {
@@ -141,7 +157,11 @@ export class PlaylistService {
     await this.playlistRepo.remove(playlist);
   }
 
-  async addMusic(id: string, musicId: string, userId: string): Promise<Playlist> {
+  async addMusic(
+    id: string,
+    musicId: string,
+    userId: string,
+  ): Promise<Playlist> {
     const playlist = await this.findOneByUser(id, userId);
 
     if (playlist.creatorId !== userId) {
@@ -164,11 +184,17 @@ export class PlaylistService {
     return playlist;
   }
 
-  async removeMusic(id: string, musicId: string, userId: string): Promise<Playlist> {
+  async removeMusic(
+    id: string,
+    musicId: string,
+    userId: string,
+  ): Promise<Playlist> {
     const playlist = await this.findOneByUser(id, userId);
 
     if (playlist.creatorId !== userId) {
-      throw new ForbiddenException('Only the playlist creator can remove tracks');
+      throw new ForbiddenException(
+        'Only the playlist creator can remove tracks',
+      );
     }
 
     playlist.musics = playlist.musics.filter((m) => m.id !== musicId);
@@ -176,7 +202,11 @@ export class PlaylistService {
     return this.playlistRepo.save(playlist);
   }
 
-  async shareWithMembers(id: string, memberIds: string[], userId: string): Promise<Playlist> {
+  async shareWithMembers(
+    id: string,
+    memberIds: string[],
+    userId: string,
+  ): Promise<Playlist> {
     const playlist = await this.findOneByUser(id, userId);
 
     if (playlist.creatorId !== userId) {
@@ -188,7 +218,10 @@ export class PlaylistService {
     }
 
     for (const memberId of memberIds) {
-      if (memberId === userId || playlist.members.some((m) => m.id === memberId)) {
+      if (
+        memberId === userId ||
+        playlist.members.some((m) => m.id === memberId)
+      ) {
         continue;
       }
 
@@ -201,7 +234,9 @@ export class PlaylistService {
       const friends = await this.friendshipService.areFriends(userId, memberId);
 
       if (!friends) {
-        throw new BadRequestException('You can only share a playlist with a friend');
+        throw new BadRequestException(
+          'You can only share a playlist with a friend',
+        );
       }
 
       playlist.members.push(user);
@@ -211,7 +246,11 @@ export class PlaylistService {
     return this.findOneByUser(id, userId);
   }
 
-  async addMember(id: string, memberId: string, userId: string): Promise<Playlist> {
+  async addMember(
+    id: string,
+    memberId: string,
+    userId: string,
+  ): Promise<Playlist> {
     const playlist = await this.findOneByUser(id, userId);
 
     if (playlist.creatorId !== userId) {
@@ -227,7 +266,9 @@ export class PlaylistService {
     const friends = await this.friendshipService.areFriends(userId, memberId);
 
     if (!friends) {
-      throw new BadRequestException('You can only share a playlist with a friend');
+      throw new BadRequestException(
+        'You can only share a playlist with a friend',
+      );
     }
 
     const alreadyMember = playlist.members.some((m) => m.id === memberId);
@@ -240,7 +281,11 @@ export class PlaylistService {
     return playlist;
   }
 
-  async removeMember(id: string, memberId: string, userId: string): Promise<Playlist> {
+  async removeMember(
+    id: string,
+    memberId: string,
+    userId: string,
+  ): Promise<Playlist> {
     const playlist = await this.findOneByUser(id, userId);
 
     if (playlist.creatorId !== userId) {

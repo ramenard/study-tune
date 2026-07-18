@@ -4,16 +4,23 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  UploadedFile, UseGuards,
+  UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import {ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiTags} from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { DocumentService } from './document.service';
 import { ProcessDocumentDto } from './dto/process-document.dto';
 import { DocumentResultDto } from './dto/document-result.dto';
-import {JwtAuthGuard} from "../auth/jwt-auth.guard";
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiBearerAuth()
 @ApiTags('document')

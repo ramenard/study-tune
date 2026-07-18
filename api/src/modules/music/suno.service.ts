@@ -30,7 +30,7 @@ export class SunoService {
 
   private get headers() {
     return {
-      'Authorization': `Bearer ${this.apiKey}`,
+      Authorization: `Bearer ${this.apiKey}`,
       'Content-Type': 'application/json',
     };
   }
@@ -73,7 +73,11 @@ export class SunoService {
       }
 
       throw new HttpException(
-        { statusCode: 502, error: 'KIE_NO_TASK_ID', message: data?.msg ?? 'Kie.ai returned no taskId' },
+        {
+          statusCode: 502,
+          error: 'KIE_NO_TASK_ID',
+          message: data?.msg ?? 'Kie.ai returned no taskId',
+        },
         HttpStatus.BAD_GATEWAY,
       );
     }
@@ -81,7 +85,9 @@ export class SunoService {
     return taskId;
   }
 
-  async getGeneratedTracks(taskId: string): Promise<{ status: string; tracks: KieTrack[] }> {
+  async getGeneratedTracks(
+    taskId: string,
+  ): Promise<{ status: string; tracks: KieTrack[] }> {
     const { data } = await firstValueFrom(
       this.http.get(`${this.baseUrl}/api/v1/generate/record-info`, {
         params: { taskId },
@@ -90,7 +96,8 @@ export class SunoService {
     );
 
     const status: string = data?.data?.status ?? 'UNKNOWN';
-    const rawTracks = data?.data?.response?.sunoData ?? data?.data?.response?.data ?? [];
+    const rawTracks =
+      data?.data?.response?.sunoData ?? data?.data?.response?.data ?? [];
 
     const tracks: KieTrack[] = rawTracks.map((track: any) => ({
       id: track.id,

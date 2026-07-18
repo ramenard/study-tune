@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -22,7 +27,10 @@ export class SubscriptionService {
   async getStatus(userId: string): Promise<SubscriptionStatus> {
     const user = await this.loadUserWithReset(userId);
     const monthlyAllowance = this.computeMonthlyAllowance(user, new Date());
-    const generationsRemaining = Math.max(0, monthlyAllowance - user.generationsUsed);
+    const generationsRemaining = Math.max(
+      0,
+      monthlyAllowance - user.generationsUsed,
+    );
     return { user, monthlyAllowance, generationsRemaining };
   }
 
@@ -31,7 +39,11 @@ export class SubscriptionService {
 
     if (generationsRemaining <= 0) {
       throw new HttpException(
-        { statusCode: HttpStatus.PAYMENT_REQUIRED, error: 'NO_GENERATIONS_LEFT', message: 'Aucune génération restante pour ton offre actuelle' },
+        {
+          statusCode: HttpStatus.PAYMENT_REQUIRED,
+          error: 'NO_GENERATIONS_LEFT',
+          message: 'Aucune génération restante pour ton offre actuelle',
+        },
         HttpStatus.PAYMENT_REQUIRED,
       );
     }
