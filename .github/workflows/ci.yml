@@ -29,6 +29,8 @@ jobs:
       DB_USER: user
       DB_PASSWORD: password
       DB_NAME: musicdb
+      JWT_SECRET: ci-test-secret
+      NODE_ENV: test
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -41,10 +43,21 @@ jobs:
         run: npm run lint -w api
       - name: Build
         run: npm run build -w api
-      - name: Test
-        run: npm run test -w api
       - name: Run migrations on a fresh database
         run: npm run migration:run -w api
+      - name: Unit tests with coverage
+        run: npm run test:cov -w api
+      - name: End-to-end tests
+        run: npm run test:e2e -w api
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-coverage
+          path: api/coverage/
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
 
   client:
     runs-on: ubuntu-latest
