@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -17,6 +18,7 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
+import { AccountService } from './account.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
@@ -29,7 +31,10 @@ type AuthRequest = Request & { user: { id: string } };
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly accountService: AccountService,
+  ) {}
 
   @Post('register')
   @Throttle({ default: { limit: 5, ttl: 60000 } })
@@ -68,6 +73,14 @@ export class AuthController {
   @ApiOkResponse({ type: ProfileDto })
   me(@Req() req: AuthRequest): Promise<ProfileDto> {
     return this.authService.getProfile(req.user.id);
+  }
+
+  @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  deleteAccount(@Req() req: AuthRequest): Promise<void> {
+    return this.accountService.deleteAccount(req.user.id);
   }
 
   @Post('subscribe')

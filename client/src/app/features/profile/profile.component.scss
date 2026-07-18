@@ -118,3 +118,28 @@
     color: var(--md-sys-color-error);
   }
 }
+
+.danger-zone {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--md-sys-color-error) 40%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--md-sys-color-error) 6%, transparent);
+}
+
+.danger-zone__title {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--md-sys-color-error);
+}
+
+.danger-zone__text {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.delete-account {
+  color: var(--md-sys-color-error);
+}

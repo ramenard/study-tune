@@ -79,4 +79,8 @@ export class StorageService {
   async getObjectStream(objectName: string): Promise<Readable> {
     return this.client.getObject(this.bucket, objectName);
   }
+
+  async removeObject(objectName: string): Promise<void> {
+    await this.client.removeObject(this.bucket, objectName);
+  }
 }

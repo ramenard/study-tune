@@ -5,13 +5,17 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AccountService } from './account.service';
 import { SubscriptionService } from './subscription.service';
 import { JwtStrategy } from './jwt.strategy';
 import { User } from './entities/user.entity';
+import { Music } from '../music/entities/music.entity';
+import { StorageModule } from '../music/storage.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Music]),
+    StorageModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -23,7 +27,7 @@ import { User } from './entities/user.entity';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, SubscriptionService, JwtStrategy],
+  providers: [AuthService, AccountService, SubscriptionService, JwtStrategy],
   exports: [JwtStrategy, SubscriptionService],
 })
 export class AuthModule {}

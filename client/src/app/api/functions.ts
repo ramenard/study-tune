@@ -27,6 +27,8 @@ export type { AuthControllerLogout$Params as AuthControllerLogout$Params } from 
 export { authControllerLogout as authControllerLogout } from './fn/auth/auth-controller-logout';
 export type { AuthControllerMe$Params as AuthControllerMe$Params } from './fn/auth/auth-controller-me';
 export { authControllerMe as authControllerMe } from './fn/auth/auth-controller-me';
+export type { AuthControllerDeleteAccount$Params as AuthControllerDeleteAccount$Params } from './fn/auth/auth-controller-delete-account';
+export { authControllerDeleteAccount as authControllerDeleteAccount } from './fn/auth/auth-controller-delete-account';
 export type { AuthControllerSubscribe$Params as AuthControllerSubscribe$Params } from './fn/auth/auth-controller-subscribe';
 export { authControllerSubscribe as authControllerSubscribe } from './fn/auth/auth-controller-subscribe';
 export type { AuthControllerUnsubscribe$Params as AuthControllerUnsubscribe$Params } from './fn/auth/auth-controller-unsubscribe';

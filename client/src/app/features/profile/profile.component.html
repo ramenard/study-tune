@@ -37,4 +37,15 @@
       Déconnexion
     </button>
   </div>
+
+  <div class="danger-zone">
+    <h2 class="danger-zone__title">Zone de danger</h2>
+    <p class="danger-zone__text">
+      La suppression de votre compte efface définitivement vos musiques, playlists et amis.
+    </p>
+    <button mat-stroked-button class="delete-account" (click)="deleteAccount()">
+      <mat-icon>delete_forever</mat-icon>
+      Supprimer mon compte
+    </button>
+  </div>
 </div>

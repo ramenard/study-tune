@@ -13,6 +13,7 @@ import { authControllerLogin } from '@api/fn/auth/auth-controller-login';
 import { authControllerRegister } from '@api/fn/auth/auth-controller-register';
 import { authControllerRefresh } from '@api/fn/auth/auth-controller-refresh';
 import { authControllerLogout } from '@api/fn/auth/auth-controller-logout';
+import { authControllerDeleteAccount } from '@api/fn/auth/auth-controller-delete-account';
 import { AuthResponseDto } from '@api/models/auth-response-dto';
 import { LoginDto } from '@api/models/login-dto';
 import { RegisterDto } from '@api/models/register-dto';
@@ -70,6 +71,11 @@ export class AuthService {
 
   logout(): void {
     void this.api.invoke(authControllerLogout).catch(() => undefined);
+    this.clearSession();
+  }
+
+  async deleteAccount(): Promise<void> {
+    await this.api.invoke(authControllerDeleteAccount);
     this.clearSession();
   }
 

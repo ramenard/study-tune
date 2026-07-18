@@ -50,4 +50,17 @@ export class ProfileComponent implements OnInit {
     this.authService.logout();
     void this.router.navigate(['/login']);
   }
+
+  async deleteAccount(): Promise<void> {
+    const confirmed = window.confirm(
+      'Supprimer définitivement votre compte ? Vos musiques, playlists et amis seront effacés. Cette action est irréversible.',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await this.authService.deleteAccount();
+    void this.router.navigate(['/login']);
+  }
 }
