@@ -98,6 +98,11 @@
     background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
   }
 
+  &:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+  }
+
   &:disabled {
     opacity: 0.4;
     cursor: default;
@@ -125,6 +130,11 @@
 
   &:hover {
     box-shadow: var(--md-elevation-2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
   }
 
   &:disabled {

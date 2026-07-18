@@ -55,7 +55,7 @@ module.exports = tseslint.config(
       '@angular-eslint/template/eqeqeq': 'error',
       '@angular-eslint/template/no-any': 'error',
       '@angular-eslint/template/use-track-by-function': 'warn',
-      '@angular-eslint/template/alt-text': 'warn',
+      '@angular-eslint/template/alt-text': 'error',
     },
   },
 );
