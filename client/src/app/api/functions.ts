@@ -21,6 +21,10 @@ export type { AuthControllerRegister$Params as AuthControllerRegister$Params } f
 export { authControllerRegister as authControllerRegister } from './fn/auth/auth-controller-register';
 export type { AuthControllerLogin$Params as AuthControllerLogin$Params } from './fn/auth/auth-controller-login';
 export { authControllerLogin as authControllerLogin } from './fn/auth/auth-controller-login';
+export type { AuthControllerRefresh$Params as AuthControllerRefresh$Params } from './fn/auth/auth-controller-refresh';
+export { authControllerRefresh as authControllerRefresh } from './fn/auth/auth-controller-refresh';
+export type { AuthControllerLogout$Params as AuthControllerLogout$Params } from './fn/auth/auth-controller-logout';
+export { authControllerLogout as authControllerLogout } from './fn/auth/auth-controller-logout';
 export type { AuthControllerMe$Params as AuthControllerMe$Params } from './fn/auth/auth-controller-me';
 export { authControllerMe as authControllerMe } from './fn/auth/auth-controller-me';
 export type { AuthControllerSubscribe$Params as AuthControllerSubscribe$Params } from './fn/auth/auth-controller-subscribe';

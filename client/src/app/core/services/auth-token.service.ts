@@ -1,41 +1,52 @@
 import { Injectable, signal } from '@angular/core';
 
 const TOKEN_STORAGE_KEY = 'studytune.accessToken';
+const REFRESH_TOKEN_STORAGE_KEY = 'studytune.refreshToken';
 
 @Injectable({ providedIn: 'root' })
 export class AuthTokenService {
-  private readonly tokenSignal = signal<string | null>(this.readFromStorage());
+  private readonly tokenSignal = signal<string | null>(
+    this.readFromStorage(TOKEN_STORAGE_KEY),
+  );
+  private readonly refreshTokenSignal = signal<string | null>(
+    this.readFromStorage(REFRESH_TOKEN_STORAGE_KEY),
+  );
 
   readonly token = this.tokenSignal.asReadonly();
+  readonly refreshToken = this.refreshTokenSignal.asReadonly();
 
-  setToken(token: string): void {
-    this.tokenSignal.set(token);
-    this.writeToStorage(token);
+  setTokens(accessToken: string, refreshToken: string): void {
+    this.tokenSignal.set(accessToken);
+    this.refreshTokenSignal.set(refreshToken);
+    this.writeToStorage(TOKEN_STORAGE_KEY, accessToken);
+    this.writeToStorage(REFRESH_TOKEN_STORAGE_KEY, refreshToken);
   }
 
   clearToken(): void {
     this.tokenSignal.set(null);
-    this.removeFromStorage();
+    this.refreshTokenSignal.set(null);
+    this.removeFromStorage(TOKEN_STORAGE_KEY);
+    this.removeFromStorage(REFRESH_TOKEN_STORAGE_KEY);
   }
 
-  private readFromStorage(): string | null {
+  private readFromStorage(key: string): string | null {
     if (typeof localStorage === 'undefined') {
       return null;
     }
-    return localStorage.getItem(TOKEN_STORAGE_KEY);
+    return localStorage.getItem(key);
   }
 
-  private writeToStorage(token: string): void {
+  private writeToStorage(key: string, value: string): void {
     if (typeof localStorage === 'undefined') {
       return;
     }
-    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    localStorage.setItem(key, value);
   }
 
-  private removeFromStorage(): void {
+  private removeFromStorage(key: string): void {
     if (typeof localStorage === 'undefined') {
       return;
     }
-    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    localStorage.removeItem(key);
   }
 }

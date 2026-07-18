@@ -3,6 +3,7 @@
 
 export type { AuthResponseDto } from './models/auth-response-dto';
 export type { CreateMusicDto } from './models/create-music-dto';
+export type { RefreshTokenDto } from './models/refresh-token-dto';
 export type { CreatePlaylistDto } from './models/create-playlist-dto';
 export type { DocumentResultDto } from './models/document-result-dto';
 export type { FavoriteToggleDto } from './models/favorite-toggle-dto';

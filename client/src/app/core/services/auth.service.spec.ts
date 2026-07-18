@@ -15,7 +15,7 @@ describe('AuthService (front)', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    invoke = vi.fn();
+    invoke = vi.fn().mockResolvedValue(undefined);
     clear = vi.fn();
     TestBed.configureTestingModule({
       providers: [
@@ -31,21 +31,34 @@ describe('AuthService (front)', () => {
     tokenService = TestBed.inject(AuthTokenService);
   });
 
-  it('stores the token on login and becomes authenticated', async () => {
-    invoke.mockResolvedValue({ accessToken: 'tok-123' });
+  it('stores both tokens on login and becomes authenticated', async () => {
+    invoke.mockResolvedValue({ accessToken: 'tok-123', refreshToken: 'ref-123' });
 
     await firstValueFrom(service.login({ email: 'a@b.c', password: 'password123' }));
 
     expect(tokenService.token()).toBe('tok-123');
+    expect(tokenService.refreshToken()).toBe('ref-123');
     expect(service.isAuthenticated()).toBe(true);
   });
 
+  it('rotates the tokens on refresh', async () => {
+    tokenService.setTokens('old-access', 'old-refresh');
+    invoke.mockResolvedValue({ accessToken: 'new-access', refreshToken: 'new-refresh' });
+
+    const accessToken = await firstValueFrom(service.refreshAccessToken());
+
+    expect(accessToken).toBe('new-access');
+    expect(tokenService.token()).toBe('new-access');
+    expect(tokenService.refreshToken()).toBe('new-refresh');
+  });
+
   it('clears the token and profile on logout', () => {
-    tokenService.setToken('tok-123');
+    tokenService.setTokens('tok-123', 'ref-123');
 
     service.logout();
 
     expect(tokenService.token()).toBeNull();
+    expect(tokenService.refreshToken()).toBeNull();
     expect(service.isAuthenticated()).toBe(false);
     expect(clear).toHaveBeenCalled();
   });
