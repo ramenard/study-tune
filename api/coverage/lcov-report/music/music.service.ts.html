@@ -30,9 +30,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">54.05% </span>
+                <span class="strong">52.85% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>40/74</span>
+                <span class='fraction'>37/70</span>
             </div>
         
             
@@ -349,7 +349,13 @@
 <a name='L284'></a><a href='#L284'>284</a>
 <a name='L285'></a><a href='#L285'>285</a>
 <a name='L286'></a><a href='#L286'>286</a>
-<a name='L287'></a><a href='#L287'>287</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -360,6 +366,7 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -376,6 +383,7 @@
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">11x</span>
@@ -629,6 +637,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -638,6 +648,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -645,7 +656,8 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Readable } from 'stream';
-import { SunoService } from './suno.service';
+import { MUSIC_PROVIDER } from './providers/music-provider.interface';
+import type { MusicProvider } from './providers/music-provider.interface';
 import { StorageService } from './storage.service';
 import { Music } from './entities/music.entity';
 import { Playlist } from '../playlist/entities/playlist.entity';
@@ -662,7 +674,8 @@ export class MusicService {
     private readonly musicRepo: Repository<span class="branch-1 cbranch-no" title="branch not covered" >&lt;Music&gt;,</span>
     @InjectRepository(Playlist)
     private readonly playlistRepo: Repository<span class="branch-1 cbranch-no" title="branch not covered" >&lt;Playlist&gt;,</span>
-    private readonly suno: SunoService<span class="branch-1 cbranch-no" title="branch not covered" >,</span>
+    @Inject(MUSIC_PROVIDER)
+    private readonly provider: MusicProvider,
     private readonly storage: StorageService<span class="branch-1 cbranch-no" title="branch not covered" >,</span>
     private readonly subscriptionService: SubscriptionService<span class="branch-1 cbranch-no" title="branch not covered" >,</span>
   ) {}
@@ -702,7 +715,7 @@ export class MusicService {
       }),
     );
 &nbsp;
-    const taskId = await this.suno.generate({
+    const taskId = await this.provider.generate({
       prompt: dto.lyrics,
       style: dto.style,
       title: dto.title,
@@ -876,7 +889,7 @@ export class MusicService {
       );
     }
 &nbsp;
-    const { tracks } = await this.suno.getGeneratedTracks(music.sunoId);
+    const { tracks } = await this.provider.getGeneratedTracks(music.sunoId);
     const ready = tracks.find((track) =&gt; !!track.audioUrl);
 &nbsp;
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!ready) {
@@ -914,7 +927,9 @@ export class MusicService {
     await this.removeStoredObject(music.objectName);
   }
 &nbsp;
-  private async removeStoredObject(objectName: string | undefined): Promise&lt;void&gt; {
+  private async removeStoredObject(
+    objectName: string | undefined,
+  ): Promise&lt;void&gt; {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!objectName) {
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
@@ -928,7 +943,7 @@ export class MusicService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-19T07:55:56.693Z
+                at 2026-07-19T08:12:28.623Z
             </div>
         <script src="../prettify.js"></script>
         <script>

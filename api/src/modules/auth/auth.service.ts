@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -34,12 +35,29 @@ export class AuthService {
       throw new ConflictException('Email already in use');
     }
 
+    const age = this.computeAge(dto.birthDate);
+
+    if (age < 13) {
+      throw new BadRequestException('You must be at least 13 years old');
+    }
+
+    const requiresParental = age < 15;
+
+    if (requiresParental && (!dto.parentEmail || dto.parentalConsent !== true)) {
+      throw new BadRequestException(
+        'A parent email and parental consent are required for users under 15',
+      );
+    }
+
     const hashed = await bcrypt.hash(dto.password, 10);
     const user = this.userRepository.create({
       email: dto.email,
       password: hashed,
       username: dto.username,
       consentAt: new Date(),
+      birthDate: dto.birthDate,
+      parentEmail: requiresParental ? dto.parentEmail : null,
+      parentalConsentAt: requiresParental ? new Date() : null,
     });
     await this.userRepository.save(user);
 
@@ -113,6 +131,19 @@ export class AuthService {
       monthlyAllowance,
       generationsRemaining,
     };
+  }
+
+  private computeAge(birthDate: string): number {
+    const birth = new Date(birthDate);
+    const now = new Date();
+    let age = now.getFullYear() - birth.getFullYear();
+    const monthDiff = now.getMonth() - birth.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+      age -= 1;
+    }
+
+    return age;
   }
 
   private async generateTokens(user: User): Promise<AuthResponseDto> {

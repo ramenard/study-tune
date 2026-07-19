@@ -38,6 +38,7 @@ describe('AuthController', () => {
       password: 'password123',
       username: 'al',
       consent: true,
+      birthDate: '2000-01-01',
     };
 
     await controller.register(dto);

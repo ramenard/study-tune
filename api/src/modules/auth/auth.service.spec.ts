@@ -1,4 +1,8 @@
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 
@@ -54,6 +58,7 @@ describe('AuthService', () => {
           password: 'password123',
           username: 'al',
           consent: true,
+          birthDate: '2000-01-01',
         }),
       ).rejects.toBeInstanceOf(ConflictException);
     });
@@ -67,11 +72,63 @@ describe('AuthService', () => {
         password: 'password123',
         username: 'al',
         consent: true,
+        birthDate: '2000-01-01',
       });
 
       expect(mockedBcrypt.hash).toHaveBeenCalledWith('password123', 10);
       expect(userRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({ password: 'hashed' }),
+      );
+      expect(result).toEqual({
+        accessToken: 'signed-token',
+        refreshToken: 'signed-token',
+      });
+    });
+  });
+
+  describe('parental consent', () => {
+    beforeEach(() => {
+      userRepo.findOneBy.mockResolvedValue(null);
+      mockedBcrypt.hash.mockResolvedValue('hashed' as never);
+    });
+
+    it('rejects users under 13', async () => {
+      await expect(
+        service.register({
+          email: 'kid@b.c',
+          password: 'password123',
+          username: 'kid',
+          consent: true,
+          birthDate: '2020-01-01',
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('requires a parent email and consent under 15', async () => {
+      await expect(
+        service.register({
+          email: 'teen@b.c',
+          password: 'password123',
+          username: 'teen',
+          consent: true,
+          birthDate: '2012-01-01',
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('accepts an under-15 user with parental consent', async () => {
+      const result = await service.register({
+        email: 'teen@b.c',
+        password: 'password123',
+        username: 'teen',
+        consent: true,
+        birthDate: '2012-01-01',
+        parentEmail: 'parent@b.c',
+        parentalConsent: true,
+      });
+
+      expect(userRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ parentEmail: 'parent@b.c' }),
       );
       expect(result).toEqual({
         accessToken: 'signed-token',

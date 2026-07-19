@@ -41,6 +41,15 @@ export class User {
   @Column({ type: 'timestamptz', nullable: true })
   consentAt: Date | null;
 
+  @Column({ type: 'date', nullable: true })
+  birthDate: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  parentEmail: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  parentalConsentAt: Date | null;
+
   @OneToMany(() => Music, (music) => music.user)
   musics: Music[];
 

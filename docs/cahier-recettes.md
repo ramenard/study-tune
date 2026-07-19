@@ -18,8 +18,9 @@ Les scénarios automatisés du flux d'authentification sont dans `api/test/app.e
 
 | ID | Fonctionnalité | Prérequis | Étapes | Résultat attendu | Type | Résultat | Anomalie |
 |---|---|---|---|---|---|---|---|
-| F-01 | Inscription | — | Remplir le formulaire `/register`, cocher le consentement, valider | Compte créé, utilisateur connecté, tokens émis | Fonctionnel | OK (auto) `E2E-1` | — |
+| F-01 | Inscription (≥ 15 ans) | — | Remplir `/register` (dont date de naissance), cocher le consentement, valider | Compte créé, utilisateur connecté, tokens émis | Fonctionnel | OK (auto) `E2E-1` | — |
 | F-02 | Inscription refusée sans consentement | — | Soumettre sans cocher le consentement | Erreur 400, pas de compte créé | Fonctionnel | OK (auto) `E2E-2` | — |
+| F-25 | Inscription < 15 ans sans email parent | — | Renseigner une date de naissance < 15 ans sans email de responsable légal | Erreur 400 ; bloc consentement parental affiché côté front | Sécurité/RGPD | OK (auto) `E2E-3'`, `auth.service.spec` | — |
 | F-03 | Connexion | Compte existant | Saisir email + mot de passe sur `/login` | Connexion, redirection accueil | Fonctionnel | OK (auto) `E2E-3` | — |
 | F-04 | Déconnexion (arrêt lecture) | Connecté, une piste en lecture | Cliquer « Déconnexion » | Session purgée, lecture stoppée, retour `/login` | Fonctionnel | OK (dev) | — |
 | F-05 | Rafraîchissement de session | Connecté, access token expiré | Laisser expirer puis agir | Refresh automatique, action rejouée sans reconnexion | Fonctionnel | OK (auto) `auth.service.spec` | B-09 |

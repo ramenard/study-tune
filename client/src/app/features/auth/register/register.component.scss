@@ -47,3 +47,18 @@
     text-decoration: none;
   }
 }
+
+.parental-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent);
+}
+
+.parental-block__note {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--md-sys-color-on-surface-variant);
+}

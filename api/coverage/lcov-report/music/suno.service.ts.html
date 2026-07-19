@@ -238,22 +238,9 @@
 <a name='L173'></a><a href='#L173'>173</a>
 <a name='L174'></a><a href='#L174'>174</a>
 <a name='L175'></a><a href='#L175'>175</a>
-<a name='L176'></a><a href='#L176'>176</a>
-<a name='L177'></a><a href='#L177'>177</a>
-<a name='L178'></a><a href='#L178'>178</a>
-<a name='L179'></a><a href='#L179'>179</a>
-<a name='L180'></a><a href='#L180'>180</a>
-<a name='L181'></a><a href='#L181'>181</a>
-<a name='L182'></a><a href='#L182'>182</a>
-<a name='L183'></a><a href='#L183'>183</a>
-<a name='L184'></a><a href='#L184'>184</a>
-<a name='L185'></a><a href='#L185'>185</a>
-<a name='L186'></a><a href='#L186'>186</a>
-<a name='L187'></a><a href='#L187'>187</a>
-<a name='L188'></a><a href='#L188'>188</a>
-<a name='L189'></a><a href='#L189'>189</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<a name='L176'></a><a href='#L176'>176</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -261,20 +248,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
@@ -442,27 +416,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-&nbsp;
-export interface SunoGenerateDto {
-  prompt: string;
-  style?: string;
-  title?: string;
-  makeInstrumental?: boolean;
-}
-&nbsp;
-export interface KieTrack {
-  id: string;
-  title: string;
-  audioUrl: string;
-  streamAudioUrl?: string;
-  imageUrl?: string;
-  status: 'pending' | 'processing' | 'complete' | 'error';
-  duration?: number;
-  tags?: string;
-}
+import {
+  MusicGenerationParams,
+  MusicProvider,
+  ProviderTrack,
+} from './providers/music-provider.interface';
 &nbsp;
 @Injectable()
-export class SunoService {
+export class SunoService implements MusicProvider {
   private readonly logger = new Logger(SunoService.name);
   private readonly baseUrl = 'https://api.kie.ai';
   private readonly apiKey = process.env.KIE_API_KEY;
@@ -476,7 +437,7 @@ export class SunoService {
     };
   }
 &nbsp;
-  async generate(dto: SunoGenerateDto): Promise&lt;string&gt; {
+  async generate(dto: MusicGenerationParams): Promise&lt;string&gt; {
     this.logger.log(`Generating music for prompt: "${dto.prompt}"`);
 &nbsp;
     const callBackUrl = `${process.env.APP_PUBLIC_URL}/api/music/webhook/kie/${process.env.KIE_WEBHOOK_SECRET ?? <span class="branch-1 cbranch-no" title="branch not covered" >''}</span>`;
@@ -526,7 +487,7 @@ export class SunoService {
 &nbsp;
   async getGeneratedTracks(
     taskId: string,
-  ): Promise&lt;{ status: string; tracks: KieTrack[] }&gt; {
+  ): Promise&lt;{ status: string; tracks: ProviderTrack[] }&gt; {
     const { data } = await firstValueFrom(
       this.http.get(`${this.baseUrl}/api/v1/generate/record-info`, {
         params: { taskId },
@@ -538,7 +499,7 @@ export class SunoService {
     const rawTracks =
       data?.data?.response?.sunoData ?? <span class="branch-1 cbranch-no" title="branch not covered" >data?.data?.response?.data </span>?? <span class="branch-2 cbranch-no" title="branch not covered" >[];</span>
 &nbsp;
-    const tracks: KieTrack[] = rawTracks.map((track: any) =&gt; ({
+    const tracks: ProviderTrack[] = rawTracks.map((track: any) =&gt; ({
       id: track.id,
       title: track.title ?? <span class="branch-1 cbranch-no" title="branch not covered" >'Untitled',</span>
       audioUrl: track.audioUrl ?? <span class="branch-1 cbranch-no" title="branch not covered" >track.audio_url </span>?? <span class="branch-2 cbranch-no" title="branch not covered" >'',</span>
@@ -556,7 +517,7 @@ export class SunoService {
     ids: string[],
     maxRetries = <span class="branch-0 cbranch-no" title="branch not covered" >40,</span>
     intervalMs = <span class="branch-0 cbranch-no" title="branch not covered" >5000,</span>
-  ): Promise&lt;KieTrack[]&gt; {
+  ): Promise&lt;ProviderTrack[]&gt; {
     for (let attempt = 0; attempt &lt; maxRetries; attempt++) {
       await this.sleep(intervalMs);
 &nbsp;
@@ -584,7 +545,7 @@ export class SunoService {
     throw new Error('Suno generation timed out after maximum retries');
   }
 &nbsp;
-  private async getTrack(id: string): Promise&lt;KieTrack&gt; {
+  private async getTrack(id: string): Promise&lt;ProviderTrack&gt; {
     const { data } = await firstValueFrom(
       this.http.get(`${this.baseUrl}/api/v1/music/${id}`, {
         headers: this.headers,
@@ -605,7 +566,7 @@ export class SunoService {
     };
   }
 &nbsp;
-  private mapStatus(raw: string): KieTrack['status'] {
+  private mapStatus(raw: string): ProviderTrack['status'] {
     const status = raw?.toLowerCase();
 &nbsp;
     if (['complete', 'completed', 'success'].includes(status)) {
@@ -634,7 +595,7 @@ export class SunoService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-19T07:55:56.693Z
+                at 2026-07-19T08:12:28.623Z
             </div>
         <script src="../prettify.js"></script>
         <script>

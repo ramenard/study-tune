@@ -33,6 +33,13 @@ générations** (`monthlyAllowance`, `generationsRemaining`) : chaque générati
 le quota se réinitialise par période. Le vocabulaire « quota de générations » est l'implémentation
 concrète de l'abstraction « tokens » ; les deux désignent la même mécanique.
 
+### Consentement parental (RGPD mineurs)
+Cible 13-18 ans. L'inscription exige une date de naissance : moins de 13 ans est refusé, et sous
+15 ans (seuil de la majorité numérique française, art. 45 loi Informatique et Libertés) l'email
+d'un responsable légal et sa confirmation de consentement sont obligatoires (`parentEmail`,
+`parentalConsentAt` persistés). L'envoi effectif d'un email de vérification au responsable est un
+jalon de mise en production ; la V1 recueille et stocke le consentement déclaré.
+
 ### Sécurité
 - **JWT courts + refresh rotatifs** : access token 15 min, refresh token 7 j stocké hashé
   (bcrypt) en base, tourné à chaque rafraîchissement, invalidé au logout. Réduit la fenêtre
