@@ -72,5 +72,3 @@ danger** permet de supprimer définitivement le compte (musiques, playlists et a
 conformément au droit à l'effacement RGPD).
 
 ![Profil](captures/08-profil.png)
-
-> Les captures ci-dessus sont des emplacements à remplacer par les captures réelles de l'application.
