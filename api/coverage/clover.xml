@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1784448748645" clover="3.2.0">
-  <project timestamp="1784448748645" name="All files">
+<coverage generated="1784449541304" clover="3.2.0">
+  <project timestamp="1784449541304" name="All files">
     <metrics statements="735" coveredstatements="619" conditionals="686" coveredconditionals="454" methods="155" coveredmethods="122" elements="1576" coveredelements="1195" complexity="0" loc="735" ncloc="735" packages="7" files="20" classes="20"/>
     <package name="auth">
       <metrics statements="182" coveredstatements="167" conditionals="156" coveredconditionals="115" methods="38" coveredmethods="32"/>
@@ -96,50 +96,50 @@
         <line num="40" count="4" type="cond" truecount="2" falsecount="0"/>
         <line num="41" count="1" type="stmt"/>
         <line num="44" count="3" type="stmt"/>
-        <line num="46" count="3" type="cond" truecount="5" falsecount="0"/>
-        <line num="47" count="1" type="stmt"/>
-        <line num="52" count="2" type="stmt"/>
-        <line num="53" count="2" type="stmt"/>
-        <line num="62" count="2" type="stmt"/>
-        <line num="64" count="2" type="stmt"/>
-        <line num="68" count="3" type="stmt"/>
-        <line num="73" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="74" count="1" type="stmt"/>
-        <line num="77" count="2" type="stmt"/>
-        <line num="79" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="80" count="1" type="stmt"/>
+        <line num="46" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="50" count="1" type="stmt"/>
+        <line num="55" count="2" type="stmt"/>
+        <line num="56" count="2" type="stmt"/>
+        <line num="65" count="2" type="stmt"/>
+        <line num="67" count="2" type="stmt"/>
+        <line num="71" count="3" type="stmt"/>
+        <line num="76" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="77" count="1" type="stmt"/>
+        <line num="80" count="2" type="stmt"/>
+        <line num="82" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="83" count="1" type="stmt"/>
-        <line num="87" count="3" type="stmt"/>
-        <line num="89" count="2" type="stmt"/>
-        <line num="94" count="2" type="cond" truecount="3" falsecount="1"/>
-        <line num="95" count="0" type="stmt"/>
-        <line num="98" count="2" type="stmt"/>
-        <line num="100" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="101" count="1" type="stmt"/>
+        <line num="86" count="1" type="stmt"/>
+        <line num="90" count="3" type="stmt"/>
+        <line num="92" count="2" type="stmt"/>
+        <line num="97" count="2" type="cond" truecount="3" falsecount="1"/>
+        <line num="98" count="0" type="stmt"/>
+        <line num="101" count="2" type="stmt"/>
+        <line num="103" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="104" count="1" type="stmt"/>
-        <line num="108" count="1" type="stmt"/>
-        <line num="112" count="0" type="stmt"/>
-        <line num="113" count="0" type="stmt"/>
-        <line num="117" count="0" type="stmt"/>
-        <line num="118" count="0" type="stmt"/>
-        <line num="123" count="0" type="stmt"/>
-        <line num="125" count="0" type="stmt"/>
-        <line num="137" count="4" type="stmt"/>
-        <line num="138" count="4" type="stmt"/>
-        <line num="139" count="4" type="stmt"/>
+        <line num="107" count="1" type="stmt"/>
+        <line num="111" count="1" type="stmt"/>
+        <line num="115" count="0" type="stmt"/>
+        <line num="116" count="0" type="stmt"/>
+        <line num="120" count="0" type="stmt"/>
+        <line num="121" count="0" type="stmt"/>
+        <line num="126" count="0" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
         <line num="140" count="4" type="stmt"/>
-        <line num="142" count="4" type="cond" truecount="3" falsecount="2"/>
-        <line num="143" count="0" type="stmt"/>
-        <line num="146" count="4" type="stmt"/>
-        <line num="150" count="4" type="stmt"/>
-        <line num="155" count="4" type="stmt"/>
-        <line num="163" count="4" type="stmt"/>
-        <line num="164" count="4" type="stmt"/>
+        <line num="141" count="4" type="stmt"/>
+        <line num="142" count="4" type="stmt"/>
+        <line num="143" count="4" type="stmt"/>
+        <line num="145" count="4" type="cond" truecount="3" falsecount="2"/>
+        <line num="146" count="0" type="stmt"/>
+        <line num="149" count="4" type="stmt"/>
+        <line num="153" count="4" type="stmt"/>
+        <line num="158" count="4" type="stmt"/>
         <line num="166" count="4" type="stmt"/>
-        <line num="170" count="3" type="stmt"/>
-        <line num="171" count="3" type="stmt"/>
-        <line num="175" count="1" type="stmt"/>
-        <line num="180" count="7" type="stmt"/>
+        <line num="167" count="4" type="stmt"/>
+        <line num="169" count="4" type="stmt"/>
+        <line num="173" count="3" type="stmt"/>
+        <line num="174" count="3" type="stmt"/>
+        <line num="178" count="1" type="stmt"/>
+        <line num="183" count="7" type="stmt"/>
       </file>
       <file name="jwt-auth.guard.ts" path="/home/welan/ynov/fin/study-tune/api/src/modules/auth/jwt-auth.guard.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
