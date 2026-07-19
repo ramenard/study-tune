@@ -86,3 +86,33 @@ ngrok http 3001
 Le callback envoyé à Kie est alors `${APP_PUBLIC_URL}/api/music/webhook/kie/${KIE_WEBHOOK_SECRET}`.
 Si une génération reste bloquée (webhook perdu), l'endpoint `POST /api/music/:id/sync` récupère
 le résultat auprès de Kie.
+
+## Exploitation en production
+
+Ces mesures sont d'ordre infrastructure : elles se configurent au niveau de l'hébergement et du
+reverse proxy, hors code applicatif.
+
+### TLS 1.3
+La terminaison TLS se fait sur le reverse proxy (nginx ou Traefik) devant l'API et le client :
+TLS 1.3 imposé, redirection HTTP→HTTPS, HSTS activé. L'API n'expose jamais de HTTP nu en production
+(elle écoute en interne, joignable uniquement via le proxy).
+
+### Chiffrement au repos
+- **PostgreSQL** : chiffrement du volume/disque côté hébergeur (LUKS ou chiffrement managé du
+  fournisseur cloud).
+- **MinIO / S3** : chiffrement côté serveur (SSE-S3 ou SSE-KMS) activé sur le bucket audio.
+
+### Sauvegardes
+- `pg_dump` quotidien chiffré, conservé hors site ; versioning activé sur le bucket objet.
+- RPO cible < 24 h.
+- **Restauration testée** : restaurer le dump dans une base neuve → `npm run migration:run -w api`
+  → vérifier `GET /api/health` → recâbler le bucket (ou restaurer sa version). La procédure doit
+  être rejouée périodiquement pour garantir sa validité.
+
+### Plan de reprise d'activité (PRA sommaire)
+Ordre de reconstruction après incident majeur :
+1. Provisionner l'infrastructure (`docker compose up -d postgres minio`).
+2. Restaurer la base PostgreSQL depuis le dernier dump, puis appliquer les migrations.
+3. Restaurer le bucket objet (audio) depuis la sauvegarde/versioning.
+4. Redémarrer l'API puis le client (`--profile full`), vérifier `/api/health` et un parcours de
+   lecture.

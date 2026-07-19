@@ -72,6 +72,17 @@ Le client utilise Angular 21 en mode zoneless, composants standalone, `OnPush` e
 avec un SDK typé généré depuis la spec OpenAPI (`ng-openapi-gen`) : le backend est la source de
 vérité unique des types.
 
+### Modération du contenu généré
+Annoncée au Bloc 1, non implémentée en V1 : c'est un prérequis à l'ouverture publique (filtrage des
+fiches et paroles générées + signalement utilisateur). Le risque est borné en bêta fermée car le
+contenu provient du **propre cours de l'élève** (pas de contenu tiers arbitraire). Jalon planifié
+avant mise en production ouverte.
+
+### Mesure d'impact carbone (CodeCarbon)
+Annoncée en veille au Bloc 1, non outillée en V1. La mesure d'éco-conception **effective** est le
+cache anti-redondance des fiches (appels IA évités) ; l'instrumentation métrologique (CodeCarbon
+autour des appels IA) est un jalon ultérieur.
+
 ## Récapitulatif des écarts assumés
 
 | Annonce Bloc 1 | Implémentation V1 | Statut |
@@ -79,4 +90,10 @@ vérité unique des types.
 | File asynchrone Redis | Webhook Kie + polling + `/sync` | Pivot documenté |
 | Paiement Stripe | Abonnement simulé (modèle prêt) | Jalon post-MVP |
 | Abstraction « tokens » | Quota mensuel de générations | Équivalence documentée |
-| Refresh tokens | Implémentés (access 15 min + refresh 7 j) | Conforme |
+| Refresh tokens | Access 15 min + refresh 7 j rotatifs | Conforme |
+| Pattern Adapter (multi-provider) | Interface `MusicProvider` + token | Conforme |
+| Cache / éco-conception | Cache `contentHash` des fiches | Conforme |
+| Consentement parental (mineurs) | Vérification d'âge + consentement < 15 ans | Conforme |
+| Mises à jour de dépendances | Dependabot + `npm audit` en CI | Conforme |
+| Modération du contenu | Non implémentée | Jalon pré-prod |
+| Mesure carbone (CodeCarbon) | Non outillée (cache = mesure effective) | Jalon |
