@@ -49,6 +49,9 @@ docker compose -f docker/docker-compose.yml --profile full up --build -d
 
 ## Politique de dépendances
 
+- **Mises à jour automatiques** : Dependabot (`.github/dependabot.yml`) ouvre chaque semaine des PR
+  de montée de version (npm et GitHub Actions), en groupant les mises à jour mineures/patch. Elles
+  sont validées par la CI (lint + tests + build + migrations) avant merge.
 - **Vulnérabilités** : `npm audit --omit=dev --audit-level=high` est exécuté en CI (non bloquant)
   pour suivre les failles des dépendances de production. Traiter les alertes `high`/`critical` en
   priorité.
