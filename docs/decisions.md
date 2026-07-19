@@ -45,6 +45,13 @@ concrète de l'abstraction « tokens » ; les deux désignent la même mécaniqu
   string : Kie.ai rappelle l'URL fournie telle quelle, et un segment de path est transmis de
   façon plus fiable qu'un paramètre de requête susceptible d'être normalisé.
 
+### Abstraction multi-provider (pattern Adapter)
+Le Bloc 1 annonce un fournisseur de génération musicale interchangeable (Suno retenu, Udio en
+backup). C'est matérialisé par une interface `MusicProvider` (`api/src/modules/music/providers/`)
+injectée via le token `MUSIC_PROVIDER`. `SunoService implements MusicProvider` et `music.service`
+dépend de l'interface, plus du service concret : un second fournisseur (Udio) se branche en changeant
+uniquement le `useClass` du provider dans `music.module.ts`, sans toucher la logique métier.
+
 ### Frontend Angular zoneless + signals
 Le client utilise Angular 21 en mode zoneless, composants standalone, `OnPush` et signals partout,
 avec un SDK typé généré depuis la spec OpenAPI (`ng-openapi-gen`) : le backend est la source de

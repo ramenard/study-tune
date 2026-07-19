@@ -50,7 +50,7 @@ describe('MusicService', () => {
     service = new MusicService(
       musicRepo as never,
       playlistRepo as never,
-      suno as never,
+      suno,
       storage as never,
       subscription as never,
     );

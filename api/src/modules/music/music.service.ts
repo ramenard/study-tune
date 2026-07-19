@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -8,7 +9,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Readable } from 'stream';
-import { SunoService } from './suno.service';
+import { MUSIC_PROVIDER } from './providers/music-provider.interface';
+import type { MusicProvider } from './providers/music-provider.interface';
 import { StorageService } from './storage.service';
 import { Music } from './entities/music.entity';
 import { Playlist } from '../playlist/entities/playlist.entity';
@@ -25,7 +27,8 @@ export class MusicService {
     private readonly musicRepo: Repository<Music>,
     @InjectRepository(Playlist)
     private readonly playlistRepo: Repository<Playlist>,
-    private readonly suno: SunoService,
+    @Inject(MUSIC_PROVIDER)
+    private readonly provider: MusicProvider,
     private readonly storage: StorageService,
     private readonly subscriptionService: SubscriptionService,
   ) {}
@@ -65,7 +68,7 @@ export class MusicService {
       }),
     );
 
-    const taskId = await this.suno.generate({
+    const taskId = await this.provider.generate({
       prompt: dto.lyrics,
       style: dto.style,
       title: dto.title,
@@ -239,7 +242,7 @@ export class MusicService {
       );
     }
 
-    const { tracks } = await this.suno.getGeneratedTracks(music.sunoId);
+    const { tracks } = await this.provider.getGeneratedTracks(music.sunoId);
     const ready = tracks.find((track) => !!track.audioUrl);
 
     if (!ready) {

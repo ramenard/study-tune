@@ -1,27 +1,14 @@
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-
-export interface SunoGenerateDto {
-  prompt: string;
-  style?: string;
-  title?: string;
-  makeInstrumental?: boolean;
-}
-
-export interface KieTrack {
-  id: string;
-  title: string;
-  audioUrl: string;
-  streamAudioUrl?: string;
-  imageUrl?: string;
-  status: 'pending' | 'processing' | 'complete' | 'error';
-  duration?: number;
-  tags?: string;
-}
+import {
+  MusicGenerationParams,
+  MusicProvider,
+  ProviderTrack,
+} from './providers/music-provider.interface';
 
 @Injectable()
-export class SunoService {
+export class SunoService implements MusicProvider {
   private readonly logger = new Logger(SunoService.name);
   private readonly baseUrl = 'https://api.kie.ai';
   private readonly apiKey = process.env.KIE_API_KEY;
@@ -35,7 +22,7 @@ export class SunoService {
     };
   }
 
-  async generate(dto: SunoGenerateDto): Promise<string> {
+  async generate(dto: MusicGenerationParams): Promise<string> {
     this.logger.log(`Generating music for prompt: "${dto.prompt}"`);
 
     const callBackUrl = `${process.env.APP_PUBLIC_URL}/api/music/webhook/kie/${process.env.KIE_WEBHOOK_SECRET ?? ''}`;
@@ -85,7 +72,7 @@ export class SunoService {
 
   async getGeneratedTracks(
     taskId: string,
-  ): Promise<{ status: string; tracks: KieTrack[] }> {
+  ): Promise<{ status: string; tracks: ProviderTrack[] }> {
     const { data } = await firstValueFrom(
       this.http.get(`${this.baseUrl}/api/v1/generate/record-info`, {
         params: { taskId },
@@ -97,7 +84,7 @@ export class SunoService {
     const rawTracks =
       data?.data?.response?.sunoData ?? data?.data?.response?.data ?? [];
 
-    const tracks: KieTrack[] = rawTracks.map((track: any) => ({
+    const tracks: ProviderTrack[] = rawTracks.map((track: any) => ({
       id: track.id,
       title: track.title ?? 'Untitled',
       audioUrl: track.audioUrl ?? track.audio_url ?? '',
@@ -115,7 +102,7 @@ export class SunoService {
     ids: string[],
     maxRetries = 40,
     intervalMs = 5000,
-  ): Promise<KieTrack[]> {
+  ): Promise<ProviderTrack[]> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       await this.sleep(intervalMs);
 
@@ -143,7 +130,7 @@ export class SunoService {
     throw new Error('Suno generation timed out after maximum retries');
   }
 
-  private async getTrack(id: string): Promise<KieTrack> {
+  private async getTrack(id: string): Promise<ProviderTrack> {
     const { data } = await firstValueFrom(
       this.http.get(`${this.baseUrl}/api/v1/music/${id}`, {
         headers: this.headers,
@@ -164,7 +151,7 @@ export class SunoService {
     };
   }
 
-  private mapStatus(raw: string): KieTrack['status'] {
+  private mapStatus(raw: string): ProviderTrack['status'] {
     const status = raw?.toLowerCase();
 
     if (['complete', 'completed', 'success'].includes(status)) {
