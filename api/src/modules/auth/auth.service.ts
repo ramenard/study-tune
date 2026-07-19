@@ -43,7 +43,10 @@ export class AuthService {
 
     const requiresParental = age < 15;
 
-    if (requiresParental && (!dto.parentEmail || dto.parentalConsent !== true)) {
+    if (
+      requiresParental &&
+      (!dto.parentEmail || dto.parentalConsent !== true)
+    ) {
       throw new BadRequestException(
         'A parent email and parental consent are required for users under 15',
       );

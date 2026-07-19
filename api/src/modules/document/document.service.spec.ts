@@ -52,7 +52,12 @@ describe('DocumentService', () => {
     const result = await service.process('user1', 'cours');
 
     expect(mistral.generateText).not.toHaveBeenCalled();
-    expect(result).toEqual({ title: 'Cached', summary: 'S', lyrics: 'L', cached: true });
+    expect(result).toEqual({
+      title: 'Cached',
+      summary: 'S',
+      lyrics: 'L',
+      cached: true,
+    });
   });
 
   it('scopes the cache lookup to the requesting user', async () => {

@@ -42,7 +42,13 @@ describe('Auth flow (e2e)', () => {
   it('registers a new user and returns both tokens', async () => {
     const res = await request(app.getHttpServer())
       .post('/api/auth/register')
-      .send({ email, password, username: 'e2e', consent: true, birthDate: '2000-01-01' })
+      .send({
+        email,
+        password,
+        username: 'e2e',
+        consent: true,
+        birthDate: '2000-01-01',
+      })
       .expect(201);
 
     expect(res.body.accessToken).toBeDefined();
@@ -52,7 +58,12 @@ describe('Auth flow (e2e)', () => {
   it('rejects registration without consent (400)', async () => {
     await request(app.getHttpServer())
       .post('/api/auth/register')
-      .send({ email: `no-consent-${email}`, password, username: 'e2e', birthDate: '2000-01-01' })
+      .send({
+        email: `no-consent-${email}`,
+        password,
+        username: 'e2e',
+        birthDate: '2000-01-01',
+      })
       .expect(400);
   });
 
