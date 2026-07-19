@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16
+    restart: unless-stopped
     environment:
       POSTGRES_DB: musicdb
       POSTGRES_USER: user
@@ -17,6 +18,7 @@ services:
 
   minio:
     image: minio/minio
+    restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -29,6 +31,8 @@ services:
 
   api:
     build: ../api
+    restart: unless-stopped
+    profiles: ["full"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -44,6 +48,16 @@ services:
       MINIO_PORT: 9000
     ports:
       - "3001:3001"
+
+  client:
+    build:
+      context: ../client
+    restart: unless-stopped
+    profiles: ["full"]
+    depends_on:
+      - api
+    ports:
+      - "4200:80"
 
 volumes:
   pgdata:
