@@ -52,6 +52,14 @@ injectée via le token `MUSIC_PROVIDER`. `SunoService implements MusicProvider` 
 dépend de l'interface, plus du service concret : un second fournisseur (Udio) se branche en changeant
 uniquement le `useClass` du provider dans `music.module.ts`, sans toucher la logique métier.
 
+### Cache anti-redondance des fiches (éco-conception)
+Argument éco-conception du Bloc 1 : ne pas régénérer une fiche déjà produite. À chaque demande,
+le texte du cours est normalisé et haché (SHA-256) ; si une fiche existe déjà pour ce couple
+`(userId, contentHash)`, elle est renvoyée telle quelle avec `cached: true`, **sans aucun appel à
+Mistral**. Sinon la fiche est générée puis persistée (entité `StudySheet`). Le cache est isolé par
+utilisateur (index unique `(userId, contentHash)`). C'est la mesure d'éco-conception effective
+(appels IA évités = énergie et coût économisés) ; la métrologie carbone (CodeCarbon) viendra ensuite.
+
 ### Frontend Angular zoneless + signals
 Le client utilise Angular 21 en mode zoneless, composants standalone, `OnPush` et signals partout,
 avec un SDK typé généré depuis la spec OpenAPI (`ng-openapi-gen`) : le backend est la source de

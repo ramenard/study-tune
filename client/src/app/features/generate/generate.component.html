@@ -127,6 +127,12 @@
       <div class="course-card">
         <div class="course-card__header">
           <div class="course-card__title">{{ ficheTitle() || 'Fiche de révision' }}</div>
+          @if (ficheCached()) {
+            <span class="cached-badge">
+              <mat-icon>bolt</mat-icon>
+              Fiche réutilisée — aucun appel IA
+            </span>
+          }
         </div>
         <pre class="course-card__summary">{{ ficheSummary() }}</pre>
       </div>

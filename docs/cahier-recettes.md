@@ -41,6 +41,7 @@ Les scénarios automatisés du flux d'authentification sont dans `api/test/app.e
 | F-21 | Thème sombre persistant | — | Basculer le thème, rafraîchir la page | Thème conservé après refresh | Fonctionnel | OK (auto) `theme.service.spec` | B-05 |
 | F-22 | Page 404 | — | Naviguer vers une URL inconnue | Vraie page 404 (pas de redirection silencieuse) | Fonctionnel | OK (dev) | — |
 | F-23 | Suppression de compte (RGPD) | Connecté | Profil → zone de danger → confirmer | Compte + données supprimés, retour `/login` | Fonctionnel | OK (auto) `E2E-7`, `E2E-8` | — |
+| F-24 | Cache anti-redondance des fiches | Connecté | Générer une fiche, puis régénérer le même cours | 2ᵉ génération instantanée, aucun appel IA, mention « Fiche réutilisée » affichée | Fonctionnel | OK (auto) `document.service.spec` | — |
 
 ## Tests de sécurité
 

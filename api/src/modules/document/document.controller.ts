@@ -4,12 +4,14 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { Request } from 'express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -21,6 +23,8 @@ import { DocumentService } from './document.service';
 import { ProcessDocumentDto } from './dto/process-document.dto';
 import { DocumentResultDto } from './dto/document-result.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
+type AuthRequest = Request & { user: { id: string } };
 
 @ApiBearerAuth()
 @ApiTags('document')
@@ -44,9 +48,10 @@ export class DocumentController {
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   @ApiOkResponse({ type: DocumentResultDto })
   async process(
+    @Req() req: AuthRequest,
     @Body() dto: ProcessDocumentDto,
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<DocumentResultDto> {
-    return this.documentService.process(dto.text, file?.buffer);
+    return this.documentService.process(req.user.id, dto.text, file?.buffer);
   }
 }

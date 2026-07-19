@@ -1,6 +1,20 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { createHash } from 'crypto';
 import { PDFParse } from 'pdf-parse';
 import { MistralService } from './mistral.service';
+import { StudySheet } from './entities/study-sheet.entity';
+
+interface SheetContent {
+  title: string;
+  summary: string;
+  lyrics: string;
+}
+
+export interface DocumentResult extends SheetContent {
+  cached: boolean;
+}
 
 const SUMMARY_PROMPT = `Tu es un assistant pédagogique. À partir du contenu de cours suivant, génère une fiche de révision structurée en français.
 La fiche doit contenir :
@@ -33,7 +47,74 @@ Fiche de cours :
 export class DocumentService {
   private readonly logger = new Logger(DocumentService.name);
 
-  constructor(private readonly mistral: MistralService) {}
+  constructor(
+    private readonly mistral: MistralService,
+    @InjectRepository(StudySheet)
+    private readonly sheetRepo: Repository<StudySheet>,
+  ) {}
+
+  async process(
+    userId: string,
+    text?: string,
+    fileBuffer?: Buffer,
+  ): Promise<DocumentResult> {
+    const source = await this.resolveSource(text, fileBuffer);
+    const contentHash = createHash('sha256')
+      .update(this.normalize(source))
+      .digest('hex');
+
+    const existing = await this.sheetRepo.findOne({
+      where: { userId, contentHash },
+    });
+
+    if (existing) {
+      this.logger.log('Study sheet cache hit — no AI call');
+      return {
+        title: existing.title,
+        summary: existing.summary,
+        lyrics: existing.lyrics,
+        cached: true,
+      };
+    }
+
+    const generated = await this.generate(source);
+    await this.sheetRepo.save(
+      this.sheetRepo.create({ userId, contentHash, ...generated }),
+    );
+
+    return { ...generated, cached: false };
+  }
+
+  private async resolveSource(
+    text?: string,
+    fileBuffer?: Buffer,
+  ): Promise<string> {
+    if (fileBuffer) {
+      this.logger.log('Processing PDF');
+      const parser = new PDFParse({ data: fileBuffer });
+      const parsed = await parser.getText();
+      return parsed.text;
+    }
+
+    if (!text) {
+      throw new BadRequestException(
+        'Provide either a PDF file or a text content',
+      );
+    }
+
+    return text;
+  }
+
+  private async generate(source: string): Promise<SheetContent> {
+    const summary = await this.mistral.generateText(SUMMARY_PROMPT + source);
+    const raw = await this.mistral.generateText(LYRICS_PROMPT + summary);
+    const { title, lyrics } = this.extractTitleAndLyrics(raw);
+    return { title, summary, lyrics };
+  }
+
+  private normalize(text: string): string {
+    return text.trim().replace(/\s+/g, ' ');
+  }
 
   private extractTitleAndLyrics(raw: string): {
     title: string;
@@ -46,41 +127,5 @@ export class DocumentService {
       : '';
     const lyrics = lines.slice(1).join('\n').trim();
     return { title, lyrics };
-  }
-
-  async processText(
-    text: string,
-  ): Promise<{ title: string; summary: string; lyrics: string }> {
-    this.logger.log('Processing raw text');
-    const summary = await this.mistral.generateText(SUMMARY_PROMPT + text);
-    const raw = await this.mistral.generateText(LYRICS_PROMPT + summary);
-    const { title, lyrics } = this.extractTitleAndLyrics(raw);
-    return { title, summary, lyrics };
-  }
-
-  async processPdf(
-    fileBuffer: Buffer,
-  ): Promise<{ title: string; summary: string; lyrics: string }> {
-    this.logger.log('Processing PDF');
-    const parser = new PDFParse({ data: fileBuffer });
-    const parsed = await parser.getText();
-    return this.processText(parsed.text);
-  }
-
-  async process(
-    text?: string,
-    fileBuffer?: Buffer,
-  ): Promise<{ title: string; summary: string; lyrics: string }> {
-    if (fileBuffer) {
-      return this.processPdf(fileBuffer);
-    }
-
-    if (!text) {
-      throw new BadRequestException(
-        'Provide either a PDF file or a text content',
-      );
-    }
-
-    return this.processText(text);
   }
 }

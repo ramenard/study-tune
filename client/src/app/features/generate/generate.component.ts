@@ -44,6 +44,7 @@ export class GenerateComponent {
   readonly ficheTitle = signal('');
   readonly ficheSummary = signal('');
   readonly ficheLyrics = signal('');
+  readonly ficheCached = signal(false);
 
   readonly generationsRemaining = this.profileService.generationsRemaining;
   readonly hasPdfFile = computed(() => this.selectedFile() !== null);
@@ -119,6 +120,7 @@ export class GenerateComponent {
       this.ficheTitle.set(result.title);
       this.ficheSummary.set(result.summary);
       this.ficheLyrics.set(result.lyrics);
+      this.ficheCached.set(result.cached);
       this.step.set(1);
     } catch {
       this.errorMessage.set('La génération de la fiche a échoué. Réessaie dans un instant.');
@@ -161,6 +163,7 @@ export class GenerateComponent {
     this.ficheTitle.set('');
     this.ficheSummary.set('');
     this.ficheLyrics.set('');
+    this.ficheCached.set(false);
     this.errorMessage.set('');
   }
 
