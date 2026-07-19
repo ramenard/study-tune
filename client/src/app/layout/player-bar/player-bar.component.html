@@ -4,7 +4,7 @@
       <mat-icon>music_note</mat-icon>
     </div>
     <div class="track-meta">
-      <span class="track-title">{{ currentTrack()?.title || 'Aucune lecture' }}</span>
+      <span class="track-title" aria-live="polite">{{ currentTrack()?.title || 'Aucune lecture' }}</span>
       <span class="track-subject">{{ currentTrack()?.subject || '—' }}</span>
       @if (queueName()) {
         <span class="track-queue"><mat-icon>queue_music</mat-icon>{{ queueName() }}</span>

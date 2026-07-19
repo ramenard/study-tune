@@ -19,6 +19,7 @@
           class="new-form-card__input"
           type="text"
           placeholder="Nom de la playlist…"
+          aria-label="Nom de la nouvelle playlist"
           [value]="newPlaylistName()"
           (input)="onNameInput(nameInput.value)"
           (keydown)="onCreateKeydown($event)" />
@@ -39,7 +40,10 @@
     <div class="section-title">Créées par moi</div>
     <div class="grid">
       @for (playlist of ownedPlaylists(); track playlist.id) {
-        <div class="playlist-card" [class.playlist-card--selected]="selectedId() === playlist.id" (click)="select(playlist.id)">
+        <div class="playlist-card" [class.playlist-card--selected]="selectedId() === playlist.id"
+             role="button" tabindex="0"
+             [attr.aria-label]="'Ouvrir la playlist ' + playlist.name"
+             (click)="select(playlist.id)" (keydown.enter)="select(playlist.id)">
           <div class="playlist-card__accent" [style.background]="colorFor(playlist.id)"></div>
           <div class="playlist-card__top">
             <div class="playlist-card__icon" [style.background]="colorFor(playlist.id)">
@@ -82,7 +86,10 @@
     <div class="section-title">Partagées avec moi</div>
     <div class="grid">
       @for (playlist of sharedPlaylists(); track playlist.id) {
-        <div class="playlist-card" [class.playlist-card--selected]="selectedId() === playlist.id" (click)="select(playlist.id)">
+        <div class="playlist-card" [class.playlist-card--selected]="selectedId() === playlist.id"
+             role="button" tabindex="0"
+             [attr.aria-label]="'Ouvrir la playlist ' + playlist.name"
+             (click)="select(playlist.id)" (keydown.enter)="select(playlist.id)">
           <div class="playlist-card__accent" [style.background]="colorFor(playlist.id)"></div>
           <div class="playlist-card__top">
             <div class="playlist-card__icon" [style.background]="colorFor(playlist.id)">

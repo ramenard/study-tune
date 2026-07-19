@@ -24,6 +24,7 @@
         class="search-input"
         type="text"
         [placeholder]="activeTab() === 'add' ? 'Rechercher par nom d’utilisateur…' : 'Filtrer mes amis…'"
+        [attr.aria-label]="activeTab() === 'add' ? 'Rechercher un utilisateur' : 'Filtrer mes amis'"
         [value]="search()"
         (input)="onSearch(searchInput.value)" />
     </div>

@@ -209,14 +209,22 @@
   color: var(--md-sys-color-error);
 }
 
-.confirm-yes {
+.confirm-yes,
+.confirm-no {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
   cursor: pointer;
+}
+
+.confirm-yes {
   text-decoration: underline;
   font-weight: 700;
+  color: var(--md-sys-color-error);
 }
 
 .confirm-no {
-  cursor: pointer;
   color: var(--md-sys-color-on-surface-variant);
 }
 

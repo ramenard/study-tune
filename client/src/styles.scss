@@ -92,3 +92,8 @@ app-root {
   background: var(--md-sys-color-outline-variant);
   border-radius: 0.1875rem;
 }
+[tabindex]:focus-visible,
+[role='button']:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}

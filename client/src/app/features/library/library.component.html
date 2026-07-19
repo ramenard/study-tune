@@ -32,6 +32,7 @@
     class="search-input"
     type="text"
     placeholder="Rechercher par titre ou style…"
+    aria-label="Rechercher une musique"
     [value]="search()"
     (input)="onSearch(searchInput.value)" />
 </div>
@@ -57,7 +58,10 @@
 
     @for (track of paged(); track track.id; let last = $last) {
       <div class="table-row">
-        <div class="thumb" [style.background]="colorFor(track.id)" (click)="play(track)">
+        <div class="thumb" [style.background]="colorFor(track.id)"
+             role="button" tabindex="0"
+             [attr.aria-label]="'Lire ' + (track.title || 'Sans titre')"
+             (click)="play(track)" (keydown.enter)="play(track)">
           <mat-icon [class.spin]="isPending(track)">{{ thumbIcon(track) }}</mat-icon>
         </div>
 
@@ -65,17 +69,19 @@
           @if (editId() === track.id) {
             <input
               class="title-input"
+              aria-label="Nouveau titre de la piste"
               [(ngModel)]="editValueStr"
               (keydown)="onEditKeydown($event, track.id)"
               (blur)="saveEdit(track.id)" />
           } @else {
-            <div class="track-title" (click)="play(track)">{{ track.title || 'Sans titre' }}</div>
+            <div class="track-title" role="button" tabindex="0"
+                 (click)="play(track)" (keydown.enter)="play(track)">{{ track.title || 'Sans titre' }}</div>
           }
           @if (deleteId() === track.id) {
             <div class="delete-confirm">
               Supprimer ?
-              <span class="confirm-yes" (click)="confirmDelete(track.id)">Oui</span>
-              <span class="confirm-no" (click)="toggleDelete(track.id)">Non</span>
+              <button type="button" class="confirm-yes" (click)="confirmDelete(track.id)">Oui</button>
+              <button type="button" class="confirm-no" (click)="toggleDelete(track.id)">Non</button>
             </div>
           }
         </div>

@@ -78,9 +78,13 @@
       @if (activeTab() === 'pdf') {
         <div class="source-form">
           <div class="upload-zone"
+               role="button"
+               tabindex="0"
+               aria-label="Choisir un fichier PDF à importer"
                (dragover)="onFileDragOver($event)"
                (drop)="onFileDrop($event)"
-               (click)="fileInput.click()">
+               (click)="fileInput.click()"
+               (keydown.enter)="fileInput.click()">
             @if (hasPdfFile()) {
               <mat-icon class="upload-zone__icon upload-zone__icon--done">check_circle</mat-icon>
               <div class="upload-zone__title">{{ selectedFile()?.name }}</div>
@@ -90,7 +94,7 @@
               <div class="upload-zone__title">Glisse ton PDF ici</div>
               <div class="upload-zone__sub">ou <span class="upload-zone__link">parcourir les fichiers</span></div>
             }
-            <input #fileInput type="file" accept=".pdf" class="file-input" (change)="onFileSelect(fileInput)">
+            <input #fileInput type="file" accept=".pdf" class="file-input" aria-label="Fichier PDF" (change)="onFileSelect(fileInput)">
           </div>
         </div>
       }
