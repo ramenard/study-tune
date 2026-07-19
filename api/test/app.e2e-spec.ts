@@ -29,7 +29,9 @@ describe('Auth flow (e2e)', () => {
         transform: true,
       }),
     );
-    app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+    app.useGlobalInterceptors(
+      new ClassSerializerInterceptor(app.get(Reflector)),
+    );
     await app.init();
   });
 

@@ -29,8 +29,16 @@ describe('AuthController', () => {
   });
 
   it('delegates register to the service', async () => {
-    authService.register.mockResolvedValue({ accessToken: 'a', refreshToken: 'r' });
-    const dto = { email: 'a@b.c', password: 'password123', username: 'al', consent: true };
+    authService.register.mockResolvedValue({
+      accessToken: 'a',
+      refreshToken: 'r',
+    });
+    const dto = {
+      email: 'a@b.c',
+      password: 'password123',
+      username: 'al',
+      consent: true,
+    };
 
     await controller.register(dto);
 

@@ -10,8 +10,14 @@ describe('MusicService', () => {
     manager: { query: jest.Mock };
   };
   let playlistRepo: { createQueryBuilder: jest.Mock };
-  let suno: { generate: jest.Mock };
-  let storage: { getPresignedUrl: jest.Mock };
+  let suno: { generate: jest.Mock; getGeneratedTracks: jest.Mock };
+  let storage: {
+    getPresignedUrl: jest.Mock;
+    ensureBucket: jest.Mock;
+    downloadAndStore: jest.Mock;
+    getPublicUrl: jest.Mock;
+    removeObject: jest.Mock;
+  };
   let subscription: {
     assertCanGenerate: jest.Mock;
     consumeGeneration: jest.Mock;
@@ -29,8 +35,14 @@ describe('MusicService', () => {
       manager: { query: jest.fn().mockResolvedValue(undefined) },
     };
     playlistRepo = { createQueryBuilder: jest.fn() };
-    suno = { generate: jest.fn() };
-    storage = { getPresignedUrl: jest.fn() };
+    suno = { generate: jest.fn(), getGeneratedTracks: jest.fn() };
+    storage = {
+      getPresignedUrl: jest.fn().mockResolvedValue('http://signed'),
+      ensureBucket: jest.fn().mockResolvedValue(undefined),
+      downloadAndStore: jest.fn().mockResolvedValue('tracks/u_m1.mp3'),
+      getPublicUrl: jest.fn().mockReturnValue('http://public/track'),
+      removeObject: jest.fn().mockResolvedValue(undefined),
+    };
     subscription = {
       assertCanGenerate: jest.fn(),
       consumeGeneration: jest.fn(),
@@ -69,6 +81,45 @@ describe('MusicService', () => {
     });
   });
 
+  describe('handleKieWebhook', () => {
+    it('ignores intermediate callbacks', async () => {
+      await service.handleKieWebhook({ data: { callbackType: 'text' } });
+
+      expect(storage.ensureBucket).not.toHaveBeenCalled();
+    });
+
+    it('downloads and completes the track on a complete callback', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        userId: 'u1',
+        title: 'old',
+      });
+
+      await service.handleKieWebhook({
+        data: {
+          callbackType: 'complete',
+          task_id: 'task-1',
+          data: [
+            {
+              id: 't1',
+              title: 'Song',
+              audio_url: 'http://a/1.mp3',
+              duration: 90,
+            },
+          ],
+        },
+      });
+
+      expect(storage.downloadAndStore).toHaveBeenCalled();
+      expect(musicRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'complete',
+          objectName: 'tracks/u_m1.mp3',
+        }),
+      );
+    });
+  });
+
   describe('findOneByUser', () => {
     it('throws NotFound when the track does not exist', async () => {
       musicRepo.findOneBy.mockResolvedValue(null);
@@ -99,9 +150,59 @@ describe('MusicService', () => {
     });
   });
 
+  describe('syncFromKie', () => {
+    it('returns immediately when already complete', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        userId: 'u1',
+        status: 'complete',
+      });
+
+      const result = await service.syncFromKie('m1', 'u1');
+
+      expect(suno.getGeneratedTracks).not.toHaveBeenCalled();
+      expect(result.status).toBe('complete');
+    });
+
+    it('downloads a ready track and marks it complete', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        userId: 'u1',
+        status: 'generating',
+        sunoId: 'task-1',
+      });
+      suno.getGeneratedTracks.mockResolvedValue({
+        tracks: [{ audioUrl: 'http://a/1.mp3', title: 'Song', duration: 90 }],
+      });
+
+      const result = await service.syncFromKie('m1', 'u1');
+
+      expect(storage.downloadAndStore).toHaveBeenCalled();
+      expect(result.status).toBe('complete');
+    });
+  });
+
+  describe('getStreamUrl', () => {
+    it('returns a presigned url for the owner', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        userId: 'u1',
+        objectName: 'tracks/u_m1.mp3',
+      });
+
+      await expect(service.getStreamUrl('m1', 'u1')).resolves.toEqual({
+        url: 'http://signed',
+      });
+    });
+  });
+
   describe('delete', () => {
-    it('cleans up playlist join rows before removing the track', async () => {
-      musicRepo.findOneBy.mockResolvedValue({ id: 'x', userId: 'u1' });
+    it('cleans up join rows, removes the track and its stored object', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'x',
+        userId: 'u1',
+        objectName: 'tracks/u_x.mp3',
+      });
 
       await service.delete('x', 'u1');
 
@@ -110,6 +211,7 @@ describe('MusicService', () => {
         ['x'],
       );
       expect(musicRepo.remove).toHaveBeenCalled();
+      expect(storage.removeObject).toHaveBeenCalledWith('tracks/u_x.mp3');
     });
   });
 });

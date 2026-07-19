@@ -274,5 +274,15 @@ export class MusicService {
       [music.id],
     );
     await this.musicRepo.remove(music);
+    await this.removeStoredObject(music.objectName);
+  }
+
+  private async removeStoredObject(
+    objectName: string | undefined,
+  ): Promise<void> {
+    if (!objectName) {
+      return;
+    }
+    await this.storage.removeObject(objectName).catch(() => undefined);
   }
 }

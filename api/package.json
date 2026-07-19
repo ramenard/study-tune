@@ -92,6 +92,9 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@mistralai/)"
+    ],
     "collectCoverageFrom": [
       "**/*.ts",
       "!**/*.module.ts",
@@ -104,10 +107,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "statements": 43,
-        "branches": 28,
-        "functions": 33,
-        "lines": 42
+        "statements": 81,
+        "branches": 63,
+        "functions": 76,
+        "lines": 81
       }
     },
     "coverageDirectory": "../coverage",

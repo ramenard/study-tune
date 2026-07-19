@@ -60,7 +60,7 @@ Les scénarios automatisés du flux d'authentification sont dans `api/test/app.e
 | T-01 | Migrations sur base vierge | `npm run migration:run -w api` sur une base neuve | Toutes les migrations s'appliquent, « No migrations pending » au 2ᵉ passage | Structurel | OK (auto) CI | — |
 | T-02 | Healthcheck | `GET /api/health` | `{ status: "ok" }`, connexion TypeORM vérifiée | Structurel | OK (dev) | — |
 | T-03 | Build de production (API + client) | `npm run build` | Les deux builds réussissent | Structurel | OK (auto) CI | — |
-| T-04 | Suite de tests | `npm test -w api`, `npm run test:cov -w api`, `npm run test -w client`, e2e | Tous verts, seuils de couverture tenus | Structurel | OK (auto) CI | — |
+| T-04 | Suite de tests | `npm test -w api`, `npm run test:cov -w api`, `npm run test -w client`, e2e | Tous verts ; couverture API ~84 % statements (seuils tenus), 96 tests unitaires + 8 e2e | Structurel | OK (auto) CI | — |
 | T-05 | Stack Docker complète | `docker compose --profile full up --build` | PostgreSQL, MinIO, API et client démarrent ; SPA servie sur `:4200` | Structurel | OK (dev) | — |
 
 ## Synthèse
