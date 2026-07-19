@@ -71,7 +71,13 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint -w client
-      - name: Test
-        run: npm run test -w client
+      - name: Test with coverage
+        run: npm run test:cov -w client
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-coverage
+          path: client/coverage/
       - name: Build
         run: npm run build -w client
