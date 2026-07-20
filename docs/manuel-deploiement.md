@@ -146,6 +146,14 @@ démarrage** de l'API. Pour les lancer manuellement :
 docker compose -f docker/docker-compose.prod.yml exec api npm run migration:run
 ```
 
+### Dépannage
+
+| Symptôme | Cause | Correction |
+|---|---|---|
+| `password authentication failed for user` dans les logs postgres | `DB_PASSWORD` ≠ `POSTGRES_PASSWORD`, **ou** volume `pgdata` initialisé lors d'un essai précédent avec un autre mot de passe (PostgreSQL ne l'applique qu'à la première initialisation) | Aligner les deux valeurs dans `.env.prod`, puis recréer le volume : `docker compose -f docker/docker-compose.prod.yml down -v` puis `up -d --build` (⚠️ `-v` efface la base) |
+| `dependency failed to start` sur un service | Un service dont il dépend n'est jamais devenu *healthy* | Regarder `docker compose -f docker/docker-compose.prod.yml ps -a` pour identifier lequel, puis ses logs |
+| Conteneur `unhealthy` alors que le service répond | Healthcheck visant `localhost` alors que le process n'écoute qu'en IPv4 | Les healthchecks utilisent `127.0.0.1` (et non `localhost`) pour cette raison |
+
 ### Vérifications
 
 ```bash
