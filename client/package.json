@@ -38,8 +38,8 @@
     "@angular/build": "^21.2.11",
     "@angular/cli": "^21.2.11",
     "@angular/compiler-cli": "^21.2.0",
-    "@tailwindcss/cli": "^4.3.0",
-    "@tailwindcss/postcss": "^4.3.0",
+    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/postcss": "^4.3.3",
     "@vitest/coverage-v8": "^4.1.10",
     "concurrently": "^9.2.1",
     "eslint": "^10.4.0",
@@ -48,7 +48,7 @@
     "prettier": "^3.8.1",
     "tailwindcss": "^4.3.0",
     "typescript": "~5.9.2",
-    "typescript-eslint": "^8.59.3",
+    "typescript-eslint": "^8.65.0",
     "vitest": "^4.1.10"
   }
 }
