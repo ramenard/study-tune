@@ -44,8 +44,10 @@ services:
       NODE_ENV: production
       DB_HOST: postgres
       DB_PORT: 5432
-      MINIO_ENDPOINT: minio
-      MINIO_PORT: 9000
+      S3_ENDPOINT: minio
+      S3_PORT: 9000
+      S3_USE_SSL: "false"
+      S3_PUBLIC_URL: http://localhost:9000
     ports:
       - "3001:3001"
 

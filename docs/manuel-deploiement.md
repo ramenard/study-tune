@@ -30,7 +30,8 @@ Copier `api/.env.example` vers `api/.env` et renseigner les valeurs. Validation 
 | `KIE_WEBHOOK_SECRET` | non | — | Secret inclus dans le path du webhook Kie |
 | `MISTRAL_API_KEY` | non | — | Clé Mistral (fiche + paroles) |
 | `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | non | `localhost` / `5432` / `user` / `password` / `musicdb` | Connexion PostgreSQL |
-| `MINIO_ENDPOINT` / `MINIO_PORT` / `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY` / `MINIO_BUCKET` / `MINIO_PUBLIC_URL` | non | `localhost` / `9000` / `minioadmin` / `minioadmin` / `music` / `http://localhost:9000` | Connexion MinIO |
+| `S3_ENDPOINT` / `S3_PORT` / `S3_USE_SSL` / `S3_REGION` / `S3_PATH_STYLE` | non | `localhost` / `9000` / `false` / `us-east-1` / `true` | Endpoint du stockage objet S3 (MinIO en local, OVH Object Storage en prod) |
+| `S3_ACCESS_KEY` / `S3_SECRET_KEY` / `S3_BUCKET` / `S3_PUBLIC_URL` | non | `minioadmin` / `minioadmin` / `music` / `http://localhost:9000` | Credentials, bucket et URL publique du stockage objet |
 
 > Bien que la plupart soient optionnelles pour démarrer, les fonctionnalités correspondantes
 > (génération, stockage audio) exigent les clés externes et MinIO opérationnels.
@@ -86,6 +87,85 @@ ngrok http 3001
 Le callback envoyé à Kie est alors `${APP_PUBLIC_URL}/api/music/webhook/kie/${KIE_WEBHOOK_SECRET}`.
 Si une génération reste bloquée (webhook perdu), l'endpoint `POST /api/music/:id/sync` récupère
 le résultat auprès de Kie.
+
+## Déploiement OVH (production)
+
+### Architecture cible
+
+```
+Internet
+   │
+Caddy (:443, TLS automatique Let's Encrypt)
+   ├── <domaine>          → conteneur client (nginx, SPA Angular)
+   └── <domaine>/api/*    → conteneur api (NestJS :3001)
+
+Réseau Docker interne (jamais exposé) : postgres, api, client
+Stockage audio : OVH Object Storage (S3, région GRA) — URLs présignées générées directement dessus
+```
+
+Front et API sur la **même origine** : aucun problème CORS. Seul Caddy publie les ports 80/443 ;
+PostgreSQL et l'API ne sont joignables que sur le réseau Docker interne.
+
+**MinIO n'existe plus en production** : il ne sert qu'au développement local. Le code est identique
+des deux côtés (même API S3), seule la configuration `S3_*` change — c'est la parité dev/prod.
+
+### Prérequis
+
+- Un VPS OVH (Ubuntu 24.04) sécurisé : utilisateur `deploy`, SSH par clé uniquement, UFW
+  autorisant seulement 22/80/443, `fail2ban` et `unattended-upgrades` installés.
+- Docker et Docker Compose installés sur le VPS.
+- Un nom de domaine dont l'enregistrement DNS `A` pointe vers l'IP du VPS.
+- Un bucket **OVH Object Storage** (région GRA) avec le **versioning activé** et un utilisateur S3
+  dédié (droits limités à ce bucket, jamais les clés admin du projet).
+
+### Fichiers de production
+
+| Fichier | Rôle |
+|---|---|
+| `docker/docker-compose.prod.yml` | Stack de production : `postgres`, `api`, `client`, `caddy` (pas de MinIO) |
+| `docker/Caddyfile` | Reverse proxy + TLS automatique ; `{$DOMAIN}` est lu depuis l'environnement |
+| `docker/.env.prod.example` | Modèle de configuration à copier en `docker/.env.prod` (git-ignoré) |
+
+### Déploiement
+
+```bash
+ssh deploy@IP_VPS
+git clone https://github.com/ramenard/study-tune.git && cd study-tune
+cp docker/.env.prod.example docker/.env.prod
+nano docker/.env.prod        # domaine, secrets, credentials S3 OVH, clés Mistral/Kie
+docker compose -f docker/docker-compose.prod.yml up -d --build
+```
+
+Les secrets forts se génèrent avec `openssl rand -base64 48` (`JWT_SECRET`, `JWT_REFRESH_SECRET`,
+`KIE_WEBHOOK_SECRET`, mot de passe PostgreSQL).
+
+En production `NODE_ENV=production`, donc les **migrations s'appliquent automatiquement au
+démarrage** de l'API. Pour les lancer manuellement :
+
+```bash
+docker compose -f docker/docker-compose.prod.yml exec api npm run migration:run
+```
+
+### Vérifications
+
+```bash
+curl -s https://<domaine>/api/health          # { "status": "ok", ... }
+curl -s -o /dev/null -w "%{http_code}\n" https://<domaine>/docs   # 404 attendu en production
+docker compose -f docker/docker-compose.prod.yml logs -f api
+```
+
+- La SPA se charge sur `https://<domaine>` avec un certificat TLS valide.
+- Le webhook Kie arrive directement sur
+  `https://<domaine>/api/music/webhook/kie/<KIE_WEBHOOK_SECRET>` — **plus besoin de ngrok**.
+- La lecture audio passe par des URLs présignées pointant sur `https://s3.gra.io.cloud.ovh.net/...`.
+  En cas de `SignatureDoesNotMatch` ou `AuthorizationHeaderMalformed`, vérifier `S3_REGION=gra` et
+  `S3_PATH_STYLE` — ce sont les deux seuls réglages sensibles avec l'endpoint OVH.
+
+### Swagger et CSP en production
+
+`/docs` n'est monté que hors production (`NODE_ENV !== 'production'`). En contrepartie, la
+Content-Security-Policy de Helmet — désactivée en développement car elle casse l'interface
+Swagger — est **active en production**.
 
 ## Exploitation en production
 

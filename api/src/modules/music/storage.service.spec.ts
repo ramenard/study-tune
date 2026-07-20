@@ -20,7 +20,7 @@ describe('StorageService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.MINIO_BUCKET = 'music';
+    process.env.S3_BUCKET = 'music';
     http = { get: jest.fn() };
     service = new StorageService(http as never);
   });
