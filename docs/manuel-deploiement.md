@@ -217,8 +217,61 @@ Swagger — est **active en production**.
 
 ## Exploitation en production
 
-Ces mesures sont d'ordre infrastructure : elles se configurent au niveau de l'hébergement et du
-reverse proxy, hors code applicatif.
+### Arrêt, relance et maintenance
+
+Toutes les commandes se lancent depuis `~/study-tune` sur le VPS.
+
+**Mettre en pause (cas courant)** — les conteneurs sont arrêtés mais conservés, la relance est
+immédiate (ni pull ni build) :
+
+```bash
+docker compose -f docker/docker-compose.prod.yml stop
+docker compose -f docker/docker-compose.prod.yml start
+```
+
+> La politique `restart: unless-stopped` fait qu'un conteneur arrêté avec `stop` **reste arrêté
+> après un redémarrage du VPS**. C'est le comportement attendu pour une coupure volontaire.
+
+**Arrêt complet** — supprime les conteneurs (les données et les certificats TLS sont conservés
+dans les volumes) :
+
+```bash
+docker compose -f docker/docker-compose.prod.yml down
+```
+
+Relance après un `down` — préciser le tag déployé :
+
+```bash
+export IMAGE_TAG=v1.0.0-rc.2      # tag visible dans la colonne IMAGE de `ps`
+docker compose -f docker/docker-compose.prod.yml up -d --no-build
+```
+
+Sans `IMAGE_TAG`, le compose retombe sur `:latest`, qui n'a pas nécessairement été tiré localement.
+Le `--no-build` évite un build accidentel de plusieurs minutes sur le VPS.
+
+**Fenêtre de maintenance** — couper uniquement l'accès public en laissant l'API et la base
+tourner (les générations en cours ne sont pas perdues) :
+
+```bash
+docker compose -f docker/docker-compose.prod.yml stop caddy
+docker compose -f docker/docker-compose.prod.yml start caddy
+```
+
+**Vérifier l'état** :
+
+```bash
+docker compose -f docker/docker-compose.prod.yml ps
+curl -s https://<domaine>/api/health
+```
+
+> ⚠️ **Ne jamais exécuter `down -v` en production.** Le `-v` supprime le volume `pgdata` : comptes,
+> musiques et playlists sont définitivement perdus. Les fichiers audio survivraient (ils sont sur
+> OVH Object Storage, pas sur le VPS), mais les métadonnées qui les référencent non.
+
+### Mesures d'infrastructure
+
+Les mesures ci-dessous se configurent au niveau de l'hébergement et du reverse proxy, hors code
+applicatif.
 
 ### TLS 1.3
 La terminaison TLS se fait sur le reverse proxy (nginx ou Traefik) devant l'API et le client :
