@@ -99,6 +99,33 @@ des audio générés — la donnée de valeur du produit — est déléguée à 
 versionné plutôt qu'à un disque de VPS. Le versioning du bucket remplace de fait une sauvegarde des
 fichiers audio : le périmètre de sauvegarde côté VPS se réduit au `pg_dump`.
 
+### Transferts de données hors UE (sous-traitants IA)
+Les fournisseurs de génération traitent potentiellement les données hors UE (États-Unis). Deux
+maillons : **Mistral** (fiches) et **Kie.ai** avec son sous-traitant **Suno** (musique).
+
+**Fait vérifié dans le code (argument principal) — minimisation structurelle du payload :**
+- vers Mistral part uniquement le **texte du cours** ;
+- vers Kie.ai / Suno partent uniquement **`prompt` (paroles), `style`, `title`**
+  (voir `suno.service.ts` / `music.service.ts`) ;
+- **aucune donnée d'identification** (email, username, `birthDate`, id de compte) n'est transmise.
+
+Le transfert de données personnelles identifiantes est donc, par construction, quasi nul — sous
+réserve que l'utilisateur n'inclue pas d'informations personnelles dans le contenu de cours
+lui-même (d'où la mention d'information dans la politique de confidentialité). C'est un point
+sensible sur le positionnement mineurs (vigilance CNIL sur les transferts de données de mineurs).
+
+**À confirmer à la source avant l'écrit du dossier (recherches non validées dans cet environnement) :**
+- entités et droit applicable : Kie.ai serait édité par NEXUSAI SERVICES LLC (Colorado, US), Suno
+  basé aux US — **à vérifier**.
+- base juridique du transfert : **certification Data Privacy Framework** des deux fournisseurs, à
+  vérifier sur `dataprivacyframework.gov` ; à défaut, clauses contractuelles types (art. 46 RGPD)
+  + analyse d'impact du transfert (TIA).
+- représentant UE art. 27 RGPD (VeraSafe côté Suno évoqué) et durées de rétention côté sous-traitant
+  (14 j médias / 2 mois logs côté Kie évoqués) — **à confirmer** pour le registre des traitements.
+
+Tant que ces points ne sont pas confirmés, la politique de confidentialité reste sur la formulation
+prudente « soit DPF, soit clauses contractuelles types », juridiquement correcte en l'état.
+
 ### Modération du contenu généré
 Annoncée au Bloc 1, non implémentée en V1 : c'est un prérequis à l'ouverture publique (filtrage des
 fiches et paroles générées + signalement utilisateur). Le risque est borné en bêta fermée car le
