@@ -7,14 +7,16 @@ import { Readable } from 'stream';
 @Injectable()
 export class StorageService {
   private readonly logger = new Logger(StorageService.name);
-  private readonly bucket = process.env.MINIO_BUCKET ?? 'music';
+  private readonly bucket = process.env.S3_BUCKET ?? 'music';
 
   private readonly client = new Minio.Client({
-    endPoint: process.env.MINIO_ENDPOINT ?? 'localhost',
-    port: parseInt(process.env.MINIO_PORT ?? '9000'),
-    useSSL: false,
-    accessKey: process.env.MINIO_ACCESS_KEY ?? 'minioadmin',
-    secretKey: process.env.MINIO_SECRET_KEY ?? 'minioadmin',
+    endPoint: process.env.S3_ENDPOINT ?? 'localhost',
+    port: parseInt(process.env.S3_PORT ?? '9000'),
+    useSSL: (process.env.S3_USE_SSL ?? 'false') === 'true',
+    region: process.env.S3_REGION ?? 'us-east-1',
+    pathStyle: (process.env.S3_PATH_STYLE ?? 'true') === 'true',
+    accessKey: process.env.S3_ACCESS_KEY ?? 'minioadmin',
+    secretKey: process.env.S3_SECRET_KEY ?? 'minioadmin',
   });
 
   constructor(private readonly http: HttpService) {}
@@ -61,7 +63,7 @@ export class StorageService {
   }
 
   getPublicUrl(objectName: string): string {
-    const host = process.env.MINIO_PUBLIC_URL ?? 'http://localhost:9000';
+    const host = process.env.S3_PUBLIC_URL ?? 'http://localhost:9000';
     return `${host}/${this.bucket}/${objectName}`;
   }
 

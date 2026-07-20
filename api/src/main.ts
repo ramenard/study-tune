@@ -6,12 +6,9 @@ import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const isProduction = process.env.NODE_ENV === 'production';
 
-  app.use(
-    helmet({
-      contentSecurityPolicy: false,
-    }),
-  );
+  app.use(helmet(isProduction ? {} : { contentSecurityPolicy: false }));
 
   app.setGlobalPrefix('api');
 
@@ -30,17 +27,19 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  const config = new DocumentBuilder()
-    .setTitle('StudyTune API')
-    .setDescription(
-      'API StudyTune — génération de musiques de révision (NestJS, Mistral, Suno)',
-    )
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+  if (!isProduction) {
+    const config = new DocumentBuilder()
+      .setTitle('StudyTune API')
+      .setDescription(
+        'API StudyTune — génération de musiques de révision (NestJS, Mistral, Suno)',
+      )
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, document);
+  }
 
   await app.listen(process.env.PORT ?? 3001);
 }
