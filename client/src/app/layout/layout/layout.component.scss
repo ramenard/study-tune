@@ -215,3 +215,61 @@
 @keyframes generating-spin {
   to { transform: rotate(360deg); }
 }
+
+.drawer-toggle {
+  display: none;
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 40;
+  border: none;
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  box-shadow: var(--md-elevation-1);
+  align-items: center;
+  justify-content: center;
+
+  &:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 20;
+}
+
+@media (max-width: 768px) {
+  .nav-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 30;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .drawer-open .nav-drawer {
+    transform: translateX(0);
+  }
+
+  .drawer-open .scrim {
+    display: block;
+  }
+
+  .drawer-toggle {
+    display: flex;
+  }
+
+  .main {
+    padding: 3.5rem 1rem 1.5rem;
+  }
+}

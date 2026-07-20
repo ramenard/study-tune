@@ -1,4 +1,12 @@
-<div class="app">
+<div class="app" [class.drawer-open]="drawerOpen()">
+  <button class="drawer-toggle" (click)="toggleDrawer()"
+          aria-label="Ouvrir le menu de navigation"
+          [attr.aria-expanded]="drawerOpen()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <div class="scrim" (click)="closeDrawer()" aria-hidden="true"></div>
+
   <nav class="nav-drawer">
     <div class="drawer-header">
       <div class="drawer-logo">
@@ -28,7 +36,8 @@
       <a class="drawer-item"
          [routerLink]="item.route"
          routerLinkActive="active"
-         [routerLinkActiveOptions]="{ exact: item.route === '/' }">
+         [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+         (click)="closeDrawer()">
         <mat-icon>{{ item.icon }}</mat-icon>
         <span>{{ item.label }}</span>
         @if (item.id === 'friends' && pendingRequests() > 0) {

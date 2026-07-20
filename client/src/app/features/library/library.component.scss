@@ -461,3 +461,44 @@
 @keyframes lib-spin {
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 768px) {
+  .table-header {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "thumb  title"
+      "thumb  meta"
+      "actions actions";
+    row-gap: 0.5rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .table-row .thumb      { grid-area: thumb; }
+  .table-row .title-cell { grid-area: title; }
+
+  .table-row .subject-cell,
+  .table-row .style-cell,
+  .table-row .duration-cell {
+    grid-column: 2;
+    justify-self: start;
+    text-align: left;
+  }
+
+  .table-row .actions-cell {
+    grid-area: actions;
+    justify-content: flex-start;
+    padding-top: 0.25rem;
+    border-top: 0.0625rem solid var(--md-sys-color-outline-variant);
+  }
+
+  .col-right,
+  .col-center { text-align: left; }
+
+  .row-divider {
+    margin-left: 1rem;
+  }
+}

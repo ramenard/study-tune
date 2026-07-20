@@ -186,3 +186,9 @@
   background: var(--md-sys-color-outline-variant);
   margin-left: 4.5rem;
 }
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

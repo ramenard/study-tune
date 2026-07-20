@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { PlayerBarComponent } from '../player-bar/player-bar.component';
@@ -41,6 +41,7 @@ export class LayoutComponent implements OnInit {
   readonly generatingCount = this.generationStatus.pendingCount;
   readonly isGenerating = this.generationStatus.isGenerating;
   readonly dark = this.themeService.dark;
+  readonly drawerOpen = signal(false);
 
   ngOnInit(): void {
     void this.profileService.load();
@@ -51,6 +52,14 @@ export class LayoutComponent implements OnInit {
 
   toggleDark(): void {
     this.themeService.toggle();
+  }
+
+  toggleDrawer(): void {
+    this.drawerOpen.set(!this.drawerOpen());
+  }
+
+  closeDrawer(): void {
+    this.drawerOpen.set(false);
   }
 
   logout(): void {
