@@ -1,0 +1,120 @@
+<div class="legal">
+  <a class="legal__back" routerLink="/login">
+    <mat-icon>arrow_back</mat-icon>
+    Retour
+  </a>
+
+  <h1>Politique de confidentialité</h1>
+  <p class="legal__updated">Dernière mise à jour : juillet 2026</p>
+
+  <p class="legal__todo">
+    À compléter avant toute ouverture au public : identité du responsable de traitement et adresse
+    de contact pour l'exercice des droits.
+  </p>
+
+  <h2>Responsable de traitement</h2>
+  <p>[À COMPLÉTER — nom et adresse de contact]</p>
+
+  <h2>Données collectées et finalités</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Données</th>
+        <th>Finalité</th>
+        <th>Base légale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Email, nom d'utilisateur, mot de passe (haché)</td>
+        <td>Création et sécurisation du compte</td>
+        <td>Exécution du service</td>
+      </tr>
+      <tr>
+        <td>Date de naissance, date de consentement</td>
+        <td>Vérification de l'âge minimum (13 ans) et traçabilité du consentement</td>
+        <td>Obligation légale</td>
+      </tr>
+      <tr>
+        <td>Email du responsable légal et date de son consentement (moins de 15 ans)</td>
+        <td>Recueil du consentement parental</td>
+        <td>Obligation légale (art. 45 loi Informatique et Libertés)</td>
+      </tr>
+      <tr>
+        <td>Cours importés, fiches de révision et paroles générées</td>
+        <td>Production des fiches et des musiques, réutilisation d'une fiche déjà générée</td>
+        <td>Exécution du service</td>
+      </tr>
+      <tr>
+        <td>Musiques générées (fichiers audio et métadonnées)</td>
+        <td>Bibliothèque, lecture et téléchargement</td>
+        <td>Exécution du service</td>
+      </tr>
+      <tr>
+        <td>Playlists, favoris, relations d'amitié</td>
+        <td>Organisation et partage des musiques</td>
+        <td>Exécution du service</td>
+      </tr>
+      <tr>
+        <td>Offre souscrite et quota de générations</td>
+        <td>Gestion de l'abonnement</td>
+        <td>Exécution du service</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Cookies et stockage local</h2>
+  <p>
+    L'application n'utilise <strong>aucun cookie de suivi ni outil de mesure d'audience tiers</strong>.
+    Le navigateur conserve uniquement, dans son stockage local, les jetons de session nécessaires
+    à l'authentification et la préférence de thème clair/sombre.
+  </p>
+
+  <h2>Destinataires et sous-traitants</h2>
+  <ul>
+    <li><strong>OVH</strong> (France) — hébergement de l'application, de la base de données et des fichiers audio.</li>
+    <li><strong>Mistral AI</strong> — génération de la fiche de révision et des paroles à partir du contenu de cours transmis.</li>
+    <li><strong>Kie.ai / Suno</strong> — génération de la musique à partir des paroles. [À VÉRIFIER — localisation d'hébergement et garanties encadrant un éventuel transfert hors Union européenne]</li>
+  </ul>
+  <p>Aucune donnée n'est vendue ni cédée à des fins publicitaires.</p>
+
+  <h2>Durées de conservation</h2>
+  <p>
+    Les données sont conservées tant que le compte existe. La suppression du compte entraîne
+    l'effacement immédiat des données associées : compte, musiques (y compris les fichiers audio
+    stockés), fiches, playlists créées et relations d'amitié.
+  </p>
+
+  <h2>Vos droits</h2>
+  <ul>
+    <li><strong>Droit d'accès et de rectification</strong> : les informations du compte sont consultables et modifiables depuis la page Profil.</li>
+    <li><strong>Droit à l'effacement</strong> : la suppression du compte est disponible directement dans la page Profil (« Zone de danger ») et prend effet immédiatement.</li>
+    <li><strong>Droit d'opposition, de limitation et à la portabilité</strong> : exercez-les en écrivant à l'adresse de contact ci-dessus.</li>
+    <li>Vous pouvez introduire une réclamation auprès de la <strong>CNIL</strong> (www.cnil.fr).</li>
+  </ul>
+
+  <h2>Mineurs</h2>
+  <p>
+    L'inscription est refusée en dessous de 13 ans. Entre 13 et 15 ans, elle requiert l'adresse
+    email d'un responsable légal et la confirmation de son consentement, conformément à l'article 45
+    de la loi Informatique et Libertés.
+  </p>
+
+  <h2>Sécurité</h2>
+  <p>
+    Les échanges sont chiffrés en HTTPS. Les mots de passe sont hachés (bcrypt) et ne sont jamais
+    stockés ni transmis en clair. L'accès à l'API est protégé par des jetons de courte durée
+    renouvelés automatiquement, et les fichiers audio ne sont accessibles que par des liens
+    temporaires signés.
+  </p>
+
+  <h2>Phase de bêta fermée</h2>
+  <p>
+    Le service est diffusé en bêta fermée, réservée à des comptes de test. Les contenus générés ne
+    font pas encore l'objet d'une modération automatisée ; ils sont produits à partir des cours
+    fournis par l'utilisateur lui-même.
+  </p>
+
+  <h2>Voir aussi</h2>
+  <p><a routerLink="/mentions-legales">Mentions légales</a></p>
+</div>

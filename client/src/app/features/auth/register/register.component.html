@@ -40,8 +40,13 @@
     }
 
     <mat-checkbox formControlName="consent" class="auth-consent">
-      J'accepte les <a href="#" target="_blank" rel="noopener">CGU</a> et le traitement de mes données.
+      J'ai lu et j'accepte le traitement de mes données.
     </mat-checkbox>
+    <p class="auth-legal-links">
+      <a routerLink="/confidentialite" target="_blank">Politique de confidentialité</a>
+      ·
+      <a routerLink="/mentions-legales" target="_blank">Mentions légales</a>
+    </p>
 
     @if (errorMessage()) {
       <p class="auth-error" role="alert">{{ errorMessage() }}</p>

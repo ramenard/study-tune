@@ -72,6 +72,33 @@ Le client utilise Angular 21 en mode zoneless, composants standalone, `OnPush` e
 avec un SDK typé généré depuis la spec OpenAPI (`ng-openapi-gen`) : le backend est la source de
 vérité unique des types.
 
+### Hébergement du frontend sur le VPS OVH (écart : Vercel Pro)
+Le budget du Bloc 1 prévoyait un hébergement du frontend sur Vercel Pro. En production, le client
+Angular est servi par un conteneur **nginx sur le même VPS OVH** que l'API, derrière Caddy.
+
+**Justification** :
+- **100 % des données et du trafic restent en France** (VPS et Object Storage en région GRA), ce qui
+  renforce directement les arguments RGPD-mineurs et éco-conception du Bloc 1 ;
+- **origine unique** pour le front et l'API (`<domaine>` et `<domaine>/api`) : plus aucune
+  problématique CORS, et des cookies/jetons strictement same-origin ;
+- **−20 €/mois** sur le budget d'infrastructure, pour une SPA statique dont la distribution ne
+  justifie pas un CDN payant à ce stade.
+
+Un CDN reste ajoutable devant Caddy si le trafic le justifie, sans changer l'application.
+
+### Parité dev/prod du stockage objet
+Le stockage des audio générés utilise la **même API S3** des deux côtés : **MinIO** dans Docker en
+développement, **OVH Object Storage** (région GRA, répliqué, versionné) en production.
+
+Le code ne contient **aucune logique conditionnelle dev/prod** : `storage.service` est entièrement
+piloté par les variables `S3_*` (endpoint, port, TLS, région, style d'adressage, credentials,
+bucket). Seule la configuration change d'un environnement à l'autre.
+
+**Justification** : conforme à l'annonce « S3 » de l'audit de faisabilité du Bloc 1, et la durabilité
+des audio générés — la donnée de valeur du produit — est déléguée à un service managé répliqué et
+versionné plutôt qu'à un disque de VPS. Le versioning du bucket remplace de fait une sauvegarde des
+fichiers audio : le périmètre de sauvegarde côté VPS se réduit au `pg_dump`.
+
 ### Modération du contenu généré
 Annoncée au Bloc 1, non implémentée en V1 : c'est un prérequis à l'ouverture publique (filtrage des
 fiches et paroles générées + signalement utilisateur). Le risque est borné en bêta fermée car le
@@ -95,5 +122,8 @@ autour des appels IA) est un jalon ultérieur.
 | Cache / éco-conception | Cache `contentHash` des fiches | Conforme |
 | Consentement parental (mineurs) | Vérification d'âge + consentement < 15 ans | Conforme |
 | Mises à jour de dépendances | Dependabot + `npm audit` en CI | Conforme |
-| Modération du contenu | Non implémentée | Jalon pré-prod |
+| Stockage S3 | MinIO en dev / OVH Object Storage en prod, même API | Conforme |
+| Frontend sur Vercel Pro | nginx conteneurisé sur le VPS OVH (même origine, 100 % FR, −20 €/mois) | Écart documenté |
+| Pages légales | Mentions légales + politique de confidentialité publiques | Conforme (identité éditeur à compléter) |
+| Modération du contenu | Non implémentée — service en bêta fermée | Jalon pré-prod |
 | Mesure carbone (CodeCarbon) | Non outillée (cache = mesure effective) | Jalon |

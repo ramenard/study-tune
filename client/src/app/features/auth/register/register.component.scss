@@ -62,3 +62,14 @@
   font-size: 0.8125rem;
   color: var(--md-sys-color-on-surface-variant);
 }
+
+.auth-legal-links {
+  margin: -0.25rem 0 0;
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--md-sys-color-on-surface-variant);
+
+  a {
+    color: var(--md-sys-color-primary);
+  }
+}

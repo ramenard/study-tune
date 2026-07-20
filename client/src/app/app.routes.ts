@@ -13,6 +13,18 @@ export const routes: Routes = [
     loadComponent: () => import('@features/auth/register/register.component').then(m => m.RegisterComponent)
   },
   {
+    path: 'mentions-legales',
+    title: 'Mentions légales — StudyTune',
+    loadComponent: () =>
+      import('@features/legal/mentions-legales.component').then(m => m.MentionsLegalesComponent)
+  },
+  {
+    path: 'confidentialite',
+    title: 'Politique de confidentialité — StudyTune',
+    loadComponent: () =>
+      import('@features/legal/confidentialite.component').then(m => m.ConfidentialiteComponent)
+  },
+  {
     path: '',
     loadComponent: () => import('@layout/layout/layout.component').then(m => m.LayoutComponent),
     canActivate: [authGuard],
