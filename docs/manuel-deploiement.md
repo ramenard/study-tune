@@ -146,6 +146,46 @@ démarrage** de l'API. Pour les lancer manuellement :
 docker compose -f docker/docker-compose.prod.yml exec api npm run migration:run
 ```
 
+### Déploiement continu (tag → production)
+
+Le workflow `.github/workflows/deploy.yml` se déclenche sur le **push d'un tag `v*`** :
+
+1. **Job `build`** : construit les images `api` et `client` et les pousse sur **GHCR**
+   (`ghcr.io/<owner>/study-tune-api` et `study-tune-client`), taguées `<tag>` **et** `latest`,
+   avec cache de build GitHub Actions.
+2. **Job `deploy`** : se connecte au VPS en SSH, met à jour le dépôt (`main`), tire les images du
+   tag (`IMAGE_TAG=<tag> docker compose pull`), redémarre la stack (`up -d --no-build`), puis
+   **vérifie `/api/health`** en boucle (12 essais) et affiche les logs de l'api en cas d'échec.
+
+Secrets à créer dans *Settings → Secrets and variables → Actions* :
+
+| Secret | Rôle |
+|---|---|
+| `VPS_HOST` | IP ou nom d'hôte du VPS |
+| `VPS_USER` | utilisateur SSH (`deploy`) |
+| `VPS_SSH_KEY` | clé privée SSH autorisée sur le VPS |
+| `GHCR_TOKEN` | **optionnel** : PAT avec `read:packages`, uniquement si les images GHCR sont privées |
+
+Publier une version :
+
+```bash
+git tag -a v1.0.0 -m "v1.0.0"
+git push origin v1.0.0
+```
+
+> **Migrations** : aucune étape manuelle dans le workflow. En production `NODE_ENV=production`
+> active `migrationsRun`, donc l'API applique les migrations **au démarrage** depuis
+> `dist/migrations/*.js`. Un `npm run migration:run` dans le conteneur de production échouerait :
+> l'image runtime ne contient ni `src/` ni `ts-node` (dépendances de développement omises).
+
+**Rollback** : redéployer un tag antérieur sans repasser par la CI —
+
+```bash
+cd ~/study-tune
+IMAGE_TAG=v0.9.0 docker compose -f docker/docker-compose.prod.yml pull api client
+IMAGE_TAG=v0.9.0 docker compose -f docker/docker-compose.prod.yml up -d --no-build
+```
+
 ### Dépannage
 
 | Symptôme | Cause | Correction |
