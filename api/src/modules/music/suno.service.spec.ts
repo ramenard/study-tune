@@ -49,6 +49,47 @@ describe('SunoService', () => {
     });
   });
 
+  describe('getTimestampedLyrics', () => {
+    it('maps aligned words and normalises missing fields', async () => {
+      http.post.mockReturnValue(
+        of({
+          data: {
+            data: {
+              alignedWords: [
+                { word: 'Hello', startS: 1.2, endS: 1.8, success: true },
+                { word: 'world', endS: 2.5, success: false },
+              ],
+            },
+          },
+        }),
+      );
+
+      const aligned = await service.getTimestampedLyrics('task-1', 'audio-1');
+
+      expect(aligned).toHaveLength(2);
+      expect(aligned[0]).toEqual({
+        word: 'Hello',
+        startS: 1.2,
+        endS: 1.8,
+        success: true,
+      });
+      expect(aligned[1]).toEqual({
+        word: 'world',
+        startS: 0,
+        endS: 2.5,
+        success: false,
+      });
+    });
+
+    it('returns an empty array when kie returns no aligned words', async () => {
+      http.post.mockReturnValue(of({ data: { data: {} } }));
+
+      const aligned = await service.getTimestampedLyrics('task-1', 'audio-1');
+
+      expect(aligned).toEqual([]);
+    });
+  });
+
   describe('getGeneratedTracks', () => {
     it('maps the raw sunoData into tracks', async () => {
       http.get.mockReturnValue(

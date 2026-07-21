@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { PlayerService } from '@core/services/player.service';
 import { PlaylistService } from '@core/services/playlist.service';
 import { FavoritesService } from '@core/services/favorites.service';
 import { MusicService } from '@core/services/music.service';
+import { LyricsViewComponent } from '@features/player/lyrics-view/lyrics-view.component';
 
 @Component({
   selector: 'app-player-bar',
-  imports: [MatIconModule, MatMenuModule],
+  imports: [MatIconModule, MatMenuModule, LyricsViewComponent],
   templateUrl: './player-bar.component.html',
   styleUrl: './player-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -27,6 +28,7 @@ export class PlayerBarComponent {
   readonly repeat = this.player.repeat;
   readonly queueName = this.player.queueName;
   readonly playlists = this.playlistService.playlists;
+  readonly showLyrics = signal(false);
 
   readonly isLiked = computed(() => {
     const track = this.currentTrack();
@@ -46,6 +48,10 @@ export class PlayerBarComponent {
 
   loadPlaylists(): void {
     void this.playlistService.load();
+  }
+
+  toggleLyrics(): void {
+    this.showLyrics.update((visible) => !visible);
   }
 
   togglePlay(): void {

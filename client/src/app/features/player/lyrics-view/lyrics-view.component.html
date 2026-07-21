@@ -1,0 +1,28 @@
+<section class="lyrics-view" aria-label="Paroles synchronisées">
+  @if (lyrics.status() === 'loading') {
+    <p class="lyrics-state">Chargement des paroles…</p>
+  } @else if (lyrics.status() === 'ready') {
+    <div class="lyrics-words" role="log" aria-live="off">
+      @for (item of displayWords(); track item.index) {
+        @if (item.breakBefore) {
+          <span class="line-break"></span>
+        }
+        @if (item.isSection) {
+          <span class="section" [attr.data-index]="item.index">{{ item.text }}</span>
+        } @else {
+          <span
+            class="word"
+            [class.word--active]="item.index === activeIndex()"
+            [class.word--passed]="item.index < activeIndex()"
+            [attr.data-index]="item.index"
+            >{{ item.text }}</span
+          >
+        }
+      }
+    </div>
+  } @else if (lyrics.raw()) {
+    <pre class="lyrics-raw">{{ lyrics.raw() }}</pre>
+  } @else {
+    <p class="lyrics-state">Paroles indisponibles pour ce morceau.</p>
+  }
+</section>

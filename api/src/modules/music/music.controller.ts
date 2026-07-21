@@ -27,6 +27,7 @@ import { UpdateMusicDto } from './dto/update-music.dto';
 import { PaginatedMusicDto } from './dto/paginated-music.dto';
 import { GenerateMusicResponseDto } from './dto/generate-music-response.dto';
 import { StreamUrlDto } from './dto/stream-url.dto';
+import { LyricsResponseDto } from './dto/lyrics-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { KieWebhookGuard } from './kie-webhook.guard';
 
@@ -97,6 +98,17 @@ export class MusicController {
     @Req() req: AuthRequest,
   ) {
     return this.musicService.update(id, dto, req.user.id);
+  }
+
+  @Get(':id/lyrics')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: LyricsResponseDto })
+  async getLyrics(
+    @Param('id') id: string,
+    @Req() req: AuthRequest,
+  ): Promise<LyricsResponseDto> {
+    return this.musicService.getLyrics(id, req.user.id);
   }
 
   @Get(':id/stream')

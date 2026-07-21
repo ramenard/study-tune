@@ -1,3 +1,5 @@
+import { AlignedWord } from '../types/aligned-word';
+
 export interface MusicGenerationParams {
   prompt: string;
   style?: string;
@@ -21,6 +23,7 @@ export interface MusicProvider {
   getGeneratedTracks(
     taskId: string,
   ): Promise<{ status: string; tracks: ProviderTrack[] }>;
+  getTimestampedLyrics(taskId: string, audioId: string): Promise<AlignedWord[]>;
 }
 
 export const MUSIC_PROVIDER = Symbol('MUSIC_PROVIDER');

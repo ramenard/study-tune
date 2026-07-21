@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
 import { Playlist } from '../../playlist/entities/playlist.entity';
+import { AlignedWord } from '../types/aligned-word';
 
 @Entity('music')
 export class Music {
@@ -17,6 +18,15 @@ export class Music {
 
   @Column({ type: 'varchar', nullable: true })
   sunoId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  kieTaskId: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  alignedLyrics: AlignedWord[] | null;
+
+  @Column({ type: 'varchar', default: 'none' })
+  lyricsStatus: string;
 
   @Column({ type: 'varchar', nullable: true })
   title: string;

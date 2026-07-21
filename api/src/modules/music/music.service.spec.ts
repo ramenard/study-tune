@@ -10,7 +10,11 @@ describe('MusicService', () => {
     manager: { query: jest.Mock };
   };
   let playlistRepo: { createQueryBuilder: jest.Mock };
-  let suno: { generate: jest.Mock; getGeneratedTracks: jest.Mock };
+  let suno: {
+    generate: jest.Mock;
+    getGeneratedTracks: jest.Mock;
+    getTimestampedLyrics: jest.Mock;
+  };
   let storage: {
     getPresignedUrl: jest.Mock;
     ensureBucket: jest.Mock;
@@ -35,7 +39,11 @@ describe('MusicService', () => {
       manager: { query: jest.fn().mockResolvedValue(undefined) },
     };
     playlistRepo = { createQueryBuilder: jest.fn() };
-    suno = { generate: jest.fn(), getGeneratedTracks: jest.fn() };
+    suno = {
+      generate: jest.fn(),
+      getGeneratedTracks: jest.fn(),
+      getTimestampedLyrics: jest.fn(),
+    };
     storage = {
       getPresignedUrl: jest.fn().mockResolvedValue('http://signed'),
       ensureBucket: jest.fn().mockResolvedValue(undefined),
@@ -116,6 +124,66 @@ describe('MusicService', () => {
           status: 'complete',
           objectName: 'tracks/u_m1.mp3',
         }),
+      );
+    });
+  });
+
+  describe('fetchAndStoreAlignedLyrics', () => {
+    it('does nothing when the track has no kieTaskId', async () => {
+      musicRepo.findOneBy.mockResolvedValue({ id: 'm1', sunoId: 'audio-1' });
+
+      await service.fetchAndStoreAlignedLyrics('m1');
+
+      expect(suno.getTimestampedLyrics).not.toHaveBeenCalled();
+      expect(musicRepo.save).not.toHaveBeenCalled();
+    });
+
+    it('marks the track as failed when the alignment is empty', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        kieTaskId: 'task-1',
+        sunoId: 'audio-1',
+      });
+      suno.getTimestampedLyrics.mockResolvedValue([]);
+
+      await service.fetchAndStoreAlignedLyrics('m1');
+
+      expect(musicRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ lyricsStatus: 'failed' }),
+      );
+    });
+
+    it('persists the alignment and marks the track ready', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        kieTaskId: 'task-1',
+        sunoId: 'audio-1',
+      });
+      const aligned = [{ word: 'Hi', startS: 0, endS: 1, success: true }];
+      suno.getTimestampedLyrics.mockResolvedValue(aligned);
+
+      await service.fetchAndStoreAlignedLyrics('m1');
+
+      expect(musicRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lyricsStatus: 'ready',
+          alignedLyrics: aligned,
+        }),
+      );
+    });
+
+    it('marks the track as failed when the provider throws', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        kieTaskId: 'task-1',
+        sunoId: 'audio-1',
+      });
+      suno.getTimestampedLyrics.mockRejectedValue(new Error('boom'));
+
+      await service.fetchAndStoreAlignedLyrics('m1');
+
+      expect(musicRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ lyricsStatus: 'failed' }),
       );
     });
   });

@@ -17,6 +17,7 @@ import { Playlist } from '../playlist/entities/playlist.entity';
 import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
 import { SubscriptionService } from '../auth/subscription.service';
+import { AlignedWord } from './types/aligned-word';
 
 @Injectable()
 export class MusicService {
@@ -132,16 +133,64 @@ export class MusicService {
         music.id,
       );
 
+      music.kieTaskId = taskId;
       music.sunoId = track.id;
       music.title = track.title ?? music.title;
       music.duration = track.duration;
       music.objectName = objectName;
       music.publicUrl = this.storage.getPublicUrl(objectName);
       music.status = 'complete';
+      music.lyricsStatus = 'pending';
 
       await this.musicRepo.save(music);
       this.logger.log(`Music "${music.title}" saved — MinIO: ${objectName}`);
+
+      void this.fetchAndStoreAlignedLyrics(music.id).catch((error) =>
+        this.logger.warn(
+          `Aligned lyrics failed for ${music.id}: ${error.message}`,
+        ),
+      );
     }
+  }
+
+  async fetchAndStoreAlignedLyrics(musicId: string): Promise<void> {
+    const music = await this.musicRepo.findOneBy({ id: musicId });
+    if (!music || !music.kieTaskId || !music.sunoId) {
+      return;
+    }
+
+    try {
+      const aligned = await this.provider.getTimestampedLyrics(
+        music.kieTaskId,
+        music.sunoId,
+      );
+      music.alignedLyrics = aligned;
+      music.lyricsStatus = 'failed';
+      if (aligned.length > 0) {
+        music.lyricsStatus = 'ready';
+      }
+    } catch {
+      music.lyricsStatus = 'failed';
+    }
+
+    await this.musicRepo.save(music);
+  }
+
+  async getLyrics(
+    id: string,
+    userId: string,
+  ): Promise<{
+    lyricsStatus: string;
+    alignedLyrics: AlignedWord[] | null;
+    lyrics: string | null;
+  }> {
+    const music = await this.findOneByUser(id, userId);
+
+    return {
+      lyricsStatus: music.lyricsStatus,
+      alignedLyrics: music.alignedLyrics,
+      lyrics: music.lyrics,
+    };
   }
 
   async findAllByUser(

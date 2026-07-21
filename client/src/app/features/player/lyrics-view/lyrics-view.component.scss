@@ -1,0 +1,57 @@
+.lyrics-view {
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: var(--md-sys-color-surface-container, #1e1e1e);
+  color: var(--md-sys-color-on-surface, #e6e6e6);
+  line-height: 2.2;
+  font-size: 1.35rem;
+}
+
+.lyrics-words {
+  display: block;
+}
+
+.line-break {
+  display: block;
+  height: 0.6rem;
+}
+
+.word {
+  display: inline;
+  margin-right: 0.35ch;
+  color: var(--md-sys-color-on-surface-variant, #9a9a9a);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.word--passed {
+  color: var(--md-sys-color-on-surface, #e6e6e6);
+}
+
+.word--active {
+  color: var(--md-sys-color-primary, #7cc4ff);
+  font-weight: 600;
+}
+
+.section {
+  display: block;
+  margin: 1rem 0 0.4rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--md-sys-color-primary, #7cc4ff);
+}
+
+.lyrics-raw {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 1.1rem;
+  color: var(--md-sys-color-on-surface, #e6e6e6);
+}
+
+.lyrics-state {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant, #9a9a9a);
+}

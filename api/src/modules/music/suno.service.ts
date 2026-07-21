@@ -6,6 +6,7 @@ import {
   MusicProvider,
   ProviderTrack,
 } from './providers/music-provider.interface';
+import { AlignedWord } from './types/aligned-word';
 
 @Injectable()
 export class SunoService implements MusicProvider {
@@ -68,6 +69,54 @@ export class SunoService implements MusicProvider {
     }
     this.logger.log(`Generation started, taskId: ${taskId}`);
     return taskId;
+  }
+
+  async getTimestampedLyrics(
+    taskId: string,
+    audioId: string,
+  ): Promise<AlignedWord[]> {
+    this.logger.log(
+      `Fetching timestamped lyrics for task ${taskId} / audio ${audioId}`,
+    );
+
+    const { data } = await firstValueFrom(
+      this.http.post(
+        `${this.baseUrl}/api/v1/generate/get-timestamped-lyrics`,
+        { taskId, audioId },
+        { headers: this.headers },
+      ),
+    );
+
+    const alignedWords = data?.data?.alignedWords;
+    if (!Array.isArray(alignedWords)) {
+      return [];
+    }
+
+    return alignedWords.map((rawWord: any) => this.mapAlignedWord(rawWord));
+  }
+
+  private mapAlignedWord(rawWord: any): AlignedWord {
+    let word = '';
+    if (typeof rawWord.word === 'string') {
+      word = rawWord.word;
+    }
+
+    let startS = 0;
+    if (typeof rawWord.startS === 'number') {
+      startS = rawWord.startS;
+    }
+
+    let endS = 0;
+    if (typeof rawWord.endS === 'number') {
+      endS = rawWord.endS;
+    }
+
+    return {
+      word,
+      startS,
+      endS,
+      success: rawWord.success === true,
+    };
   }
 
   async getGeneratedTracks(
