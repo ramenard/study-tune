@@ -176,6 +176,43 @@ export class MusicService {
     await this.musicRepo.save(music);
   }
 
+  async retryAlignedLyrics(
+    id: string,
+    userId: string,
+  ): Promise<{
+    lyricsStatus: string;
+    alignedLyrics: AlignedWord[] | null;
+    lyrics: string | null;
+  }> {
+    const music = await this.findOneByUser(id, userId);
+    await this.ensureLyricsIds(music);
+    await this.fetchAndStoreAlignedLyrics(music.id);
+    return this.getLyrics(id, userId);
+  }
+
+  private async ensureLyricsIds(music: Music): Promise<void> {
+    if (music.kieTaskId) {
+      return;
+    }
+    if (!music.sunoId) {
+      return;
+    }
+
+    const taskId = music.sunoId;
+    try {
+      const { tracks } = await this.provider.getGeneratedTracks(taskId);
+      const ready = tracks.find((track) => !!track.id);
+      if (!ready) {
+        return;
+      }
+      music.kieTaskId = taskId;
+      music.sunoId = ready.id;
+      await this.musicRepo.save(music);
+    } catch {
+      this.logger.warn(`Could not resolve lyrics ids for ${music.id}`);
+    }
+  }
+
   async getLyrics(
     id: string,
     userId: string,
@@ -291,7 +328,8 @@ export class MusicService {
       );
     }
 
-    const { tracks } = await this.provider.getGeneratedTracks(music.sunoId);
+    const taskId = music.sunoId;
+    const { tracks } = await this.provider.getGeneratedTracks(taskId);
     const ready = tracks.find((track) => !!track.audioUrl);
 
     if (!ready) {
@@ -313,9 +351,21 @@ export class MusicService {
     music.objectName = objectName;
     music.publicUrl = this.storage.getPublicUrl(objectName);
     music.status = 'complete';
+    music.kieTaskId = taskId;
+    music.lyricsStatus = 'pending';
+    if (ready.id) {
+      music.sunoId = ready.id;
+    }
 
     await this.musicRepo.save(music);
     this.logger.log(`Track ${id} synced from kie.ai — MinIO: ${objectName}`);
+
+    void this.fetchAndStoreAlignedLyrics(music.id).catch((error) =>
+      this.logger.warn(
+        `Aligned lyrics failed for ${music.id}: ${error.message}`,
+      ),
+    );
+
     return music;
   }
 

@@ -111,6 +111,17 @@ export class MusicController {
     return this.musicService.getLyrics(id, req.user.id);
   }
 
+  @Post(':id/lyrics/retry')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: LyricsResponseDto })
+  async retryLyrics(
+    @Param('id') id: string,
+    @Req() req: AuthRequest,
+  ): Promise<LyricsResponseDto> {
+    return this.musicService.retryAlignedLyrics(id, req.user.id);
+  }
+
   @Get(':id/stream')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

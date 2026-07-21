@@ -20,9 +20,16 @@
         }
       }
     </div>
-  } @else if (lyrics.raw()) {
-    <pre class="lyrics-raw">{{ lyrics.raw() }}</pre>
   } @else {
-    <p class="lyrics-state">Paroles indisponibles pour ce morceau.</p>
+    <div class="lyrics-fallback">
+      <button type="button" class="sync-btn" (click)="retrySync()">
+        Activer la synchronisation
+      </button>
+      @if (lyrics.raw()) {
+        <pre class="lyrics-raw">{{ lyrics.raw() }}</pre>
+      } @else {
+        <p class="lyrics-state">Paroles indisponibles pour ce morceau.</p>
+      }
+    </div>
   }
 </section>

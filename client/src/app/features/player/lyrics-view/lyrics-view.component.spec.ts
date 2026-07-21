@@ -53,6 +53,18 @@ describe('LyricsViewComponent', () => {
     expect(component.activeIndex()).toBe(1);
   });
 
+  it('applies the latency offset so the highlight lags the raw time', () => {
+    const component = buildComponent();
+    aligned.set([
+      { word: 'one', startS: 0, endS: 1, success: true },
+      { word: 'two', startS: 1, endS: 2, success: true },
+    ]);
+
+    currentTime.set(1.1);
+
+    expect(component.activeIndex()).toBe(0);
+  });
+
   it('never marks a failed word as active', () => {
     const component = buildComponent();
     aligned.set([{ word: 'lost', startS: 0, endS: 5, success: false }]);

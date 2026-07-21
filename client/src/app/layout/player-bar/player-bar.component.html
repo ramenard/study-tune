@@ -36,6 +36,11 @@
               [attr.aria-label]="repeat() ? 'Répétition activée' : 'Répétition désactivée'">
         <mat-icon>repeat</mat-icon>
       </button>
+      <button class="icon-btn lyrics-btn" [class.icon-btn--active]="showLyrics()" [disabled]="!currentTrack()"
+              (click)="toggleLyrics()" [attr.aria-pressed]="showLyrics()"
+              [attr.aria-label]="showLyrics() ? 'Masquer les paroles' : 'Afficher les paroles'">
+        <mat-icon>lyrics</mat-icon>
+      </button>
     </div>
 
     <div class="seekbar">
@@ -56,12 +61,6 @@
   </div>
 
   <div class="player-right">
-    <button class="icon-btn" [class.icon-btn--active]="showLyrics()" [disabled]="!currentTrack()"
-            (click)="toggleLyrics()" [attr.aria-pressed]="showLyrics()"
-            [attr.aria-label]="showLyrics() ? 'Masquer les paroles' : 'Afficher les paroles'">
-      <mat-icon>lyrics</mat-icon>
-    </button>
-
     <button class="icon-btn" [disabled]="!currentTrack()" (click)="downloadCurrent()" aria-label="Télécharger">
       <mat-icon>download</mat-icon>
     </button>

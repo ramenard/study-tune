@@ -67,6 +67,25 @@ export class LyricsService {
     this.statusSignal.set('failed');
   }
 
+  async retry(musicId: string): Promise<void> {
+    this.currentMusicId = musicId;
+    this.statusSignal.set('loading');
+
+    try {
+      await firstValueFrom(
+        this.http.post<LyricsResponse>(
+          `${environment.apiUrl}/music/${musicId}/lyrics/retry`,
+          {},
+        ),
+      );
+    } catch {
+      this.statusSignal.set('failed');
+      return;
+    }
+
+    await this.loadForMusic(musicId);
+  }
+
   clear(): void {
     this.currentMusicId = null;
     this.alignedSignal.set([]);

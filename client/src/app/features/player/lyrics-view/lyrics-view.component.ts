@@ -39,8 +39,10 @@ export class LyricsViewComponent {
     });
   });
 
+  private readonly highlightOffsetSeconds = 0.35;
+
   readonly activeIndex = computed(() => {
-    const time = this.player.currentTime();
+    const time = this.player.currentTime() - this.highlightOffsetSeconds;
     const words = this.lyrics.aligned();
 
     return words.findIndex((word) => {
@@ -65,6 +67,14 @@ export class LyricsViewComponent {
       }
       this.scrollToActive(index);
     });
+  }
+
+  retrySync(): void {
+    const track = this.player.currentTrack();
+    if (!track) {
+      return;
+    }
+    void this.lyrics.retry(track.id);
   }
 
   private scrollToActive(index: number): void {

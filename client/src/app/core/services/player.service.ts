@@ -16,6 +16,7 @@ export class PlayerService {
   private readonly queueSignal = signal<PlayableTrack[]>([]);
   private readonly queueNameSignal = signal<string | null>(null);
   private queueIndex = 0;
+  private animationFrameId = 0;
 
   readonly currentTrack = this.currentTrackSignal.asReadonly();
   readonly playing = this.playingSignal.asReadonly();
@@ -31,11 +32,42 @@ export class PlayerService {
 
   constructor() {
     this.audio.volume = this.volumeSignal();
-    this.audio.addEventListener('play', () => this.playingSignal.set(true));
-    this.audio.addEventListener('pause', () => this.playingSignal.set(false));
+    this.audio.addEventListener('play', () => this.handlePlay());
+    this.audio.addEventListener('pause', () => this.handlePause());
     this.audio.addEventListener('timeupdate', () => this.currentTimeSignal.set(this.audio.currentTime));
     this.audio.addEventListener('loadedmetadata', () => this.durationSignal.set(this.audio.duration || 0));
     this.audio.addEventListener('ended', () => this.handleEnded());
+  }
+
+  private handlePlay(): void {
+    this.playingSignal.set(true);
+    this.startTimeTracking();
+  }
+
+  private handlePause(): void {
+    this.playingSignal.set(false);
+    this.stopTimeTracking();
+  }
+
+  private startTimeTracking(): void {
+    this.stopTimeTracking();
+    this.trackTime();
+  }
+
+  private readonly trackTime = (): void => {
+    this.currentTimeSignal.set(this.audio.currentTime);
+    if (this.audio.paused) {
+      return;
+    }
+    this.animationFrameId = requestAnimationFrame(this.trackTime);
+  };
+
+  private stopTimeTracking(): void {
+    if (this.animationFrameId === 0) {
+      return;
+    }
+    cancelAnimationFrame(this.animationFrameId);
+    this.animationFrameId = 0;
   }
 
   play(track: PlayableTrack): void {
@@ -100,6 +132,7 @@ export class PlayerService {
   }
 
   stop(): void {
+    this.stopTimeTracking();
     this.audio.pause();
     this.audio.removeAttribute('src');
     this.audio.load();
@@ -138,6 +171,7 @@ export class PlayerService {
       return;
     }
     if (this.queueSignal().length <= 1) {
+      this.stopTimeTracking();
       this.playingSignal.set(false);
       return;
     }
