@@ -188,6 +188,68 @@ describe('MusicService', () => {
     });
   });
 
+  describe('getLyrics', () => {
+    it('returns the stored lyrics state for the owner', async () => {
+      const aligned = [{ word: 'Hi', startS: 0, endS: 1, success: true }];
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        userId: 'u1',
+        lyricsStatus: 'ready',
+        alignedLyrics: aligned,
+        lyrics: 'Hi there',
+      });
+
+      await expect(service.getLyrics('m1', 'u1')).resolves.toEqual({
+        lyricsStatus: 'ready',
+        alignedLyrics: aligned,
+        lyrics: 'Hi there',
+      });
+    });
+  });
+
+  describe('retryAlignedLyrics', () => {
+    it('resolves the lyrics ids then fetches and returns the alignment', async () => {
+      const aligned = [{ word: 'Hi', startS: 0, endS: 1, success: true }];
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        userId: 'u1',
+        sunoId: 'task-1',
+        kieTaskId: null,
+        lyricsStatus: 'none',
+        alignedLyrics: null,
+        lyrics: null,
+      });
+      suno.getGeneratedTracks.mockResolvedValue({
+        tracks: [{ id: 'audio-1', audioUrl: 'http://a/1.mp3' }],
+      });
+      suno.getTimestampedLyrics.mockResolvedValue(aligned);
+
+      const result = await service.retryAlignedLyrics('m1', 'u1');
+
+      expect(suno.getTimestampedLyrics).toHaveBeenCalledWith('task-1', 'audio-1');
+      expect(result.lyricsStatus).toBe('ready');
+      expect(result.alignedLyrics).toEqual(aligned);
+    });
+
+    it('warns and keeps going when the ids cannot be resolved', async () => {
+      musicRepo.findOneBy.mockResolvedValue({
+        id: 'm1',
+        userId: 'u1',
+        sunoId: 'task-1',
+        kieTaskId: null,
+        lyricsStatus: 'none',
+        alignedLyrics: null,
+        lyrics: null,
+      });
+      suno.getGeneratedTracks.mockRejectedValue(new Error('offline'));
+
+      const result = await service.retryAlignedLyrics('m1', 'u1');
+
+      expect(suno.getTimestampedLyrics).not.toHaveBeenCalled();
+      expect(result.lyricsStatus).toBe('none');
+    });
+  });
+
   describe('findOneByUser', () => {
     it('throws NotFound when the track does not exist', async () => {
       musicRepo.findOneBy.mockResolvedValue(null);
