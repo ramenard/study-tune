@@ -3,6 +3,61 @@
 Toutes les évolutions notables du projet. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/),
 versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [1.0.0-rc.5] — 2026-07-21
+
+Paroles karaoké synchronisées.
+
+### Paroles synchronisées
+- Récupération des paroles horodatées mot à mot via kie.ai (`get-timestamped-lyrics`) et stockage de l'alignement.
+- Surlignage du mot en cours façon karaoké, synchronisé à la lecture audio (boucle `requestAnimationFrame`).
+- Compensation de la latence de sortie audio pour un surlignage bien calé sur le son.
+- Récupération de l'alignement par webhook comme par synchronisation manuelle, avec bouton de relance.
+
+### Mobile
+- Bouton d'affichage des paroles dans le lecteur en version mobile.
+
+## [1.0.0-rc.4] — 2026-07-20
+
+Mention des transferts hors UE.
+
+### RGPD
+- Documentation des transferts vers les sous-traitants IA hors UE et minimisation des données transmises (payload).
+
+## [1.0.0-rc.3] — 2026-07-20
+
+Pages légales publiques.
+
+### Légal
+- Pages légales publiques (mentions légales, confidentialité) avec identité de l'éditeur renseignée.
+- Notes d'écart Bloc 1 sur l'hébergement et le stockage.
+
+### Documentation
+- Procédures d'arrêt, de redémarrage et de maintenance ajoutées au manuel de déploiement.
+
+## [1.0.0-rc.2] — 2026-07-20
+
+Premier déploiement automatique sur le VPS OVH et responsive mobile.
+
+### Déploiement
+- Stack de production OVH (compose, Caddy, configuration S3 générique compatible OVH Object Storage).
+- Déploiement continu déclenché par les tags de version, avec health checks sur `127.0.0.1`.
+
+### Mobile
+- Refonte responsive : drawer repliable, bibliothèque empilée, grilles en colonne unique, lecteur condensé.
+- Corrections de débordement horizontal et de mise en page du player et de la bannière de crédits.
+
+### RGPD
+- Vérification de l'âge et consentement parental pour les moins de 15 ans.
+
+### Éco-conception & architecture
+- Cache par empreinte de contenu pour éviter les appels IA redondants (`DocumentService`).
+- Extraction de l'interface `MusicProvider` (pattern adaptateur, prêt pour plusieurs fournisseurs).
+
+### Tests, docs & CI
+- Tests de la chaîne de génération (suno, mistral, storage, music) et des contrôleurs restants.
+- Dependabot pour les workspaces npm et les GitHub Actions.
+- Documentation : README réel, manuels de déploiement / utilisateur / mise à jour, décisions d'architecture, cahier de recettes.
+
 ## [1.0.0-rc.1] — 2026-07-19
 
 Durcissement de la certification Bloc 2 : sécurité, RGPD, tests, accessibilité, déploiement.
@@ -61,6 +116,10 @@ MVP initial.
 - Génération de musique : fiche de révision via Mistral (PDF ou texte) puis musique via Kie/Suno.
 - Bibliothèque, playlists et amis câblés au backend, quota d'abonnement.
 
+[1.0.0-rc.5]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.5
+[1.0.0-rc.4]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.4
+[1.0.0-rc.3]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.3
+[1.0.0-rc.2]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.2
 [1.0.0-rc.1]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.1
 [0.3.0]: https://github.com/ramenard/study-tune/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ramenard/study-tune/releases/tag/v0.2.0
