@@ -3,7 +3,7 @@
 StudyTune transforme un cours (PDF ou texte libre) en musique de révision. L'utilisateur importe
 un document, l'IA en tire une fiche de révision et des paroles (Mistral), puis génère une chanson
 (Kie.ai / Suno). Les morceaux se rangent dans une bibliothèque et des playlists, se partagent entre
-amis et s'écoutent dans un lecteur intégré.
+amis et s'écoutent dans un lecteur intégré avec paroles synchronisées façon karaoké.
 
 Le projet est un monorepo npm workspaces : une API NestJS et un client Angular indépendants,
 plus l'infrastructure Docker (PostgreSQL, MinIO).

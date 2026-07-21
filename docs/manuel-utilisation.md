@@ -41,6 +41,11 @@ Page **Bibliothèque** : lister, rechercher, renommer, supprimer et télécharge
 Cliquer une piste la lance dans le lecteur en bas d'écran (lecture/pause, position, volume,
 répétition, file d'attente).
 
+Le bouton **paroles** ouvre un panneau karaoké : les paroles défilent et le mot chanté se
+surligne en temps réel, synchronisé à la lecture. Si l'alignement n'est pas encore disponible,
+un bouton **Activer la synchronisation** le récupère. Le panneau reste accessible en version
+mobile via le même bouton dans le lecteur.
+
 ![Bibliothèque](captures/04-bibliotheque.png)
 
 ### 5. Playlists
