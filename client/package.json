@@ -35,7 +35,7 @@
     "@angular-eslint/eslint-plugin-template": "^21.4.0",
     "@angular-eslint/schematics": "^21.4.0",
     "@angular-eslint/template-parser": "^21.4.0",
-    "@angular/build": "^21.2.11",
+    "@angular/build": "^22.0.7",
     "@angular/cli": "^21.2.11",
     "@angular/compiler-cli": "^21.2.0",
     "@tailwindcss/cli": "^4.3.0",
