@@ -3,7 +3,7 @@
 Toutes les évolutions notables du projet. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/),
 versions selon [SemVer](https://semver.org/lang/fr/).
 
-## [Non publié]
+## [1.0.0-rc.6] — 2026-07-23
 
 Modération des entrées.
 
