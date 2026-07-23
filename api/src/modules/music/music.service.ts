@@ -17,6 +17,7 @@ import { Playlist } from '../playlist/entities/playlist.entity';
 import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
 import { SubscriptionService } from '../auth/subscription.service';
+import { ModerationService } from '../moderation/moderation.service';
 import { AlignedWord } from './types/aligned-word';
 
 @Injectable()
@@ -32,6 +33,7 @@ export class MusicService {
     private readonly provider: MusicProvider,
     private readonly storage: StorageService,
     private readonly subscriptionService: SubscriptionService,
+    private readonly moderation: ModerationService,
   ) {}
 
   private async canAccessMusic(music: Music, userId: string): Promise<boolean> {
@@ -56,6 +58,7 @@ export class MusicService {
     dto: CreateMusicDto,
     userId: string,
   ): Promise<{ id: string; taskId: string }> {
+    await this.moderation.assertClean(dto.lyrics, dto.style, dto.title);
     await this.subscriptionService.assertCanGenerate(userId);
 
     const music = await this.musicRepo.save(

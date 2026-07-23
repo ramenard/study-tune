@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { createHash } from 'crypto';
 import { PDFParse } from 'pdf-parse';
 import { MistralService } from './mistral.service';
+import { ModerationService } from '../moderation/moderation.service';
 import { StudySheet } from './entities/study-sheet.entity';
 
 interface SheetContent {
@@ -51,6 +52,7 @@ export class DocumentService {
     private readonly mistral: MistralService,
     @InjectRepository(StudySheet)
     private readonly sheetRepo: Repository<StudySheet>,
+    private readonly moderation: ModerationService,
   ) {}
 
   async process(
@@ -106,6 +108,7 @@ export class DocumentService {
   }
 
   private async generate(source: string): Promise<SheetContent> {
+    await this.moderation.assertClean(source);
     const summary = await this.mistral.generateText(SUMMARY_PROMPT + source);
     const raw = await this.mistral.generateText(LYRICS_PROMPT + summary);
     const { title, lyrics } = this.extractTitleAndLyrics(raw);

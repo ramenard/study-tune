@@ -26,6 +26,7 @@ describe('MusicService', () => {
     assertCanGenerate: jest.Mock;
     consumeGeneration: jest.Mock;
   };
+  let moderation: { assertClean: jest.Mock };
   let service: MusicService;
 
   beforeEach(() => {
@@ -55,16 +56,28 @@ describe('MusicService', () => {
       assertCanGenerate: jest.fn(),
       consumeGeneration: jest.fn(),
     };
+    moderation = { assertClean: jest.fn().mockResolvedValue(undefined) };
     service = new MusicService(
       musicRepo as never,
       playlistRepo as never,
       suno,
       storage as never,
       subscription as never,
+      moderation as never,
     );
   });
 
   describe('generateAndStore', () => {
+    it('moderates the input before checking quota or calling Suno', async () => {
+      moderation.assertClean.mockRejectedValue(new Error('flagged'));
+
+      await expect(
+        service.generateAndStore({ lyrics: 'some lyrics here' }, 'u1'),
+      ).rejects.toThrow('flagged');
+      expect(subscription.assertCanGenerate).not.toHaveBeenCalled();
+      expect(suno.generate).not.toHaveBeenCalled();
+    });
+
     it('checks quota before calling Suno', async () => {
       subscription.assertCanGenerate.mockRejectedValue(new Error('402'));
 

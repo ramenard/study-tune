@@ -10,6 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Music } from './entities/music.entity';
 import { Playlist } from '../playlist/entities/playlist.entity';
 import { AuthModule } from '../auth/auth.module';
+import { ModerationModule } from '../moderation/moderation.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuthModule } from '../auth/auth.module';
     StorageModule,
     TypeOrmModule.forFeature([Music, Playlist]),
     AuthModule,
+    ModerationModule,
   ],
   controllers: [MusicController],
   providers: [

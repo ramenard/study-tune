@@ -4,12 +4,16 @@ jest.mock('pdf-parse', () => ({
   })),
 }));
 
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { DocumentService } from './document.service';
 
 describe('DocumentService', () => {
   let mistral: { generateText: jest.Mock };
   let sheetRepo: { findOne: jest.Mock; create: jest.Mock; save: jest.Mock };
+  let moderation: { assertClean: jest.Mock };
   let service: DocumentService;
 
   beforeEach(() => {
@@ -19,7 +23,12 @@ describe('DocumentService', () => {
       create: jest.fn((v: object) => v),
       save: jest.fn((v: object) => Promise.resolve(v)),
     };
-    service = new DocumentService(mistral as never, sheetRepo as never);
+    moderation = { assertClean: jest.fn().mockResolvedValue(undefined) };
+    service = new DocumentService(
+      mistral as never,
+      sheetRepo as never,
+      moderation as never,
+    );
   });
 
   it('generates and persists a fresh sheet on a cache miss', async () => {
@@ -75,6 +84,17 @@ describe('DocumentService', () => {
     await expect(service.process('user1')).rejects.toBeInstanceOf(
       BadRequestException,
     );
+  });
+
+  it('rejects flagged content before calling the AI', async () => {
+    sheetRepo.findOne.mockResolvedValue(null);
+    moderation.assertClean.mockRejectedValue(new UnprocessableEntityException());
+
+    await expect(service.process('user1', 'contenu interdit')).rejects.toThrow(
+      UnprocessableEntityException,
+    );
+    expect(mistral.generateText).not.toHaveBeenCalled();
+    expect(sheetRepo.save).not.toHaveBeenCalled();
   });
 
   it('processes a pdf through pdf-parse', async () => {
