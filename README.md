@@ -15,7 +15,7 @@ plus l'infrastructure Docker (PostgreSQL, MinIO).
 | Frontend | Angular 21 (standalone, zoneless, signals, OnPush), Material, Tailwind 4, SDK généré (ng-openapi-gen) |
 | Backend | NestJS 11, TypeORM 0.3 + migrations, PostgreSQL, MinIO, JWT, Joi, Terminus, Swagger |
 | Infra | Docker Compose (PostgreSQL 16, MinIO), CI GitHub Actions |
-| IA externes | Mistral (fiche + paroles), Kie.ai / Suno (musique) |
+| IA externes | Mistral (fiche + paroles + modération des entrées), Kie.ai / Suno (musique) |
 
 ## Prérequis
 

@@ -3,6 +3,13 @@
 Toutes les évolutions notables du projet. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/),
 versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [Non publié]
+
+Modération des entrées.
+
+### Sécurité
+- Filtrage du texte soumis par l'utilisateur (contenu de cours, paroles/style/titre) via l'API Moderation de Mistral avant tout appel IA ; contenu nuisible rejeté en `422`, indisponibilité du service en `503` (fail-closed). Catégories `health`, `law` et `financial` exclues pour éviter les faux positifs sur des cours de médecine ou de droit.
+
 ## [1.0.0-rc.5] — 2026-07-21
 
 Paroles karaoké synchronisées.

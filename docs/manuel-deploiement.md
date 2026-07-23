@@ -28,7 +28,7 @@ Copier `api/.env.example` vers `api/.env` et renseigner les valeurs. Validation 
 | `APP_PUBLIC_URL` | non | — | URL publique de l'API pour le callback Kie |
 | `KIE_API_KEY` | non | — | Clé API Kie.ai (génération musique) |
 | `KIE_WEBHOOK_SECRET` | non | — | Secret inclus dans le path du webhook Kie |
-| `MISTRAL_API_KEY` | non | — | Clé Mistral (fiche + paroles) |
+| `MISTRAL_API_KEY` | non | — | Clé Mistral (fiche + paroles + modération des entrées) |
 | `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | non | `localhost` / `5432` / `user` / `password` / `musicdb` | Connexion PostgreSQL |
 | `S3_ENDPOINT` / `S3_PORT` / `S3_USE_SSL` / `S3_REGION` / `S3_PATH_STYLE` | non | `localhost` / `9000` / `false` / `us-east-1` / `true` | Endpoint du stockage objet S3 (MinIO en local, OVH Object Storage en prod) |
 | `S3_ACCESS_KEY` / `S3_SECRET_KEY` / `S3_BUCKET` / `S3_PUBLIC_URL` | non | `minioadmin` / `minioadmin` / `music` / `http://localhost:9000` | Credentials, bucket et URL publique du stockage objet |

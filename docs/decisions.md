@@ -126,11 +126,24 @@ sensible sur le positionnement mineurs (vigilance CNIL sur les transferts de don
 Tant que ces points ne sont pas confirmés, la politique de confidentialité reste sur la formulation
 prudente « soit DPF, soit clauses contractuelles types », juridiquement correcte en l'état.
 
-### Modération du contenu généré
-Annoncée au Bloc 1, non implémentée en V1 : c'est un prérequis à l'ouverture publique (filtrage des
-fiches et paroles générées + signalement utilisateur). Le risque est borné en bêta fermée car le
-contenu provient du **propre cours de l'élève** (pas de contenu tiers arbitraire). Jalon planifié
-avant mise en production ouverte.
+### Modération du contenu soumis (API Mistral Moderation)
+Annoncée au Bloc 1, une première brique est implémentée en V1 : le **texte soumis par
+l'utilisateur** est filtré avant tout traitement via l'**API Moderation de Mistral**
+(`mistral-moderation-latest`). Deux points d'entrée sont couverts (module partagé `moderation`) :
+- le contenu de cours (texte libre ou PDF) avant génération de la fiche (`document.service`) ;
+- les paroles, style et titre avant l'envoi à Kie.ai (`music.service`).
+
+Un contenu signalé au-delà d'un seuil (`0.5`) sur une catégorie **réellement nuisible** — `sexual`,
+`hate_and_discrimination`, `violence_and_threats`, `dangerous_and_criminal_content`, `selfharm` —
+est rejeté en **422** avec la liste des catégories. Les catégories `health`, `law` et `financial`
+sont **volontairement exclues** : sur une app d'étude, un cours de médecine ou de droit les
+déclencherait à tort. En cas d'indisponibilité de l'API de modération, la requête échoue en **503**
+(fail-closed : on ne laisse pas passer de contenu non vérifié). Aucune variable d'environnement
+supplémentaire : la clé `MISTRAL_API_KEY` existante est réutilisée.
+
+**Reste à faire avant l'ouverture publique** : filtrage du contenu *généré* (fiches et paroles en
+sortie d'IA) et signalement utilisateur. Le risque résiduel est borné en bêta fermée car le contenu
+d'entrée provient du **propre cours de l'élève** (pas de contenu tiers arbitraire).
 
 ### Mesure d'impact carbone (CodeCarbon)
 Annoncée en veille au Bloc 1, non outillée en V1. La mesure d'éco-conception **effective** est le
@@ -152,5 +165,5 @@ autour des appels IA) est un jalon ultérieur.
 | Stockage S3 | MinIO en dev / OVH Object Storage en prod, même API | Conforme |
 | Frontend sur Vercel Pro | nginx conteneurisé sur le VPS OVH (même origine, 100 % FR, −20 €/mois) | Écart documenté |
 | Pages légales | Mentions légales + politique de confidentialité publiques | Conforme (identité éditeur à compléter) |
-| Modération du contenu | Non implémentée — service en bêta fermée | Jalon pré-prod |
+| Modération du contenu | Filtrage des entrées via API Mistral Moderation ; sortie générée + signalement à venir | Partiel |
 | Mesure carbone (CodeCarbon) | Non outillée (cache = mesure effective) | Jalon |

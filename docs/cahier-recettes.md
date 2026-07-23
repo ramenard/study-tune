@@ -54,6 +54,7 @@ Les scénarios automatisés du flux d'authentification sont dans `api/test/app.e
 | S-04 | Rate limiting login | — | Rafale de requêtes sur `/api/auth/login` | 429 après 5 requêtes/min | Sécurité | OK (dev)                           | — |
 | S-05 | Accès à la ressource d'un autre utilisateur | Deux comptes | Tenter d'accéder à une musique d'un autre | 403 / 404 | Sécurité | OK (dev)                           | — |
 | S-06 | Mot de passe absent des réponses | Connecté | Lire la réponse de `/api/auth/me` | Aucun champ `password` | Sécurité | OK (auto) `E2E-4`                  | — |
+| S-07 | Modération du contenu soumis | Connecté, `MISTRAL_API_KEY` | Soumettre un cours ou des paroles à contenu nuisible | 422, contenu rejeté avant appel IA, catégories signalées | Sécurité | OK (auto) `moderation.service.spec` | — |
 
 ## Tests structurels
 
@@ -62,7 +63,7 @@ Les scénarios automatisés du flux d'authentification sont dans `api/test/app.e
 | T-01 | Migrations sur base vierge | `npm run migration:run -w api` sur une base neuve | Toutes les migrations s'appliquent, « No migrations pending » au 2ᵉ passage | Structurel | OK (auto) CI | — |
 | T-02 | Healthcheck | `GET /api/health` | `{ status: "ok" }`, connexion TypeORM vérifiée | Structurel | OK (dev) | — |
 | T-03 | Build de production (API + client) | `npm run build` | Les deux builds réussissent | Structurel | OK (auto) CI | — |
-| T-04 | Suite de tests | `npm test -w api`, `npm run test:cov -w api`, `npm run test -w client`, e2e | Tous verts ; couverture API ~84 % statements (seuils tenus), 96 tests unitaires + 8 e2e | Structurel | OK (auto) CI | — |
+| T-04 | Suite de tests | `npm test -w api`, `npm run test:cov -w api`, `npm run test -w client`, e2e | Tous verts ; couverture API ~85 % statements (seuils tenus), 118 tests unitaires + 8 e2e | Structurel | OK (auto) CI | — |
 | T-05 | Stack Docker complète | `docker compose --profile full up --build` | PostgreSQL, MinIO, API et client démarrent ; SPA servie sur `:4200` | Structurel | OK (dev) | — |
 
 ## Synthèse
