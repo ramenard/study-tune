@@ -11,3 +11,7 @@
 		reverse_proxy client:80
 	}
 }
+
+{$STATUS_DOMAIN:status.localhost} {
+	reverse_proxy uptime-kuma:3001
+}

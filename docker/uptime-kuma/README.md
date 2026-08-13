@@ -24,17 +24,22 @@ sous un autre nom, ajuster `networks.proxy.name` en conséquence.
 
 ## Exposition via Caddy
 
-Ajouter ce bloc au `docker/Caddyfile`, puis renseigner `STATUS_DOMAIN` dans
-`.env.prod` (ex. `STATUS_DOMAIN=status.study-tune.fr`) :
+Le bloc est déjà présent dans `docker/Caddyfile` :
 
 ```caddy
-{$STATUS_DOMAIN} {
+{$STATUS_DOMAIN:status.localhost} {
 	reverse_proxy uptime-kuma:3001
 }
 ```
 
-Le même pattern que le site principal (`{$DOMAIN}`) est réutilisé : Caddy obtient
-automatiquement le certificat TLS du sous-domaine.
+Il suffit de renseigner `STATUS_DOMAIN` dans `.env.prod` (ex.
+`STATUS_DOMAIN=status.study-tune.fr`) pour activer le sous-domaine : Caddy obtient
+alors automatiquement le certificat TLS, en réutilisant le pattern du site
+principal (`{$DOMAIN}`).
+
+Sans cette variable, le placeholder retombe sur `status.localhost` (CA interne
+de Caddy, aucun appel Let's Encrypt) : la prod démarre normalement, le statut
+n'est simplement pas exposé publiquement.
 
 ## Monitors à configurer
 
