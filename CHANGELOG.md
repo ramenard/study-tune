@@ -96,6 +96,10 @@ Durcissement de la certification Bloc 2 : sécurité, RGPD, tests, accessibilit�
 ### Nettoyage
 - Suppression des modules `chat` et `gemini` inutilisés et de leur configuration.
 
+### Corrections
+- **B-09** — déconnexion au bout de 15 min après passage aux tokens courts : rafraîchissement automatique de l'access token sur `401` (`4841f81`).
+- **B-10** — piste bloquée en chargement quand MinIO est arrêté (`ECONNREFUSED`) : `restart: unless-stopped` sur les dépendances + rattrapage `/sync` (`0a287e6`). Voir `docs/fiches-anomalies/B-10-minio-econnrefused.md`.
+
 ## [0.3.0] — 2026-07-18
 
 Qualité et modernisation du front.
@@ -104,6 +108,9 @@ Qualité et modernisation du front.
 - `ChangeDetectionStrategy.OnPush` sur tous les composants, `:focus-visible`.
 - Restructuration `core` / `features` / `shared` / `layout` avec alias de chemins.
 - Premiers tests unitaires client et budgets de build réalistes.
+
+### Corrections
+- **B-05** — le mode sombre ne survivait pas au rafraîchissement : `ThemeService` (signal + `localStorage`) (`dfc73df`).
 
 ## [0.2.0] — 2026-07-14
 
@@ -115,6 +122,11 @@ Produit complet côté fonctionnalités.
 - UX de statut de génération (indicateur ambiant, notification par polling + sync).
 - Téléchargement des pistes.
 
+### Corrections
+- **B-03** — le webhook kie n'atteignait jamais l'API : correction du préfixe de path du callback (`14b443f`).
+- **B-04** — pistes bloquées en « génération » quand le webhook est perdu : endpoint `POST /music/:id/sync` (`4b556e3`).
+- **B-07** — échec de lint (échappement inutile dans une regex) (`893b5f7`).
+
 ## [0.1.0] — 2026-07-13
 
 MVP initial.
@@ -122,6 +134,13 @@ MVP initial.
 - Authentification JWT (register / login / profil).
 - Génération de musique : fiche de révision via Mistral (PDF ou texte) puis musique via Kie/Suno.
 - Bibliothèque, playlists et amis câblés au backend, quota d'abonnement.
+
+### Corrections
+- **B-01 / B-02** — le front ne pouvait pas appeler l'API (CORS absent, `provideHttpClient` manquant) (`dc9d18b`).
+- **B-06** — tests client en échec en CI (styles Tailwind manquants) : build Tailwind avant les tests (`90cec3b`).
+- **B-08** — cascade de warnings ESLint `any` bloquant le build : règles assouplies en `warn` (`ca81bac`).
+
+> Synthèse et non-régressions détaillées de toutes les anomalies : `docs/plan-correction-bogues.md`.
 
 [1.0.0-rc.5]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.5
 [1.0.0-rc.4]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.4
