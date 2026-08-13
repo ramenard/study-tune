@@ -88,7 +88,7 @@ jobs:
             cd ~/study-tune
             for attempt in $(seq 1 12); do
               if docker compose -f docker/docker-compose.prod.yml exec -T api \
-                   wget -qO- http://127.0.0.1:3001/api/health | grep -q '"status":"ok"'; then
+                   wget -qO- http://127.0.0.1:3001/api/health/ready | grep -q '"status":"ok"'; then
                 echo "API healthy"
                 exit 0
               fi
