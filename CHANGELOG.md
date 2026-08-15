@@ -3,6 +3,21 @@
 Toutes les évolutions notables du projet. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/),
 versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [1.0.0-rc.7] — 2026-08-15
+
+Supervision et maintien en condition opérationnelle (Bloc 4).
+
+### Supervision
+- Sondes de santé enrichies : `GET /api/health/live` (liveness), `GET /api/health/ready` (readiness : base de données, disque à 90 %, mémoire tas à 300 Mo) et `GET /api/health` (check complet avec ping non bloquant de kie.ai et Mistral, dégradation gracieuse).
+- Healthcheck Docker de l'API sur `liveness` et vérification de `readiness` après déploiement.
+- Stack de supervision externe Uptime Kuma (`docker-compose.monitoring.yml`) exposée via Caddy sur un sous-domaine de statut, et script cron de secours (`scripts/healthcheck-cron.sh`) avec alerte Discord.
+- Documentation du dispositif de supervision (`docs/supervision.md`).
+
+### Gestion des anomalies
+- Template d'issue GitHub, processus de gestion des anomalies de bout en bout et fiche de consignation détaillée (B-10).
+- Traçabilité d'un correctif à travers la chaîne CI/CD (`docs/traitement-anomalie-cicd.md`).
+- Rattachement des anomalies corrigées (B-01 à B-10) aux versions du journal.
+
 ## [1.0.0-rc.6] — 2026-07-23
 
 Modération des entrées.
@@ -142,6 +157,8 @@ MVP initial.
 
 > Synthèse et non-régressions détaillées de toutes les anomalies : `docs/plan-correction-bogues.md`.
 
+[1.0.0-rc.7]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.7
+[1.0.0-rc.6]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.6
 [1.0.0-rc.5]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.5
 [1.0.0-rc.4]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.4
 [1.0.0-rc.3]: https://github.com/ramenard/study-tune/releases/tag/v1.0.0-rc.3
