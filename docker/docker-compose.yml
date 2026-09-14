@@ -30,7 +30,9 @@ services:
       - miniodata:/data
 
   api:
-    build: ../api
+    build:
+      context: ..
+      dockerfile: api/Dockerfile
     restart: unless-stopped
     profiles: ["full"]
     depends_on:
@@ -53,7 +55,8 @@ services:
 
   client:
     build:
-      context: ../client
+      context: ..
+      dockerfile: client/Dockerfile
     restart: unless-stopped
     profiles: ["full"]
     depends_on:
