@@ -39,6 +39,7 @@ import * as Joi from 'joi';
         KIE_API_KEY: Joi.string().optional(),
         KIE_WEBHOOK_SECRET: Joi.string().optional(),
         MISTRAL_API_KEY: Joi.string().optional(),
+        MISTRAL_MODEL: Joi.string().optional(),
         S3_ENDPOINT: Joi.string().optional(),
         S3_PORT: Joi.number().optional(),
         S3_USE_SSL: Joi.boolean().optional(),
