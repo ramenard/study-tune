@@ -3,6 +3,15 @@
 Toutes les évolutions notables du projet. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/),
 versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [1.0.0-rc.9] — 2026-09-14
+
+Fiabilisation de la construction des images Docker.
+
+### Intégration et déploiement
+- Les images API et client sont construites depuis la racine du dépôt et installent leurs dépendances avec `npm ci` à partir du `package-lock.json` des workspaces : les builds deviennent reproductibles.
+- Correction de l'échec de build de l'image client (`npm error Cannot read properties of null (reading 'edgesOut')`) : chaque image résolvait ses dépendances depuis le registre sans lockfile, une publication amont suffisait à casser la résolution des peer dependencies.
+- Ajout d'un `.dockerignore` à la racine (`.git`, `node_modules`, `dist`, `coverage`, `.angular`, fichiers `.env`).
+
 ## [1.0.0-rc.8] — 2026-09-14
 
 Correctif de la génération de fiche en production.
